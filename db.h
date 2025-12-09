@@ -62,13 +62,10 @@ struct char_data *read_mobile(int nr, int type);
 
 #define GREETINGS \
 "\n\r\n\r  \
-                           DikuMUD I (GAMMA 0.0)\n\r\n\r \
-                              Created by\n\r \
-                  Hans Henrik Staerfeldt, Katja Nyboe,\n\r \
-           Tom Madsen, Michael Seifert, and Sebastian Hammer\n\r\n\r"
+Welcome to Korvessa!\n\r\
 
 #define WELC_MESSG \
-"\n\rWelcome to the land of DikuMUD. May your visit here be... Interesting.\
+"\n\rWelcome to the city of Korvessa. May your visit here be... Interesting.\
 \n\r\n\r"
 
 
