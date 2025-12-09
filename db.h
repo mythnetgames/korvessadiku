@@ -62,6 +62,7 @@ struct char_data *read_mobile(int nr, int type);
 
 #define GREETINGS \
 "\n\r\n\rWelcome to Korvessa!\n\r\
+\n\r\n\r"
 
 #define WELC_MESSG \
 "\n\rWelcome to the city of Korvessa. May your visit here be... Interesting.\
