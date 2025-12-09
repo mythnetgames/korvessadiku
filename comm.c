@@ -244,7 +244,8 @@ int game_loop(int s)
 	static struct timeval opt_time;
 	char comm[MAX_INPUT_LENGTH];
 	struct descriptor_data *t, *point, *next_point;
-	int pulse = 0, mask;
+	int pulse = 0;
+	sigset_t mask;
 
 	null_time.tv_sec = 0;
 	null_time.tv_usec = 0;
@@ -256,10 +257,18 @@ int game_loop(int s)
 	maxdesc = s;
 	avail_descs = getdtablesize() - 2; /* !! Change if more needed !! */
 
-	mask = sigmask(SIGUSR1) | sigmask(SIGUSR2) | sigmask(SIGINT) |
-		sigmask(SIGPIPE) | sigmask(SIGALRM) | sigmask(SIGTERM) |
-		sigmask(SIGURG) | sigmask(SIGXCPU) | sigmask(SIGHUP) |
-		sigmask(SIGVTALRM);
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGUSR1);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGPIPE);
+	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGURG);
+	sigaddset(&mask, SIGXCPU);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGVTALRM);
+	sigprocmask(SIG_BLOCK, &mask, NULL);
 
 	/* Main loop */
 	while (!shutting_down)
@@ -303,7 +312,9 @@ int game_loop(int s)
 			exit(1);
 		}
 
-		sigsetmask(0);
+		sigemptyset(&mask);
+		sigprocmask(SIG_SETMASK, &mask, NULL);
+
 
 		/* Respond to whatever might be happening */
 		
@@ -1015,7 +1026,9 @@ void coma(int s)
 			if (load() < 6)
 			{
 				slog("Leaving coma with visitor.");
-				sigsetmask(0);
+				sigemptyset(&mask);
+				sigprocmask(SIG_SETMASK, &mask, NULL);
+
 				return;
 			}
 			if ((conn = new_connection(s)) >= 0)
@@ -1036,7 +1049,9 @@ void coma(int s)
 	while (load() >= 6);
 
 	slog("Leaving coma.");
-	sigsetmask(0);
+	sigemptyset(&mask);
+	sigprocmask(SIG_SETMASK, &mask, NULL);
+
 }
 
 
