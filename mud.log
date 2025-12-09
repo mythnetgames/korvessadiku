@@ -1,0 +1,55 @@
+nohup: ignoring input
+Tue Dec  9 00:17:00 2025 :: Running game on port 4000.
+Tue Dec  9 00:17:00 2025 :: Using lib as data directory.
+Tue Dec  9 00:17:00 2025 :: Signal trapping.
+Tue Dec  9 00:17:00 2025 :: Opening mother connection.
+Tue Dec  9 00:17:00 2025 :: Boot db -- BEGIN.
+Tue Dec  9 00:17:00 2025 :: Resetting the game time:
+Tue Dec  9 00:17:00 2025 ::    Current Gametime: 9H 30D 16M 1040Y.
+Tue Dec  9 00:17:00 2025 :: Reading newsfile, credits, help-page, info and motd.
+Tue Dec  9 00:17:00 2025 :: Opening mobile, object and help files.
+Tue Dec  9 00:17:00 2025 :: Loading zone table.
+Tue Dec  9 00:17:00 2025 :: Loading rooms.
+Tue Dec  9 00:17:00 2025 :: Renumbering rooms.
+Tue Dec  9 00:17:00 2025 :: Generating index tables for mobile and object files.
+Tue Dec  9 00:17:00 2025 :: Renumbering zone table.
+Tue Dec  9 00:17:00 2025 :: Generating player index.
+Tue Dec  9 00:17:00 2025 :: Loading fight messages.
+Tue Dec  9 00:17:00 2025 :: Loading social messages.
+Tue Dec  9 00:17:00 2025 :: Loading pose messages.
+Tue Dec  9 00:17:00 2025 :: Assigning function pointers:
+Tue Dec  9 00:17:00 2025 ::    Mobiles.
+Tue Dec  9 00:17:00 2025 ::    Objects.
+Tue Dec  9 00:17:00 2025 ::    Room.
+Tue Dec  9 00:17:00 2025 ::    Commands.
+Tue Dec  9 00:17:00 2025 ::    Spells.
+Tue Dec  9 00:17:00 2025 :: Updating characters with saved items:
+Performing boot-time reset of LIMBO (rooms 0-3).
+Performing boot-time reset of Northern Midgaard Main City (rooms 4-3099).
+Performing boot-time reset of Southern part of Midgaard (rooms 3100-3199).
+Performing boot-time reset of River of Midgaard (rooms 3200-3299).
+Performing boot-time reset of Buildings in Midgaard (rooms 3300-3399).
+Performing boot-time reset of The Graveyard (rooms 3400-3499).
+Performing boot-time reset of The Graveyard (rooms 3500-3699).
+Performing boot-time reset of Moria level 1-2 (rooms 3700-4099).
+Performing boot-time reset of Moria level 3-4 (rooms 4100-4199).
+Performing boot-time reset of Plains north of City of Midgaard. (rooms 4200-5500).
+Performing boot-time reset of City of Ofcol. (rooms 5501-5550).
+Performing boot-time reset of HAON-DOR-LIGHT (rooms 5551-6099).
+Performing boot-time reset of HAON-DOR-DARK (rooms 6100-6199).
+Performing boot-time reset of QUIFAEL-CUSTOM-ROOMS (rooms 6200-6999).
+Performing boot-time reset of Sewer (rooms 7000-7099).
+Performing boot-time reset of SecondSewer (rooms 7100-7199).
+Performing boot-time reset of SEWERMAZE (rooms 7200-7399).
+Performing boot-time reset of The tunnels (rooms 7400-7799).
+Performing boot-time reset of Redferne's fridge and larder (rooms 7800-7899).
+Performing boot-time reset of Redferne's Residence (rooms 7900-7999).
+Performing boot-time reset of Main matrix (rooms 8000-8099).
+Performing boot-time reset of Main_matrix_auxiliary (rooms 8100-8899).
+Performing boot-time reset of The_holy_grove (rooms 8900-8999).
+Tue Dec  9 00:17:00 2025 :: Boot db -- DONE.
+Tue Dec  9 00:17:00 2025 :: Entering game loop.
+Tue Dec  9 00:17:10 2025 :: Non-Existing MOB[4160] SPEC procedure (mobact.c)
+Tue Dec  9 00:17:10 2025 :: Non-Existing MOB[4160] SPEC procedure (mobact.c)
+Tue Dec  9 00:17:10 2025 :: Non-Existing MOB[4159] SPEC procedure (mobact.c)
+Tue Dec  9 00:17:10 2025 :: Non-Existing MOB[4159] SPEC procedure (mobact.c)
