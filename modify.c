@@ -703,7 +703,7 @@ int load(void)
 		for (i = 1; i < 5; i++)
 			previous[i] = previous[0];
 		p_point = 1;
-		return(previous[0]);
+		return previous[0];
 	}
 	sum = 0;
 	previous[p_point++ % 5] = atoi(info.sl_load1);
