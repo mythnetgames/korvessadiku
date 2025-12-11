@@ -706,11 +706,11 @@ int load(void)
 		return(previous[0]);
 	}
 	sum = 0;
-	previous[p_point++ % 5] = atoi(info.sl_load1);
-	for (i = 0; i < 5; i++)
-		sum += previous[i];
-	return(sum / 5);
-}
+		previous[p_point++ % 5] = atoi(info.sl_load1);
+		for (i = 0; i < 5; i++)
+			sum += previous[i];
+		return(sum / 5);
+	}
 
 char *nogames(void)
 {
