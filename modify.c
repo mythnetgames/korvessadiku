@@ -605,35 +605,32 @@ void check_reboot(void)
 					slog("Reboot is nonempty.");
 
 					/* the script can't handle the signals */
-					sigsetmask(sigmask(SIGUSR1) | sigmask(SIGUSR2) |
-						sigset_t mask;
-						sigemptyset(&mask);
-						sigaddset(&mask, SIGUSR1);
-						sigaddset(&mask, SIGUSR2);
-						sigaddset(&mask, SIGINT);
-						sigaddset(&mask, SIGPIPE);
-						sigaddset(&mask, SIGALRM);
-						sigaddset(&mask, SIGTERM);
-						sigaddset(&mask, SIGURG);
-						sigaddset(&mask, SIGXCPU);
-						sigaddset(&mask, SIGHUP);
-						sigaddset(&mask, SIGVTALRM);
-						sigprocmask(SIG_SETMASK, &mask, NULL);
+					sigset_t mask;
+					sigemptyset(&mask);
+					sigaddset(&mask, SIGUSR1);
+					sigaddset(&mask, SIGUSR2);
+					sigaddset(&mask, SIGINT);
+					sigaddset(&mask, SIGPIPE);
+					sigaddset(&mask, SIGALRM);
+					sigaddset(&mask, SIGTERM);
+					sigaddset(&mask, SIGURG);
+					sigaddset(&mask, SIGXCPU);
+					sigaddset(&mask, SIGHUP);
+					sigaddset(&mask, SIGVTALRM);
+					sigprocmask(SIG_SETMASK, &mask, NULL);
 					if (system("./reboot"))
 					{
 						slog("Reboot script terminated abnormally");
 						send_to_all("The reboot was cancelled.\n\r");
 						system("mv ./reboot reboot.FAILED");
 						fclose(boot);
-						sigsetmask(0);
-							sigemptyset(&mask);
-							sigprocmask(SIG_SETMASK, &mask, NULL);
+						sigemptyset(&mask);
+						sigprocmask(SIG_SETMASK, &mask, NULL);
 					}
 					else
 						system("mv ./reboot reboot.SUCCEEDED");
-					sigsetmask(0);
-						sigemptyset(&mask);
-						sigprocmask(SIG_SETMASK, &mask, NULL);
+					sigemptyset(&mask);
+					sigprocmask(SIG_SETMASK, &mask, NULL);
 
 				send_to_all("Automatic reboot. Come back in a little while.\n\r");
 				shutting_down = reboot = 1;
@@ -649,7 +646,7 @@ void check_reboot(void)
 }
 
 
-#define GR
+// #define GR
 #define NEW
 #ifdef GR
 
@@ -784,7 +781,7 @@ void coma(void)
 
 
 /* emulate the game regulator */
-void gr(int s)
+// void gr(int s)
 {
 	char *txt = 0, buf[1024];
 	int ld = 0;
