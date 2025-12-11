@@ -1,6 +1,19 @@
 /* Korvessa MUD - db.c */
 #include <stdio.h>
 #include "structs.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#include <time.h>
+
+/* Korvessa Character Creation Pipeline Prototypes */
+void set_race(struct char_data *ch, const char *race);
+void set_personality(struct char_data *ch, const char *personality);
+void assign_stats(struct char_data *ch, int str, int dex, int con, int int_, int wis, int cha);
+void buy_skill_group(struct char_data *ch, int domain, int cap);
+void set_standing(struct char_data *ch, int faction, int value);
+void set_background(struct char_data *ch, const char *background);
+void set_public_knowledge(struct char_data *ch, const char *facts);
 /* Korvessa World Restrictions & Low-Magic Rules */
 int can_use_magic(struct char_data *ch) {
 	/* No player magic at launch */
@@ -2410,12 +2423,12 @@ void set_personality(struct char_data *ch, const char *personality) {
 }
 
 void assign_stats(struct char_data *ch, int str, int dex, int con, int int_, int wis, int cha) {
-	GET_STR(ch) = str;
-	GET_DEX(ch) = dex;
-	GET_CON(ch) = con;
-	GET_INT(ch) = int_;
-	GET_WIS(ch) = wis;
-	GET_CHA(ch) = cha;
+	ch->abilities.str = str;
+	ch->abilities.dex = dex;
+	ch->abilities.con = con;
+	ch->abilities.intelligence = int_;
+	ch->abilities.wis = wis;
+	ch->abilities.cha = cha;
 }
 
 void buy_skill_group(struct char_data *ch, int domain, int cap) {
@@ -2462,12 +2475,12 @@ void init_char(struct char_data *ch)
 	for (i = 0; i < MAX_TOUNGE; i++)
 	 ch->player.talks[i] = 0;
 
-	GET_STR(ch) = 9;
-	GET_INT(ch) = 9;
-	GET_WIS(ch) = 9;
-	GET_DEX(ch) = 9;
-	GET_CON(ch) = 9;
-	GET_CHA(ch) = 9;
+	ch->abilities.str = 9;
+	ch->abilities.intelligence = 9;
+	ch->abilities.wis = 9;
+	ch->abilities.dex = 9;
+	ch->abilities.con = 9;
+	ch->abilities.cha = 9;
 
 	/* Korvessa additions */
 	strncpy(ch->personality, "Freehands", sizeof(ch->personality));
