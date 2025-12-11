@@ -1234,7 +1234,7 @@ void roll_abilities(struct char_data *ch)
 
 	switch (GET_CLASS(ch)) {
 		case CLASS_MAGIC_USER: {
-			ch->abilities.intel = table[0];
+						ch->abilities.intelligence = table[0];
 			ch->abilities.wis = table[1];
 			ch->abilities.dex = table[2];
 			ch->abilities.str = table[3];
@@ -1242,7 +1242,7 @@ void roll_abilities(struct char_data *ch)
 		}	break;
 		case CLASS_CLERIC: {
 			ch->abilities.wis = table[0];
-			ch->abilities.intel = table[1];
+						ch->abilities.intelligence = table[1];
 			ch->abilities.str = table[2];
 			ch->abilities.dex = table[3];
 			ch->abilities.con = table[4];
@@ -1251,7 +1251,7 @@ void roll_abilities(struct char_data *ch)
 			ch->abilities.dex = table[0];
 			ch->abilities.str = table[1];
 			ch->abilities.con = table[2];
-			ch->abilities.intel = table[3];
+						ch->abilities.intelligence = table[3];
 			ch->abilities.wis = table[4];
 		} break;
 		case CLASS_WARRIOR: {
@@ -1259,7 +1259,7 @@ void roll_abilities(struct char_data *ch)
 			ch->abilities.dex = table[1];
 			ch->abilities.con = table[2];
 			ch->abilities.wis = table[3];
-			ch->abilities.intel = table[4];
+						ch->abilities.intelligence = table[4];
 			if (ch->abilities.str == 18)
 				ch->abilities.str_add = number(0,100);
 		} break;
@@ -1477,7 +1477,7 @@ void do_restore(struct char_data *ch, char *argument, int cmd)
 
 				if (GET_LEVEL(victim) >= 23) {
 					victim->abilities.str_add = 100;
-					victim->abilities.intel = 25;
+										victim->abilities.intelligence = 25;
 					victim->abilities.wis = 25;
 					victim->abilities.dex = 25;
 					victim->abilities.str = 25;

@@ -99,7 +99,7 @@ void gr(int s);
 
 #define GET_DEX(ch)     ((ch)->tmpabilities.dex)
 
-#define GET_INT(ch)     ((ch)->tmpabilities.intel)
+#define GET_INT(ch)     ((ch)->tmpabilities.intelligence)
 
 #define GET_WIS(ch)     ((ch)->tmpabilities.wis)
 
