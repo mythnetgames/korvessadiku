@@ -643,11 +643,6 @@ void check_reboot(void)
 
 // #define GR
 #define NEW
-#ifdef GR
-
-
-
-
 int workhours()
 {
 	long tc;
@@ -880,5 +875,4 @@ void gr(int s)
 
 
 
-#endif
 // The file ends here
