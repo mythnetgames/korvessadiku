@@ -583,8 +583,9 @@ void night_watchman(void)
 
 	
 void check_reboot(void)
-{
-	long tc;
+	}
+    }
+}
 	struct tm *t_info;
 	char dummy;
 	FILE *boot;
