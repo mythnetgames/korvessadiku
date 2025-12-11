@@ -539,12 +539,13 @@ void damage(struct char_data *ch, struct char_data *victim,
 	if (IS_AFFECTED(ch, AFF_INVISIBLE))
 		appear(ch);
 
-	if (IS_AFFECTED(victim, AFF_SANCTUARY))
-		dam = MIN(dam, 18);  /* Max 18 damage when sanctuary */
-
-	dam=MIN(dam,100);
-
-	dam=MAX(dam,0);
+		/* Korvessa: Reduce damage globally, increase danger, and apply stat modifiers */
+		dam = dam * 85 / 100; /* Reduce damage by 15% */
+		dam += (GET_STR(ch) + GET_DEX(ch)) / 10; /* Stat-based bonus */
+		if (IS_AFFECTED(victim, AFF_SANCTUARY))
+			dam = MIN(dam, 15);  /* Sanctuary: lower max damage */
+		dam = MIN(dam, 80); /* Lower max damage overall */
+		dam = MAX(dam, 0);
 
 	GET_HIT(victim)-=dam;
 
@@ -672,6 +673,17 @@ void damage(struct char_data *ch, struct char_data *victim,
 
 
 void hit(struct char_data *ch, struct char_data *victim, int type)
+	/* Korvessa: Stamina drain and stat-based combat */
+	int stamina_cost = 10; /* Base cost, can be tuned per maneuver */
+	if (ch->stamina < stamina_cost) {
+		send_to_char("You are too exhausted to fight effectively!\n\r", ch);
+		return;
+	}
+	ch->stamina -= stamina_cost;
+
+	/* Stat-based hit chance and damage modifiers */
+	int stat_hit_mod = (GET_DEX(ch) + GET_STR(ch)) / 4;
+	int stat_dam_mod = (GET_STR(ch) + GET_CON(ch)) / 4;
 {
 
 	struct obj_data *wielded = 0;

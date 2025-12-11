@@ -434,10 +434,11 @@ struct char_ability_data
 {
 	sbyte str; 
 	sbyte str_add;      /* 000 - 100 if strength 18             */
-	sbyte intel;
-	sbyte wis; 
-	sbyte dex; 
-	sbyte con; 
+	sbyte dex;
+	sbyte con;
+	sbyte int;          /* Renamed from intel */
+	sbyte wis;
+	sbyte cha;          /* Added for Korvessa */
 };
 
 
@@ -493,6 +494,10 @@ struct char_skill_data
 {
 	byte learned;           /* % chance for success 0 = not learned   */
 	bool recognise;         /* If you can recognise the scroll etc.   */
+	byte domain;            /* Skill domain (Combat, Stealth, etc.)   */
+	byte proficiency_cap;   /* Max proficiency for this skill         */
+	byte learning_rate;     /* Learning rate modifier                 */
+	bool restricted;        /* Access restriction flag                */
 };
 
 
@@ -517,6 +522,8 @@ struct follow_type
 
 /* ================== Structure for player/non-player ===================== */
 struct char_data
+	int daily_xp_gained;                  /* XP gained today */
+	time_t last_xp_reset;                 /* Last XP reset timestamp */
 {
 	sh_int nr;                            /* monster nr (pos in file)      */
 	sh_int in_room;                       /* Location                      */
@@ -525,8 +532,16 @@ struct char_data
 	struct char_ability_data abilities;   /* Abilities                     */
 	struct char_ability_data tmpabilities;/* The abilities we will use     */
 	struct char_point_data points;        /* Points                        */
-	struct char_special_data specials;    /* Special plaing constants      */
+	struct char_special_data specials;    /* Special playing constants      */
 	struct char_skill_data skills[MAX_SKILLS]; /* Skills                   */
+
+	/* Korvessa additions */
+	char personality[20];                 /* Personality archetype         */
+	int standing[8];                      /* Faction standings (Civic_Order, Laborers, Merchants, Nobility, Underbelly, Watcher_Cult, Scholars, Feyliks_Freefolk) */
+	char public_knowledge[256];           /* Public knowledge/facts        */
+	int stamina;                          /* Stamina for combat/actions    */
+	int injury_tier;                      /* Injury tier (0-3)             */
+	int skill_domain_caps[8];             /* Skill proficiency caps by domain */
 
 	struct affected_type *affected;       /* affected by what spells       */
 	struct obj_data *equipment[MAX_WEAR]; /* Equipment array               */
@@ -598,6 +613,14 @@ struct char_file_u
 	struct char_skill_data skills[MAX_SKILLS];
 
 	struct affected_type affected[MAX_AFFECT];
+
+	/* Korvessa additions */
+	char personality[20];                 /* Personality archetype         */
+	int standing[8];                      /* Faction standings             */
+	char public_knowledge[256];           /* Public knowledge/facts        */
+	int stamina;                          /* Stamina for combat/actions    */
+	int injury_tier;                      /* Injury tier (0-3)             */
+	int skill_domain_caps[8];             /* Skill proficiency caps by domain */
 
 	/* specials */
 
