@@ -1,3 +1,7 @@
+#define STAFF_LEVEL 50  /* Adjust as appropriate */
+#define GM_LEVEL 60     /* Adjust as appropriate */
+#define IS_STAFF(ch) (GET_LEVEL(ch) >= STAFF_LEVEL)
+#define IS_GM(ch)    (GET_LEVEL(ch) >= GM_LEVEL)
 int workhours(void);
 int load(void);
 void gr(int s);

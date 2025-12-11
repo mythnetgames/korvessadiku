@@ -1,5 +1,6 @@
 /* Korvessa MUD - db.c */
 #include <stdio.h>
+#include "utils.h"
 #include "structs.h"
 #include <stdio.h>
 #include <string.h>
