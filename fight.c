@@ -536,21 +536,24 @@ void damage(struct char_data *ch, struct char_data *victim,
 	if (victim->master == ch)
 		stop_follower(victim);
 			
-	if (IS_AFFECTED(ch, AFF_INVISIBLE))
+	if (IS_AFFECTED(ch, AFF_INVISIBLE)) {
 		appear(ch);
+	}
 
-		/* Korvessa: Reduce damage globally, increase danger, and apply stat modifiers */
-		dam = dam * 85 / 100; /* Reduce damage by 15% */
-		dam += (GET_STR(ch) + GET_DEX(ch)) / 10; /* Stat-based bonus */
-		if (IS_AFFECTED(victim, AFF_SANCTUARY))
-			dam = MIN(dam, 15);  /* Sanctuary: lower max damage */
-		dam = MIN(dam, 80); /* Lower max damage overall */
-		dam = MAX(dam, 0);
+	/* Korvessa: Reduce damage globally, increase danger, and apply stat modifiers */
+	dam = dam * 85 / 100; /* Reduce damage by 15% */
+	dam += (GET_STR(ch) + GET_DEX(ch)) / 10; /* Stat-based bonus */
+	if (IS_AFFECTED(victim, AFF_SANCTUARY)) {
+		dam = MIN(dam, 15);  /* Sanctuary: lower max damage */
+	}
+	dam = MIN(dam, 80); /* Lower max damage overall */
+	dam = MAX(dam, 0);
 
 	GET_HIT(victim)-=dam;
 
-	if (ch != victim)
+	if (ch != victim) {
 		gain_exp(ch,GET_LEVEL(victim)*dam);
+	}
 
 	update_pos(victim);
 
@@ -636,13 +639,17 @@ void damage(struct char_data *ch, struct char_data *victim,
 		}
 	}
 
-	if (GET_POS(victim) < POSITION_STUNNED)
-		if (ch->specials.fighting == victim)
+	if (GET_POS(victim) < POSITION_STUNNED) {
+		if (ch->specials.fighting == victim) {
 			stop_fighting(ch);
+		}
+	}
 
-	if (!AWAKE(victim))
-		if (victim->specials.fighting)
+	if (!AWAKE(victim)) {
+		if (victim->specials.fighting) {
 			stop_fighting(victim);
+		}
+	}
 
 	if (GET_POS(victim) == POSITION_DEAD) {
 		if (IS_NPC(victim) || victim->desc)
@@ -673,19 +680,11 @@ void damage(struct char_data *ch, struct char_data *victim,
 
 
 void hit(struct char_data *ch, struct char_data *victim, int type)
+{
 	/* Korvessa: Stamina drain and stat-based combat */
 	int stamina_cost = 10; /* Base cost, can be tuned per maneuver */
-	if (ch->stamina < stamina_cost) {
-		send_to_char("You are too exhausted to fight effectively!\n\r", ch);
-		return;
-	}
-	ch->stamina -= stamina_cost;
-
-	/* Stat-based hit chance and damage modifiers */
 	int stat_hit_mod = (GET_DEX(ch) + GET_STR(ch)) / 4;
 	int stat_dam_mod = (GET_STR(ch) + GET_CON(ch)) / 4;
-{
-
 	struct obj_data *wielded = 0;
 	struct obj_data *held = 0;
 	int w_type;
@@ -698,13 +697,20 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
 	extern struct str_app_type str_app[];
 	extern struct dex_app_type dex_app[];
 
+	if (ch->stamina < stamina_cost) {
+		send_to_char("You are too exhausted to fight effectively!\n\r", ch);
+		return;
+	}
+	ch->stamina -= stamina_cost;
+
 	if (ch->in_room != victim->in_room) {
 		slog("NOT SAME ROOM WHEN FIGHTING!");
 		return;
 	}
 
-	if (ch->equipment[HOLD])
+	if (ch->equipment[HOLD]) {
 		held = ch->equipment[HOLD];
+	}
 
 	if (ch->equipment[WIELD] &&
 	   (ch->equipment[WIELD]->obj_flags.type_flag == ITEM_WEAPON)) {
@@ -725,19 +731,20 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
 
 			default : w_type = TYPE_HIT; break;
 		}
-	}	else {
-		if (IS_NPC(ch) && (ch->specials.attack_type >= TYPE_HIT))
+	}   else {
+		if (IS_NPC(ch) && (ch->specials.attack_type >= TYPE_HIT)) {
 			w_type = ch->specials.attack_type;
-		else
+		} else {
 			w_type = TYPE_HIT;
+		}
 	}
 
 	/* Calculate the raw armor including magic armor */
 	/* The lower AC, the better                      */
 
-	if (!IS_NPC(ch))
+	if (!IS_NPC(ch)) {
 		calc_thaco  = thaco[GET_CLASS(ch)-1][GET_LEVEL(ch)];
-	else
+	} else {
 		/* THAC0 for monsters is set in the HitRoll */
 		calc_thaco = 20;
 
