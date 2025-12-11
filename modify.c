@@ -606,10 +606,19 @@ void check_reboot(void)
 
 					/* the script can't handle the signals */
 					sigsetmask(sigmask(SIGUSR1) | sigmask(SIGUSR2) |
-					sigmask(SIGINT) |	sigmask(SIGPIPE) | sigmask(SIGALRM) |
-					sigmask(SIGTERM) | sigmask(SIGURG) | sigmask(SIGXCPU) |
-					sigmask(SIGHUP) |	sigmask(SIGVTALRM));
-
+						sigset_t mask;
+						sigemptyset(&mask);
+						sigaddset(&mask, SIGUSR1);
+						sigaddset(&mask, SIGUSR2);
+						sigaddset(&mask, SIGINT);
+						sigaddset(&mask, SIGPIPE);
+						sigaddset(&mask, SIGALRM);
+						sigaddset(&mask, SIGTERM);
+						sigaddset(&mask, SIGURG);
+						sigaddset(&mask, SIGXCPU);
+						sigaddset(&mask, SIGHUP);
+						sigaddset(&mask, SIGVTALRM);
+						sigprocmask(SIG_SETMASK, &mask, NULL);
 					if (system("./reboot"))
 					{
 						slog("Reboot script terminated abnormally");
@@ -617,12 +626,14 @@ void check_reboot(void)
 						system("mv ./reboot reboot.FAILED");
 						fclose(boot);
 						sigsetmask(0);
-						return;
+							sigemptyset(&mask);
+							sigprocmask(SIG_SETMASK, &mask, NULL);
 					}
 					else
 						system("mv ./reboot reboot.SUCCEEDED");
 					sigsetmask(0);
-				}
+						sigemptyset(&mask);
+						sigprocmask(SIG_SETMASK, &mask, NULL);
 
 				send_to_all("Automatic reboot. Come back in a little while.\n\r");
 				shutting_down = reboot = 1;
