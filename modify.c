@@ -639,9 +639,6 @@ void check_reboot(void)
 	}
 }
 // ...existing code...
-	}
-	return previous[p_point++ % 5];
-}
 
 
 // #define GR
