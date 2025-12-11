@@ -509,7 +509,7 @@ void do_set(struct char_data *ch, char *argument, int cmd)
 				}
 				slog(buf2);
 				/* set original INT of victim */
-				vict->abilities.intel = value;
+								vict->abilities.intelligence = value;
 			}
 			break;
 			case 9: /* wis */
