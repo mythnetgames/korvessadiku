@@ -1,7 +1,7 @@
-#include <stdbool.h>
+/* structs.h - Central data structures for Korvessa MUD */
 #ifndef STRUCTS_H
 #define STRUCTS_H
-#endif /* STRUCTS_H */
+#include <stdbool.h>
 /* ************************************************************************
 *  file: structs.h , Structures        .                  Part of DIKUMUD *
 *  Usage: Declarations of central data structures                         *
@@ -803,3 +803,5 @@ struct con_app_type
 	sh_int hitp;
 	sh_int shock;
 };
+
+#endif /* STRUCTS_H */

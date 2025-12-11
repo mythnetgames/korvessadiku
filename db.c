@@ -1,3 +1,5 @@
+/* Korvessa MUD - db.c */
+#include <stdio.h>
 #include "structs.h"
 /* Korvessa World Restrictions & Low-Magic Rules */
 int can_use_magic(struct char_data *ch) {
