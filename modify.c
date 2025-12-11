@@ -699,87 +699,29 @@ int load(void)
 	}
 	fclose(fl);
 
-	if (p_point < 0)
-	{
 		previous[0] = atoi(info.sl_load1);
 		for (i = 1; i< 5; i++)
 			previous[i] = previous[0];
 		p_point = 1;
 		return(previous[0]);
-{
-	long tc;
-	struct tm *t_info;
-	char dummy;
-	FILE *boot;
-
-	extern int shutting_down, reboot;
-
-	tc = time(0);
-	t_info = localtime(&tc);
-
-	if ((t_info->tm_hour + 1) == REBOOT_AT && t_info->tm_min > 30)
-		if ((boot = fopen("./reboot", "r")))
-		{
-			if (t_info->tm_min > 50)
-			{
-				slog("Reboot exists.");
-				fread(&dummy, sizeof(dummy), 1, boot);
-				if (!feof(boot))   /* the file is nonempty */
-				{
-					slog("Reboot is nonempty.");
-
-					/* the script can't handle the signals */
-					sigset_t mask;
-					sigemptyset(&mask);
-					sigaddset(&mask, SIGUSR1);
-					sigaddset(&mask, SIGUSR2);
-					sigaddset(&mask, SIGINT);
-					sigaddset(&mask, SIGPIPE);
-					sigaddset(&mask, SIGALRM);
-					sigaddset(&mask, SIGTERM);
-					sigaddset(&mask, SIGURG);
-					sigaddset(&mask, SIGXCPU);
-					sigaddset(&mask, SIGHUP);
-					sigaddset(&mask, SIGVTALRM);
-					sigprocmask(SIG_SETMASK, &mask, NULL);
-					if (system("./reboot"))
-					{
-						slog("Reboot script terminated abnormally");
-						send_to_all("The reboot was cancelled.\n\r");
-						system("mv ./reboot reboot.FAILED");
-						fclose(boot);
-						sigemptyset(&mask);
-						sigprocmask(SIG_SETMASK, &mask, NULL);
-					}
-					else
-						system("mv ./reboot reboot.SUCCEEDED");
-					sigemptyset(&mask);
-					sigprocmask(SIG_SETMASK, &mask, NULL);
-
-					send_to_all("Automatic reboot. Come back in a little while.\n\r");
-					shutting_down = reboot = 1;
-				}
-			}
-			else if (t_info->tm_min > 40)
-				send_to_all("ATTENTION: DikuMUD will reboot in 10 minutes.\n\r");
-			else if (t_info->tm_min > 30)
-				send_to_all("Warning: The game will close and reboot in 20 minutes.\n\r");
-
-			fclose(boot);
-		}
-
+	}
+	sum = 0;
+	previous[p_point++ % 5] = atoi(info.sl_load1);
+	for (i = 0; i < 5; i++)
+		sum += previous[i];
+	return(sum / 5);
+}
 
 char *nogames(void)
 {
 	static char text[200];
 	FILE *fl;
-
-	if (fl = fopen("lib/nogames", "r"))
+	if ((fl = fopen("lib/nogames", "r")))
 	{
 		slog("/usr/games/nogames exists");
 		fgets(text, 200-1, fl);
-		return(text);
 		fclose(fl);
+		return(text);
 	}
 	else
 		return(0);
