@@ -699,17 +699,19 @@ int load(void)
 	}
 	fclose(fl);
 
-		previous[0] = atoi(info.sl_load1);
-		for (i = 1; i < 5; i++)
-			previous[i] = previous[0];
-		p_point = 1;
-		return previous[0];
-	}
-	sum = 0;
-	previous[p_point++ % 5] = atoi(info.sl_load1);
-	for (i = 0; i < 5; i++)
-		sum += previous[i];
-	return(sum / 5);
+		if (p_point == -1) {
+			previous[0] = atoi(info.sl_load1);
+			for (i = 1; i < 5; i++)
+				previous[i] = previous[0];
+			p_point = 1;
+			return previous[0];
+		} else {
+			sum = 0;
+			previous[p_point++ % 5] = atoi(info.sl_load1);
+			for (i = 0; i < 5; i++)
+				sum += previous[i];
+			return(sum / 5);
+		}
 }
 
 char *nogames(void)
