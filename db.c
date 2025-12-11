@@ -39,6 +39,10 @@ void attempt_high_tier_power(struct char_data *ch) {
 }
 /* Sample interactive character creation for Korvessa */
 #include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#include <time.h>
+#include "structs.h"
 
 void korvessa_character_creation(struct char_data *ch) {
 	char input[128];
@@ -1223,7 +1227,7 @@ struct char_data *read_mobile(int nr, int type)
 	if (letter == 'S') {
 		/* The new easy monsters */
 		mob->abilities.str   = 11;
-		mob->abilities.intel = 11; 
+		mob->abilities.intelligence = 11; 
 		mob->abilities.wis   = 11;
 		mob->abilities.dex   = 11;
 		mob->abilities.con   = 11;
@@ -1287,7 +1291,7 @@ struct char_data *read_mobile(int nr, int type)
 		mob->abilities.str = tmp;
 
 		fscanf(mob_f, " %ld ", &tmp);
-		mob->abilities.intel = tmp; 
+		mob->abilities.intelligence = tmp; 
 
 		fscanf(mob_f, " %ld ", &tmp);
 		mob->abilities.wis = tmp;
