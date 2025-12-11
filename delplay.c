@@ -63,7 +63,7 @@ void del(char *filename, int name)
 int main(int argc, char **argv)
 {
 	if (argc != 3)
-		puts("Usage: delplay <DikuMUD player filename> <Player Number>");
+		puts("Usage: delplay <KorvessaRPI player filename> <Player Number>");
 	else {
 		if (atoi(argv[2]) < 1)
 			puts("Illegal player number, must be >= 1");

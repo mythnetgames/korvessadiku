@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file: act.other.c , Implementation of commands.        Part of DIKUMUD *
+*  file: act.other.c , Implementation of commands.        Part of KorvessaRPI *
 *  Usage : Other commands.                                                *
 *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
 ************************************************************************* */

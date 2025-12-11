@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file: signals.c , trapping of signals from Unix.       Part of DIKUMUD *
+*  file: signals.c , trapping of signals from Unix.       Part of KorvessaRPI *
 *  Usage : Signal Trapping.                                               *
 *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
 ************************************************************************* */

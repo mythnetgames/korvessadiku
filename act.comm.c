@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file: act.comm.c , Implementation of commands.         Part of DIKUMUD *
+*  file: act.comm.c , Implementation of commands.         Part of KorvessaRPI *
 *  Usage : Communication.                                                 *
 *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
 ************************************************************************* */

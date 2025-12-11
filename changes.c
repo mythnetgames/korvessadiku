@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file: changes.c , Implementation of new commands.      Part of DIKUMUD *
+*  file: changes.c , Implementation of new commands.      Part of KorvessaRPI *
 *  Usage : New commands while new datastructures are developed.           *
 *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
 ************************************************************************* */

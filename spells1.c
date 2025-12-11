@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file: spells1.c , handling of magic.                   Part of DIKUMUD *
+*  file: spells1.c , handling of magic.                   Part of KorvessaRPI *
 *  Usage : Procedures handling all offensive magic.                       *
 *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
 ************************************************************************* */

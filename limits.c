@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file: limits.c , Limit and gain control module.        Part of DIKUMUD *
+*  file: limits.c , Limit and gain control module.        Part of KorvessaRPI *
 *  Usage: Procedures controling gain and limit.                           *
 *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
 ************************************************************************* */

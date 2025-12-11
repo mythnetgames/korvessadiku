@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file: utility.c, Utility module.                       Part of DIKUMUD *
+*  file: utility.c, Utility module.                       Part of KorvessaRPI *
 *  Usage: Utility procedures                                              *
 *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
 ************************************************************************* */

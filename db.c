@@ -260,7 +260,7 @@ int spend_xp(struct char_data *ch, int amount) {
 	return amount;
 }
 /**************************************************************************
-*  file: db.c , Database module.                          Part of DIKUMUD *
+*  file: db.c , Database module.                          Part of KorvessaRPI *
 *  Usage: Loading/Saving chars, booting world, resetting etc.             *
 *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
 ***************************************************************************/

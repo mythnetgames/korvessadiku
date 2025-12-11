@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file: spec_procs.c , Special module.                   Part of DIKUMUD *
+*  file: spec_procs.c , Special module.                   Part of KorvessaRPI *
 *  Usage: Procedures handling special procedures for object/room/mobile   *
 *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
 ************************************************************************* */

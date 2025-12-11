@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file: act.social.c , Implementation of commands.       Part of DIKUMUD *
+*  file: act.social.c , Implementation of commands.       Part of KorvessaRPI *
 *  Usage : Social commands.                                               *
 *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
 ************************************************************************* */

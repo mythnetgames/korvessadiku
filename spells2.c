@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file: spells2.c , Implementation of magic.             Part of DIKUMUD *
+*  file: spells2.c , Implementation of magic.             Part of KorvessaRPI *
 *  Usage : All the non-offensive magic handling routines.                 *
 *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
 ************************************************************************* */

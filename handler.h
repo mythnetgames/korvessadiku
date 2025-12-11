@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file: handler.h , Handler module.                      Part of DIKUMUD *
+*  file: handler.h , Handler module.                      Part of KorvessaRPI *
 *  Usage: Various routines for moving about objects/players               *
 ************************************************************************* */
 

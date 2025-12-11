@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file: spells.h , Implementation of magic spells.       Part of DIKUMUD *
+*  file: spells.h , Implementation of magic spells.       Part of KorvessaRPI *
 *  Usage : Spells                                                         *
 ************************************************************************* */
 

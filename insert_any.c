@@ -1,6 +1,6 @@
 /**************************************************************************
-*  File: insert_any.c                                     Part of DikuMud *
-*  Usage: Merges DikuMud wld/obj/mob/zon files                            *
+*  File: insert_any.c                                     Part of KorvessaRPI *
+*  Usage: Merges KorvessaRPI wld/obj/mob/zon files                        *
 *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
 ***************************************************************************/
 

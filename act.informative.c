@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file: act.informative.c , Implementation of commands.  Part of DIKUMUD *
+*  file: act.informative.c , Implementation of commands.  Part of KorvessaRPI *
 *  Usage : Informative commands.                                          *
 *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
 ************************************************************************* */

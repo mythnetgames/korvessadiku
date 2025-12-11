@@ -1,5 +1,5 @@
 /* ************************************************************************
-*  file: magic.c , Implementation of spells.              Part of DIKUMUD *
+*  file: magic.c , Implementation of spells.              Part of KorvessaRPI *
 *  Usage : The actual effect of magic.                                    *
 *  Copyright (C) 1990, 1991 - see 'license.doc' for complete information. *
 ************************************************************************* */

@@ -24,7 +24,7 @@ void list(char *filename);
 main(int argc, char **argv)
 {
 	if (argc != 2)
-		fprintf(stderr, "Usage: %s <DikuMUD playerfile-name>\n", argv[0]);
+			   fprintf(stderr, "Usage: %s <KorvessaRPI playerfile-name>\n", argv[0]);
 	else
 		list(argv[1]);
 }
