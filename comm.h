@@ -1,3 +1,12 @@
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void perform_violence(void);
+
+#ifdef __cplusplus
+}
+#endif
 /* ************************************************************************
 *  file: comm.h , Communication module.                   Part of DIKUMUD *
 *  Usage: Prototypes for the common functions in comm.c                   *
