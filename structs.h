@@ -1,3 +1,6 @@
+#ifndef STRUCTS_H
+#define STRUCTS_H
+#endif /* STRUCTS_H */
 /* ************************************************************************
 *  file: structs.h , Structures        .                  Part of DIKUMUD *
 *  Usage: Declarations of central data structures                         *
