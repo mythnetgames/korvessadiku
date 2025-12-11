@@ -639,6 +639,9 @@ void check_reboot(void)
 	}
 }
 // ...existing code...
+	}
+	return previous[p_point++ % 5];
+}
 
 
 // #define GR
@@ -817,7 +820,7 @@ void coma(void)
 
 
 /* emulate the game regulator */
-void gr(int s)
+void gr(int s) __attribute__((unused))
 {
 	char *txt = 0, buf[1024];
 	int ld = 0;
