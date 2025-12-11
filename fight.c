@@ -802,7 +802,7 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
 
 
 /* control the fights going on */
-static void perform_violence(void)
+void perform_violence(void)
 {
 	struct char_data *ch;
 
