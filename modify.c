@@ -762,7 +762,7 @@ void coma(void)
 
 
 /* emulate the game regulator */
-void gr(int s) __attribute__((unused))
+void gr(int s)
 {
 	char *txt = 0, buf[1024];
 	int ld = 0;
