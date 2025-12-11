@@ -522,9 +522,9 @@ struct follow_type
 
 /* ================== Structure for player/non-player ===================== */
 struct char_data
-	int daily_xp_gained;                  /* XP gained today */
-	time_t last_xp_reset;                 /* Last XP reset timestamp */
-{
+	{
+		int daily_xp_gained;                  /* XP gained today */
+		time_t last_xp_reset;                  /* Last XP reset timestamp */
 	sh_int nr;                            /* monster nr (pos in file)      */
 	sh_int in_room;                       /* Location                      */
 
