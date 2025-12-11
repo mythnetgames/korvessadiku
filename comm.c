@@ -297,7 +297,7 @@ int game_loop(int s)
 			last_time.tv_sec++;
 		}
 
-		sigsetmask(mask);
+		sigprocmask(SIG_SETMASK, &mask, NULL);
 
 		if (select(maxdesc + 1, &input_set, &output_set, &exc_set, &null_time) 
 			< 0)
@@ -1004,10 +1004,19 @@ void coma(int s)
 
 	slog("Entering comatose state.");
 
-	sigsetmask(sigmask(SIGUSR1) | sigmask(SIGUSR2) | sigmask(SIGINT) |
-		sigmask(SIGPIPE) | sigmask(SIGALRM) | sigmask(SIGTERM) |
-		sigmask(SIGURG) | sigmask(SIGXCPU) | sigmask(SIGHUP) |
-		sigmask(SIGVTALRM));
+	sigset_t mask;
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGUSR1);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGPIPE);
+	sigaddset(&mask, SIGALRM);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGURG);
+	sigaddset(&mask, SIGXCPU);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGVTALRM);
+	sigprocmask(SIG_SETMASK, &mask, NULL);
 
 	while (descriptor_list)
 		close_socket(descriptor_list);
