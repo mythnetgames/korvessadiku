@@ -13,7 +13,6 @@ typedef signed char sbyte;
 typedef unsigned char ubyte;
 typedef signed short int sh_int;
 typedef unsigned short int ush_int;
-typedef char bool;
 typedef char byte;
 
 #define PULSE_ZONE     240

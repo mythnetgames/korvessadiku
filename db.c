@@ -1,3 +1,4 @@
+#include "structs.h"
 /* Korvessa World Restrictions & Low-Magic Rules */
 int can_use_magic(struct char_data *ch) {
 	/* No player magic at launch */
@@ -67,7 +68,7 @@ void korvessa_character_creation(struct char_data *ch) {
 	printf("%s%s==============================%s\n", BOLD, HEADER, RESET);
 	printf("%sWelcome to Korvessa!%s\n", BOLD, RESET);
 	printf("%sLet's create your character.%s\n", INFO, RESET);
-	printf("%s==============================%s\n\n", BOLD, HEADER, RESET);
+	printf("%s==============================%s%s\n\n", BOLD, HEADER, RESET);
 
 	/* Race selection */
 	printf("%s%s[Step 1] Race Selection%s\n", BOLD, STEP, RESET);
@@ -233,14 +234,14 @@ int gain_xp(struct char_data *ch, int amount) {
 	int can_gain = KORVESSA_DAILY_XP_CAP - ch->daily_xp_gained;
 	if (can_gain <= 0) return 0;
 	int to_gain = (amount > can_gain) ? can_gain : amount;
-	ch->exp += to_gain;
+	ch->points.exp += to_gain;
 	ch->daily_xp_gained += to_gain;
 	return to_gain;
 }
 
 int spend_xp(struct char_data *ch, int amount) {
-	if (ch->exp < amount) return 0;
-	ch->exp -= amount;
+	if (ch->points.exp < amount) return 0;
+	ch->points.exp -= amount;
 	return amount;
 }
 /**************************************************************************
