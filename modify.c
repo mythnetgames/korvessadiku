@@ -571,11 +571,11 @@ void night_watchman(void)
 		if (t_info->tm_min > 50)
 		{
 			slog("Leaving the scene for the serious folks.");
-			send_to_all("Closing down. Thank you for flying DikuMUD.\n\r");
+			send_to_all("Closing down. Thank you for flying KorvessaRPI.\n\r");
 			shutting_down = 1;
 		}
 		else if (t_info->tm_min > 40)
-			send_to_all("ATTENTION: DikuMUD will shut down in 10 minutes.\n\r");
+			send_to_all("ATTENTION: KorvessaRPI will shut down in 10 minutes.\n\r");
 		else if (t_info->tm_min > 30)
 			send_to_all("Warning: The game will close in 20 minutes.\n\r");
 	}
