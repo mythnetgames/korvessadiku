@@ -2400,8 +2400,6 @@ void clear_object(struct obj_data *obj)
 
 
 
-/* initialize a new character only if class is set */
-void init_char(struct char_data *ch)
 /* Korvessa Character Creation Pipeline */
 void set_race(struct char_data *ch, const char *race) {
 	strncpy(ch->player.short_descr, race, 20);
@@ -2435,6 +2433,9 @@ void set_background(struct char_data *ch, const char *background) {
 void set_public_knowledge(struct char_data *ch, const char *facts) {
 	strncpy(ch->public_knowledge, facts, sizeof(ch->public_knowledge));
 }
+
+/* initialize a new character only if class is set */
+void init_char(struct char_data *ch)
 {
 	int i;
 
