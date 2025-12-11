@@ -644,7 +644,7 @@ void check_reboot(void)
 
 			fclose(boot);
 		}
-}
+// ...existing code...
 
 
 // #define GR
