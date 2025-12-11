@@ -436,7 +436,7 @@ struct char_ability_data
 	sbyte str_add;      /* 000 - 100 if strength 18             */
 	sbyte dex;
 	sbyte con;
-	sbyte int;          /* Renamed from intel */
+	sbyte intelligence; /* Renamed from intel */
 	sbyte wis;
 	sbyte cha;          /* Added for Korvessa */
 };
