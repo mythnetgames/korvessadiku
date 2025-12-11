@@ -1,3 +1,6 @@
+int workhours(void);
+int load(void);
+void gr(int s);
 /* ************************************************************************
 *  file: utils.h, Utility module.                         Part of DIKUMUD *
 *  Usage: Utility macros                                                  *

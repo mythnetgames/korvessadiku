@@ -822,7 +822,7 @@ void coma(void)
 
 
 /* emulate the game regulator */
-// void gr(int s)
+void gr(int s)
 {
 	char *txt = 0, buf[1024];
 	int ld = 0;

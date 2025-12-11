@@ -28,6 +28,7 @@ struct obj_data  *object_list = 0;    /* the global linked list of obj's */
 struct char_data *character_list = 0; /* global l-list of chars          */
 
 struct zone_data *zone_table;         /* table of reset data             */
+struct reset_q_type reset_q;
 int top_of_zone_table = 0;
 struct message_list fight_messages[MAX_MESSAGES]; /* fighting messages   */
 struct player_index_element *player_table = 0; /* index to player file   */
