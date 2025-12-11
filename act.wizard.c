@@ -1329,7 +1329,7 @@ void do_advance(struct char_data *ch, char *argument, int cmd)
 {
 	struct char_data *victim;
 	char name[100], level[100], buf[240];
-	int adv, newlevel;
+	int adv, newlevel = 0;
 
 	void gain_exp(struct char_data *ch, int gain);
 
