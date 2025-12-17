@@ -513,12 +513,12 @@ struct timeval timediff(struct timeval *a, struct timeval *b)
 
 	tmp = *a;
 
-	if ((rslt.tv_usec = tmp.tv_usec - b->tv_usec) < 0)
+	if (((rslt.tv_usec = tmp.tv_usec - b->tv_usec)) < 0)
 	{
 		rslt.tv_usec += 1000000;
 		--(tmp.tv_sec);
 	}
-	if ((rslt.tv_sec = tmp.tv_sec - b->tv_sec) < 0)
+	if (((rslt.tv_sec = tmp.tv_sec - b->tv_sec)) < 0)
 	{
 		rslt.tv_usec = 0;
 		rslt.tv_sec =0;
@@ -616,7 +616,7 @@ int new_connection(int s)
 	getsockname(s, (struct sockaddr *) &isa, &i);
 
 
-	if ((t = accept(s, (struct sockaddr *) &isa, &i)) < 0)
+	if (((t = accept(s, (struct sockaddr *) &isa, &i)) < 0))
 	{
 		perror("Accept");
 		return(-1);
@@ -651,7 +651,7 @@ int new_descriptor(int s)
 	struct hostent *from;
 	char buf[10];
 
-	if ((desc = new_connection(s)) < 0)
+	if (((desc = new_connection(s)) < 0))
 		return (-1);
 
 	if (wizlock)
@@ -1040,7 +1040,7 @@ void coma(int s)
 
 				return;
 			}
-			if ((conn = new_connection(s)) >= 0)
+			   if (((conn = new_connection(s)) >= 0))
 			{
 				write_to_descriptor(conn, COMA_SIGN);
 				sleep(2);
@@ -1110,7 +1110,7 @@ void send_to_except(char *messg, struct char_data *ch)
 
 	if (messg)
 		for (i = descriptor_list; i; i = i->next)
-			if (ch->desc != i && !i->connected)
+			   if (ch->desc != i && !(i->connected))
 				write_to_q(messg, &i->output);
 }
 

@@ -56,7 +56,7 @@ main(int argc, char **argv)
 		}
 		strcat(txt, buf);
 	}
-	if ((port = atoi(argv[2])) <= 1024)
+	if (((port = atoi(argv[2])) <= 1024))
 	{
 		fputs("Illegal port #\n", stderr);
 		exit(1);
@@ -94,7 +94,7 @@ void wave(int sock, char *text)
 {
 	int s;
 
-	if ((s = new_connection(sock)) < 0)
+	if (((s = new_connection(sock)) < 0))
 		return;
 
 	write_to_descriptor(s, text);
@@ -116,7 +116,7 @@ int new_connection(int s)
 	getsockname(s, &isa, &i);
 
 
-	if ((t = accept(s, &isa, &i)) < 0)
+	if (((t = accept(s, &isa, &i)) < 0))
 	{
 		perror("Accept");
 		return(-1);
