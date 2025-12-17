@@ -82,9 +82,11 @@ void cast_call_lightning( byte level, struct char_data *ch, char *arg, int type,
 			break;
       case SPELL_TYPE_SCROLL:
 			if (OUTSIDE(ch) && (weather_info.sky>=SKY_RAINING)) {
-				if(victim) 
-					spell_call_lightning(level, ch, victim, 0);
-				else if(!tar_obj) spell_call_lightning(level, ch, ch, 0);
+        if(victim) {
+          spell_call_lightning(level, ch, victim, 0);
+        } else if(!tar_obj) {
+          spell_call_lightning(level, ch, ch, 0);
+        }
 			}
 			break;
       case SPELL_TYPE_STAFF:
@@ -138,10 +140,11 @@ void cast_colour_spray( byte level, struct char_data *ch, char *arg, int type,
 			spell_colour_spray(level, ch, victim, 0);
          break; 
     case SPELL_TYPE_SCROLL:
-         if(victim) 
-            spell_colour_spray(level, ch, victim, 0);
-         else if (!tar_obj)
-				spell_colour_spray(level, ch, ch, 0);
+        if(victim) {
+          spell_colour_spray(level, ch, victim, 0);
+        } else if (!tar_obj) {
+  				spell_colour_spray(level, ch, ch, 0);
+        }
          break;
     case SPELL_TYPE_WAND:
          if(victim) 

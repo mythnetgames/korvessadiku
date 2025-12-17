@@ -16,7 +16,7 @@ void del(char *filename, int name)
 	int pos, num;
 	long end;
 
-	if (!(fl = fopen(filename, "r+")))
+	if (!((fl = fopen(filename, "r+"))))
 	{
 		perror("list");
 		exit(1);

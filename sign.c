@@ -38,11 +38,11 @@ main(int argc, char **argv)
 		fl = stdin;
 		puts("Input text (terminate with ^D)");
 	}
-	else if (!(fl = fopen(argv[1], "r")))
-	{
-		perror(argv[1]);
-		exit(1);
-	}
+    else if (!((fl = fopen(argv[1], "r"))))
+    {
+        perror(argv[1]);
+        exit(1);
+    }
 	for (;;)
 	{
 		fgets(buf, 81, fl);

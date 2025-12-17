@@ -13,12 +13,12 @@ main(int argc, char **argv)
 	if (argc != 4) {
 		fprintf(stderr, "Usage: %s source target ulit\n", argv[0]);
 		exit (0);
-	} else if (!(src = fopen(argv[1], "rb")))
+	} else if (!((src = fopen(argv[1], "rb"))))
 		fprintf(stderr, "%s: Could not open.\n", argv[1]);
-	else if (!(trg = fopen(argv[2], "rb")))
+	else if (!((trg = fopen(argv[2], "rb"))))
 		fprintf(stderr, "%s: Could not open.\n", argv[2]);
-	else if (!(out = fopen(argv[3], "wb")))
-      fprintf(stderr, "%s: Could not open.\n", argv[3]);
+	else if (!((out = fopen(argv[3], "wb"))))
+		fprintf(stderr, "%s: Could not open.\n", argv[3]);
    else
 		do_it(src, trg, out);
 

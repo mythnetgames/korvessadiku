@@ -279,10 +279,11 @@ void cast_control_weather( byte level, struct char_data *ch, char *arg, int type
 				return;
 			}
 
-			if(!strcasecmp("better",buffer))
-				weather_info.change+=(dice(((level)/3),4));
-			else
-				weather_info.change-=(dice(((level)/3),4)); 
+      if(!strcasecmp("better",buffer)) {
+        weather_info.change+=(dice(((level)/3),4));
+      } else {
+        weather_info.change-=(dice(((level)/3),4)); 
+      }
 			break;
       default :
 	      slog("Serious screw-up in control weather!");
@@ -641,15 +642,17 @@ void cast_invisibility( byte level, struct char_data *ch, char *arg, int type,
   switch (type) {
     case SPELL_TYPE_SPELL:
 			if (tar_obj) {
-				if ( IS_SET(tar_obj->obj_flags.extra_flags, ITEM_INVISIBLE) )
-					send_to_char("Nothing new seems to happen.\n\r", ch);
-				else
-					spell_invisibility(level, ch, 0, tar_obj);
+        if ( IS_SET(tar_obj->obj_flags.extra_flags, ITEM_INVISIBLE) ) {
+          send_to_char("Nothing new seems to happen.\n\r", ch);
+        } else {
+          spell_invisibility(level, ch, 0, tar_obj);
+        }
 			} else { /* tar_ch */
-				if ( IS_AFFECTED(tar_ch, AFF_INVISIBLE) )
-					send_to_char("Nothing new seems to happen.\n\r", ch);
-				else
-					spell_invisibility(level, ch, tar_ch, 0);
+        if ( IS_AFFECTED(tar_ch, AFF_INVISIBLE) ) {
+          send_to_char("Nothing new seems to happen.\n\r", ch);
+        } else {
+          spell_invisibility(level, ch, tar_ch, 0);
+        }
 			}
 			break;
     case SPELL_TYPE_POTION:
