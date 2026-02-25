@@ -408,8 +408,8 @@ figure_wound_skillcheck_penalties(CHAR_DATA* ch, int skill)
 	if (lookup_race_int(ch->race, RACE_NOMAD))
 		return skill;
 
-	// Save vs WILLPOWER
-	if (number(1, 25) <= ch->wil)
+	// Save vs WISDOM
+	if (number(1, 25) <= ch->wis)
 	{
 		return skill;
 	}
@@ -801,7 +801,7 @@ set_fighting(CHAR_DATA* ch, CHAR_DATA* vict)
 	//  affect_remove (ch, af);
 
 	if ((GET_FLAG (ch, FLAG_AUTOFLEE)
-		/*|| (get_soma_affect(ch, SOMA_PLANT_VISIONS) && number(0,20) > GET_WIL(ch))*/) && AWAKE (ch))
+		/*|| (get_soma_affect(ch, SOMA_PLANT_VISIONS) && number(0,20) > GET_WIS(ch))*/) && AWAKE (ch))
 	{
 		send_to_char("You try to escape!\n\r", ch);
 		act("$n tries to escape!", false, ch, 0, 0, TO_ROOM | _ACT_COMBAT);
@@ -2070,13 +2070,13 @@ do_aimstrike(CHAR_DATA* ch, char* argument, int cmd)
 	}
 	else
 	{
-		if (ch->agi <= 9)
+		if (ch->dex <= 9)
 			ch->balance += -10;
-		else if (ch->agi > 9 && ch->agi <= 13)
+		else if (ch->dex > 9 && ch->dex <= 13)
 			ch->balance += -8;
-		else if (ch->agi > 13 && ch->agi <= 15)
+		else if (ch->dex > 13 && ch->dex <= 15)
 			ch->balance += -7;
-		else if (ch->agi > 15 && ch->agi <= 18)
+		else if (ch->dex > 15 && ch->dex <= 18)
 			ch->balance += -6;
 		else
 			ch->balance += -5;
@@ -2328,7 +2328,7 @@ do_combat_bash(CHAR_DATA* ch, char* argument, int cmd)
 		sprintf(buf2, "You attempt to thrust %s at $N's face, but instead stumble and fall to the ground.", obj_short_desc(shield));
 		sprintf(buf3, "$n attempts to thrust %s at $N's face, but instead $e stumble and fall to the ground.", obj_short_desc(shield));
 		GET_POS (ch) = REST;
-		add_second_affect(SA_STAND, ((25 - GET_AGI(ch)) + number(1, 3)), ch, 0, 0, 0);
+		add_second_affect(SA_STAND, ((25 - GET_DEX(ch)) + number(1, 3)), ch, 0, 0, 0);
 
 		if (is_outdoors(ch->room))
 		{
@@ -2413,7 +2413,7 @@ do_combat_bash(CHAR_DATA* ch, char* argument, int cmd)
 		soma_add_affect(victim, SOMA_NERVES_HEADACHE, 2, 0, 0, 800, 400, 800, 2, 4, 6, 8);
 		soma_add_affect(victim, SOMA_BLUNT_MEDHEAD, 2, 0, 0, 800, 400, 800, 1, 1, 1, 2);
 		GET_POS (victim) = REST;
-		add_second_affect(SA_STAND, ((25 - GET_AGI(victim)) + number(2, 6)), victim, 0, 0, 0);
+		add_second_affect(SA_STAND, ((25 - GET_DEX(victim)) + number(2, 6)), victim, 0, 0, 0);
 
 		if (is_outdoors(victim->room))
 		{
@@ -3053,8 +3053,8 @@ strike(CHAR_DATA* src, CHAR_DATA* tar, int attack_num, int mode)
 
 	for (i = 0; j > fatigue[i].percent; i++);
 
-	// Save vs WILLPOWER
-	if (number(1, 25) > src->wil)
+	// Save vs WISDOM
+	if (number(1, 25) > src->wis)
 		fatchk = fatigue[i].penalty;
 	else
 		fatchk = 1.00;
@@ -3303,8 +3303,8 @@ strike(CHAR_DATA* src, CHAR_DATA* tar, int attack_num, int mode)
 	for (i = 0; j > fatigue[i].percent; i++);
 
 
-	// Save vs WILLPOWER
-	if (number(1, 25) > tar->wil)
+	// Save vs WISDOM
+	if (number(1, 25) > tar->wis)
 		fatchk = fatigue[i].penalty;
 	else
 		fatchk = 1.00;
@@ -3478,9 +3478,9 @@ strike(CHAR_DATA* src, CHAR_DATA* tar, int attack_num, int mode)
 
 	// If you are suffering from a stun, and fail your willpower test, lose 5 points.
 
-	if (get_soma_affect(src, SOMA_BLUNT_MEDHEAD) && number(0, 25) > GET_WIL(src))
+	if (get_soma_affect(src, SOMA_BLUNT_MEDHEAD) && number(0, 25) > GET_WIS(src))
 		attack -= 5;
-	if (get_soma_affect(tar, SOMA_BLUNT_MEDHEAD) && number(0, 25) > GET_WIL(tar))
+	if (get_soma_affect(tar, SOMA_BLUNT_MEDHEAD) && number(0, 25) > GET_WIS(tar))
 		defense -= 5;
 
 	// If you are suffering from the genetic terror shakes, lose 20 points.
@@ -4384,7 +4384,7 @@ combat_results(CHAR_DATA* src, CHAR_DATA* tar, OBJ_DATA* attack_weapon,
 	else if (off_result == RESULT_STUMBLE)
 	{
 		GET_POS (src) = REST;
-		add_second_affect(SA_STAND, ((25 - GET_AGI(src)) + number(1, 3)), src, 0, 0, 0);
+		add_second_affect(SA_STAND, ((25 - GET_DEX(src)) + number(1, 3)), src, 0, 0, 0);
 
 		if (is_outdoors(src->room))
 		{
@@ -4459,7 +4459,7 @@ combat_results(CHAR_DATA* src, CHAR_DATA* tar, OBJ_DATA* attack_weapon,
 		if (GET_POS (tar) == FIGHT || GET_POS (tar) == STAND)
 		{
 			GET_POS (tar) = REST;
-			add_second_affect(SA_STAND, ((25 - GET_AGI(tar)) + number(1, 3)), tar, 0, 0, 0);
+			add_second_affect(SA_STAND, ((25 - GET_DEX(tar)) + number(1, 3)), tar, 0, 0, 0);
 
 			if (is_outdoors(tar->room))
 			{
@@ -4778,9 +4778,9 @@ combat_results(CHAR_DATA* src, CHAR_DATA* tar, OBJ_DATA* attack_weapon,
 
 	delay_modifier = 126;
 
-	delay_modifier = delay_modifier - (GET_AGI (src) * 3);
+	delay_modifier = delay_modifier - (GET_DEX (src) * 3);
 
-	sprintf(AD, "AGIadj %d%% ", delay_modifier);
+	sprintf(AD, "DEXadj %d%% ", delay_modifier);
 
 	attack_delay = attack_delay * delay_modifier / 100;
 
@@ -5910,8 +5910,8 @@ do_escape(CHAR_DATA* ch, char* argument, int cmd)
 		return;
 	}
 
-	chance = 20 + 2 * (GET_STR (ch) + GET_AGI (ch) - GET_STR (ch->subdue)
-		- GET_AGI (ch->subdue));
+	chance = 20 + 2 * (GET_STR (ch) + GET_DEX (ch) - GET_STR (ch->subdue)
+		- GET_DEX (ch->subdue));
 
 	if (chance > number(0, 100))
 	{
@@ -6485,7 +6485,7 @@ rescue_attempt(CHAR_DATA* ch, CHAR_DATA* friendPtr)
 	if (IS_SET(tch->act, ACT_FLYING))
 		return 2;
 
-	agi_diff = (GET_AGI (ch) - GET_AGI (tch)) +
+	agi_diff = (GET_DEX (ch) - GET_DEX (tch)) +
 	           /* easier to rescue if you are fighting your friend's enemy */
 	           /* harder to rescue if you are fighting someone else */
 	           /* otherwise rescue as normal */
@@ -6767,7 +6767,7 @@ delayed_study(CHAR_DATA* ch)
 
 	if (((obj = get_equip(ch->delay_ch, WEAR_FACE))
 			&& IS_SET (obj->obj_flags.extra_flags, ITEM_MASK))
-		|| (((ch->intel * 2.5 + ch->wil + ch->aur / 2) < number(0, 100)) || (IS_SET(ch->act, ACT_ENFORCER) && number(0, 1))))
+		|| (((ch->intel * 2.5 + ch->wis + ch->cha / 2) < number(0, 100)) || (IS_SET(ch->act, ACT_ENFORCER) && number(0, 1))))
 	{
 		if (ch->delay_ch->d_age)
 		{

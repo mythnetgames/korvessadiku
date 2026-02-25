@@ -1251,15 +1251,14 @@ void do_reveal(CHAR_DATA* ch, char* argument, int cmd)
 void
 do_upgrade(CHAR_DATA* ch, char* argument, int cmd)
 {
-	const char* attribs[7] =
+	const char* attribs[6] =
 		{
 			"strength",
 			"dexterity",
 			"constitution",
 			"intelligence",
-			"willpower",
-			"presence",
-			"agility"
+			"wisdom",
+			"presence"
 		};
 
 
@@ -1287,7 +1286,7 @@ do_upgrade(CHAR_DATA* ch, char* argument, int cmd)
 
 	if (!*arg1)
 	{
-		send_to_char("You need to enter an attribute to raise - #6str, int, agi, dex, con, or wil#0.\n", ch);
+		send_to_char("You need to enter an attribute to raise - #6str, int, dex, con, wis, or cha#0.\n", ch);
 		return;
 	}
 
@@ -1295,7 +1294,7 @@ do_upgrade(CHAR_DATA* ch, char* argument, int cmd)
 
 	if (!*arg2)
 	{
-		send_to_char("You need to enter an attribute to decrease - #6str, int, agi, dex, con, or wil#0.\n", ch);
+		send_to_char("You need to enter an attribute to decrease - #6str, int, dex, con, wis, or cha#0.\n", ch);
 		return;
 	}
 
@@ -1339,11 +1338,11 @@ do_upgrade(CHAR_DATA* ch, char* argument, int cmd)
 			return;
 		}
 	}
-	else if (!str_cmp(arg1, "wil"))
+	else if (!str_cmp(arg1, "wis"))
 	{
 		raise = 4;
 
-		if (ch->wil + 1 > 18)
+		if (ch->wis + 1 > 18)
 		{
 			send_to_char("There is no possibility of improving on your extreme willpower.\n", ch);
 			return;
@@ -1353,26 +1352,16 @@ do_upgrade(CHAR_DATA* ch, char* argument, int cmd)
 	{
 		raise = 5;
 
-		if (ch->aur + 1 > 18)
+		if (ch->cha + 1 > 18)
 		{
 			send_to_char("There is no possibility of improving on your extreme presence.\n", ch);
-			return;
-		}
-	}
-	else if (!str_cmp(arg1, "agi"))
-	{
-		raise = 6;
-
-		if (ch->agi + 1 > 18)
-		{
-			send_to_char("There is no possibility of improving on your extreme agility.\n", ch);
 			return;
 		}
 	}
 
 	if (raise == -1)
 	{
-		send_to_char("You need to enter an attribute to raise - #6str, int, agi, dex, con, pre, or wil#0.\n", ch);
+		send_to_char("You need to enter an attribute to raise - #6str, int, dex, con, wis, or cha#0.\n", ch);
 		return;
 	}
 
@@ -1416,11 +1405,11 @@ do_upgrade(CHAR_DATA* ch, char* argument, int cmd)
 			return;
 		}
 	}
-	else if (!str_cmp(arg2, "wil"))
+	else if (!str_cmp(arg2, "wis"))
 	{
 		lower = 4;
 
-		if (ch->wil - 1 < 10)
+		if (ch->wis - 1 < 10)
 		{
 			send_to_char("There is no possibility of further debasing your dismal willpower.\n", ch);
 			return;
@@ -1430,19 +1419,9 @@ do_upgrade(CHAR_DATA* ch, char* argument, int cmd)
 	{
 		lower = 5;
 
-		if (ch->aur - 1 < 10)
+		if (ch->cha - 1 < 10)
 		{
 			send_to_char("There is no possibility of further debasing your dismal presence.\n", ch);
-			return;
-		}
-	}
-	else if (!str_cmp(arg2, "agi"))
-	{
-		lower = 6;
-
-		if (ch->agi - 1 < 10)
-		{
-			send_to_char("There is no possibility of further debasing your dismal agility.\n", ch);
 			return;
 		}
 	}
@@ -1450,7 +1429,7 @@ do_upgrade(CHAR_DATA* ch, char* argument, int cmd)
 
 	if (lower == -1)
 	{
-		send_to_char("You need to enter an attribute to decrease - #6str, int, agi, dex, con, pre, or wil#0.\n", ch);
+		send_to_char("You need to enter an attribute to decrease - #6str, int, dex, con, pre, or wil#0.\n", ch);
 		return;
 	}
 
@@ -5066,7 +5045,7 @@ rl_minute_affect_update(void)
 		/*
           if (ch->mana < ch->max_mana && !IS_SET (ch->room->room_flags, OOC))
         {
-          ch->mana += (ch->aur / 3) + number (2, 6);
+          ch->mana += (ch->cha / 3) + number (2, 6);
         }
         */
 
@@ -5766,19 +5745,14 @@ hour_affect_update(void)
 					send_to_char("At last, you feel more alert and intelligent.\n", ch);
 					break;
 				case 4:
-					ch->wil += 1;
-					ch->tmp_wil += 1;
+					ch->wis += 1;
+					ch->tmp_wis += 1;
 					send_to_char("At last, you feel more willful and focused.\n", ch);
 					break;
 				case 5:
-					ch->aur += 1;
-					ch->tmp_aur += 1;
+					ch->cha += 1;
+					ch->tmp_cha += 1;
 					send_to_char("At last, your aura increases.\n", ch);
-					break;
-				case 6:
-					ch->agi += 1;
-					ch->tmp_agi += 1;
-					send_to_char("At last, you feel more agile and speedy.\n", ch);
 					break;
 				default:
 					ch->str += 1;
@@ -5808,19 +5782,14 @@ hour_affect_update(void)
 					send_to_char("Alas, you feel less alert and intelligent.\n", ch);
 					break;
 				case 4:
-					ch->wil -= 1;
-					ch->tmp_wil -= 1;
+					ch->wis -= 1;
+					ch->tmp_wis -= 1;
 					send_to_char("Alas, you feel less willful and focused.\n", ch);
 					break;
 				case 5:
-					ch->aur -= 1;
-					ch->tmp_aur -= 1;
+					ch->cha -= 1;
+					ch->tmp_cha -= 1;
 					send_to_char("Alas, you feel your aura weaken.\n", ch);
-					break;
-				case 6:
-					ch->agi -= 1;
-					ch->tmp_agi -= 1;
-					send_to_char("Alas, you feel less agile and quick.\n", ch);
 					break;
 				default:
 					ch->str -= 1;
@@ -5925,7 +5894,7 @@ void teach_skill(CHAR_DATA* student, int skill, CHAR_DATA* teacher)
 	learn_chance = MIN((int)(calc_lookup(student, REG_LV, skill) * multiplier), 65);
 
 	learn_chance += (GET_INT (teacher) + GET_INT (student)) / 2;
-	learn_chance += (GET_WIL (teacher) + GET_WIL (student)) / 2;
+	learn_chance += (GET_WIS (teacher) + GET_WIS (student)) / 2;
 
 	roll = number(1, 80);
 	if (roll > learn_chance)
@@ -5947,11 +5916,11 @@ void teach_skill(CHAR_DATA* student, int skill, CHAR_DATA* teacher)
 	// How much they learn
 	//INT/WIL bonus/penalty for teacher
 	modifier = GET_INT (teacher) - 14;
-	modifier += GET_WIL (teacher) - 14;
+	modifier += GET_WIS (teacher) - 14;
 
 	//INT/WIL bonus/penalty for student
 	modifier += GET_INT (student) - 14;
-	modifier += GET_WIL (student) - 14;
+	modifier += GET_WIS (student) - 14;
 
 	modifier *= 1; //modifer adjustment for worth of INT/WIL
 
@@ -6858,7 +6827,7 @@ delayed_log3(CHAR_DATA* ch)
        act("With a sudden, chilling realization, you watch as $p twists midway through its fall.", false, ch, tree, 0, TO_CHAR | _ACT_FORMAT);
        act("With an urgent splitting sound, $p twists midway through its fall.", false, ch, tree, 0, TO_ROOM | _ACT_FORMAT);
 
-      if(number(1,20) >= GET_AGI (ch))
+      if(number(1,20) >= GET_DEX (ch))
       {
         act("You dive a moment too late as $p crashes to the ground, your legs caught in the whipping branches and your ears flooded by an awful din of smashing wood and rustling leaves.", false, ch, tree, 0, TO_CHAR | _ACT_FORMAT);
         act("As $p falls, $n makes $s dive to safety a moment to late, $s legs caught up in the whipping branches as the tree crashes with an awful thump.", false, ch, tree, 0, TO_ROOM | _ACT_FORMAT);

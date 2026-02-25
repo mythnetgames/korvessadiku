@@ -271,9 +271,9 @@ mob_char_indirect (CHAR_DATA * mob, char *token, int *value, int *type)
     {
     3, "con", MP_TYPE_INTEGER},
     {
-    4, "wil", MP_TYPE_INTEGER},
+    4, "wis", MP_TYPE_INTEGER},
     {
-    5, "aur", MP_TYPE_INTEGER},
+    5, "cha", MP_TYPE_INTEGER},
     {
     6, "hit", MP_TYPE_INTEGER},
     {
@@ -357,10 +357,10 @@ mob_char_indirect (CHAR_DATA * mob, char *token, int *value, int *type)
       *value = GET_CON (ch);
       break;
     case 4:
-      *value = GET_WIL (ch);
+      *value = GET_WIS (ch);
       break;
     case 5:
-      *value = GET_AUR (ch);
+      *value = GET_CHA (ch);
       break;
     case 6:
       *value = GET_HIT (ch);

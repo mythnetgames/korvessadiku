@@ -29,9 +29,9 @@ const char* trap_attrs2[8] =
 	"dexterity",
 	"constitution",
 	"intelligence",
-	"willpower",
+	"wisdom",
 	"mutations",
-	"agility"
+	"dexterity"
 };
 
 // So, if we remove an object from the room, then we need to go through
@@ -285,7 +285,7 @@ int
 	if (IS_SET(trap->trap_bit, TRAP_AFF_TRIP))
 	{
 		GET_POS (ch) = REST;
-		add_second_affect (SA_STAND, ((20-GET_AGI(ch))+number(3,7)), ch, NULL, NULL, 0);
+		add_second_affect (SA_STAND, ((20-GET_DEX(ch))+number(3,7)), ch, NULL, NULL, 0);
 		if (is_outdoors(ch->room))
 		{
 			object__enviro(ch, NULL, COND_DIRT, 5, HITLOC_NONE);
@@ -1463,7 +1463,7 @@ void
 
 	// So, assume 12 int and 12 wil, you'll get a search score between 37 and 77
 
-	search = ((ch->intel * 3.0) + ch->wil) - 10 + number(0, 40);
+	search = ((ch->intel * 3.0) + ch->wis) - 10 + number(0, 40);
 	search_base = int(search);
 
 	// If a character is wearing an enclosed helm, or something covering their face, then their search ability is significantly reduced.
@@ -1991,13 +1991,10 @@ int trap_enact (CHAR_DATA *tch, OBJ_DATA *obj, int cmd, OBJ_DATA *tobj)
 			roll = GET_INT(tch);
 			break;
 		case 5:
-			roll = GET_WIL(tch);
+			roll = GET_WIS(tch);
 			break;
 		case 6:
-			roll = GET_AUR(tch);
-			break;
-		case 7:
-			roll = GET_AGI(tch);
+			roll = GET_CHA(tch);
 			break;
 		default:
 			roll = -1;

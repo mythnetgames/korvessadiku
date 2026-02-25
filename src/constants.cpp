@@ -218,74 +218,74 @@ const char *somatics[] = {
 
 const char *skills[] = {
   "Unused", // 0
-  "Brawling",
-  "Small-Blade",
-  "Long-Blade",
-  "Polearm",
-  "Bludgeon",
-  "Dodge",
-  "Deflect",
-  "Sole-Wield",
-  "Dual-Wield",
-  "Aim", //10
-  "Handgun",
-  "Rifle",
-  "Machinegun",
-  "Gunnery",
-  "Explosives",
+  "Brawling",         // 1
+  "Small-Blade",      // 2
+  "Long-Blade",       // 3
+  "Polearm",          // 4
+  "Bludgeon",         // 5
+  "Dodge",            // 6
+  "Parry",            // 7  (was Deflect)
+  "Sole-Wield",       // 8
+  "Dual-Wield",       // 9
+  "Aim",              // 10
+  "Grapple",          // 11 (was Handgun)
+  "Shortbow",         // 12 (was Rifle)
+  "Longbow",          // 13 (was Machinegun)
+  "Crossbow",         // 14 (was Gunnery)
+  "Thrown",           // 15 (was Explosives)
 
-  "Sneak",
-  "Hide",
-  "Steal",
-  "Picklock",
-  "Haggle",
-  "Handle",
-  "Hunting",
-  "First-Aid",
-  "Medicine",
-  "Forage",
-  "Eavesdrop",
-  "Butchery",
+  "Sneak",            // 16
+  "Hide",             // 17
+  "Steal",            // 18
+  "Picklock",         // 19
+  "Haggle",           // 20
+  "Persuasion",       // 21 (was Handle)
+  "Streetwise",       // 22 (was Hunting)
+  "First-Aid",        // 23
+  "Tracking",         // 24 (was Medicine)
+  "Forage",           // 25
+  "Eavesdrop",        // 26
+  "Butchery",         // 27
 
-  "Chemistry",
-  "Mechanics",
-  "Gunsmith",
-  "Computerology",
-  "Electronics",
-  "Biology",
-  "Weaponcraft",
-  "Armorcraft",
-  "Handicraft",
-  "Artistry",
+  "Herbalism",        // 28 (was Chemistry)
+  "Blacksmithing",    // 29 (was Mechanics)
+  "Carpentry",        // 30 (was Gunsmith)
+  "Appraise",         // 31 (was Computerology)
+  "Investigation",    // 32 (was Electronics)
+  "Lore",             // 33 (was Biology)
+  "Weaponcraft",      // 34
+  "Armorcraft",       // 35
+  "Handicraft",       // 36
+  "Artistry",         // 37
 
-  "Education",
-  "Empathy",
-  "Common",
-  "Metalcraft", 
-  "Leathercraft", 
-  "Textilecraft", 
-  "Woodcraft", 
-  "Cooking", 
-  "Baking", 
-  "Brewing", 
-  "Fishing", 
-  "Stonecraft", 
-  "Earthencraft", 
-  "Gardening",
-  "Farming", 
-  "Shortbow", 
-  "Longbow", 
-  "Crossbow", 
-  "Music", 
-  "Astronomy",
-  "Orkish",
-  "Wargish",
-  "Dalish",
-  "Sindarin",
-  "Khuzdul",
-  "Tengwar",
-  "Cirth",
-  "Warcraft",
+  "Education",        // 38
+  "Sense-Motive",     // 39 (was Empathy)
+  "Common",           // 40
+  "Metalcraft",       // 41
+  "Leathercraft",     // 42
+  "Textilecraft",     // 43
+  "Woodcraft",        // 44
+  "Cooking",          // 45
+  "Baking",           // 46
+  "Brewing",          // 47
+  "Fishing",          // 48
+  "Stonecraft",       // 49
+  "Earthencraft",     // 50
+  "Gardening",        // 51
+  "Farming",          // 52
+  "Athletics",        // 53 (was Shortbow dup)
+  "Bandaging",        // 54 (was Longbow dup)
+  "Chirurgy",         // 55 (was Crossbow dup)
+  "Music",            // 56
+  "Meditation",       // 57 (was Astronomy)
+  "Perception",       // 58 (was Orkish)
+  "Handle",           // 59 (was Wargish - animal handling)
+  "Hunting",          // 60 (was Dalish)
+  "Endurance",        // 61 (was Sindarin)
+  "Adaptability",     // 62 (was Khuzdul)
+  "Climbing",         // 63 (was Tengwar)
+  "Swimming",         // 64 (was Cirth)
+  "Warcraft",         // 65
   "\n"
 };
 

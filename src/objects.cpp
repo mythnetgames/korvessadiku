@@ -3801,7 +3801,7 @@ void
 
 		if (ch->intoxication != -1)
 		{
-			if (number (6, 20) > ((ch->con + ch->wil) / 2))
+			if (number (6, 20) > ((ch->con + ch->wis) / 2))
 				ch->intoxication += (drink->o.fluid.alcohol * sips);
 			else
 				ch->intoxication += ((drink->o.fluid.alcohol * sips) / 2);

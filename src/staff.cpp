@@ -39,7 +39,7 @@ char b_buf[ B_BUF_SIZE ];
 const char *player_bits[] = { "Brief", "NoShout", "Compact", "DONTSET", "Quiet", "Reboot", "Shutdown", "Build",
 		"Approval", "Outlaw", "\n" };
 
-const char* trap_attrs[ 8 ] = { "None", "Str", "Dex", "Con", "Int", "Wil", "Pre", "Agi" };
+const char* trap_attrs[ 7 ] = { "None", "Str", "Dex", "Con", "Int", "Wis", "Cha" };
 
 extern rpie::server engine;
 extern const char *skills[];
@@ -935,12 +935,10 @@ void do_roll( CHAR_DATA * ch, char *argument, int cmd ) {
 				attr = ch->con;
 			} else if ( strcasecmp( buf, "int" ) == 0 ) {
 				attr = ch->intel;
-			} else if ( strcasecmp( buf, "wil" ) == 0 ) {
-				attr = ch->wil;
-			} else if ( strcasecmp( buf, "aur" ) == 0 ) {
-				attr = ch->aur;
-			} else if ( strcasecmp( buf, "agi" ) == 0 ) {
-				attr = ch->agi;
+			} else if ( strcasecmp( buf, "wis" ) == 0 ) {
+				attr = ch->wis;
+			} else if ( strcasecmp( buf, "cha" ) == 0 ) {
+				attr = ch->cha;
 			} else if ( strcasecmp( buf, "luk" ) == 0 ) {
 				attr = dice( 3, 6 );
 			} else // else attr = 0 ! \;)
@@ -2350,7 +2348,7 @@ void charstat( CHAR_DATA * ch, char *name, bool bPCsOnly ) {
 	sprintf( ADD, "\n" );
 	send_to_char( buf, ch );
 
-	sprintf( buf, "#2Wil:#0 %d/%d", GET_WIL (k), k->wil );
+	sprintf( buf, "#2Wis:#0 %d/%d", GET_WIS (k), k->wis );
 	pad_buffer( buf, 25 );
 	sprintf( ADD, "#2Hrnss:#0 %d", k->harness );
 	pad_buffer( buf, 53 );
@@ -2358,7 +2356,7 @@ void charstat( CHAR_DATA * ch, char *name, bool bPCsOnly ) {
 	send_to_char( buf, ch );
 	send_to_char( "\n", ch );
 
-	sprintf( buf, "#2Aur:#0 %d/%d", GET_AUR (k), k->aur );
+	sprintf( buf, "#2Cha:#0 %d/%d", GET_CHA (k), k->cha );
 	pad_buffer( buf, 25 );
 	sprintf( ADD, "#2Armor:#0 %d", k->armor );
 	pad_buffer( buf, 53 );
@@ -2366,8 +2364,7 @@ void charstat( CHAR_DATA * ch, char *name, bool bPCsOnly ) {
 	send_to_char( buf, ch );
 	send_to_char( "\n", ch );
 
-	sprintf( buf, "#2Agi:#0 %d/%d", GET_AGI (k), k->agi );
-
+	*buf = '\0';
 	pad_buffer( buf, 25 );
 	sprintf( ADD, "#2Room:#0  %d", k->in_room );
 	pad_buffer( buf, 53 );
@@ -2382,7 +2379,7 @@ void charstat( CHAR_DATA * ch, char *name, bool bPCsOnly ) {
 
 	if ( IS_NPC (k) ) {
 		*buf = '\0';
-		sprintf( buf, "#2Sum:#0 %d", k->str + k->dex + k->con + k->intel + k->wil + k->aur + k->agi );
+		sprintf( buf, "#2Sum:#0 %d", k->str + k->dex + k->con + k->intel + k->wis + k->cha );
 		pad_buffer( buf, 25 );
 
 		if ( IS_SET(k->act, ACT_AUCTIONEER) ) {
@@ -2429,7 +2426,7 @@ void charstat( CHAR_DATA * ch, char *name, bool bPCsOnly ) {
 
 	} else if ( k->pc ) {
 		*buf = '\0';
-		sprintf( buf, "#2Sum:#0 %d", k->str + k->dex + k->con + k->intel + k->wil + k->aur + k->agi );
+		sprintf( buf, "#2Sum:#0 %d", k->str + k->dex + k->con + k->intel + k->wis + k->cha );
 		pad_buffer( buf, 25 );
 		sprintf( buf + strlen( buf ), "#2Skillcap:#0 %d/%d", skill_max( k, 0, 1 ), skill_max(k,0,2));
 		pad_buffer( buf, 53 );
@@ -7402,13 +7399,13 @@ void char__unbalance( CHAR_DATA * ch, float nMultiplier ) {
 
 	float nPenalty = 0.0;
 
-	if ( ch->agi <= 9 )
+	if ( ch->dex <= 9 )
 		nPenalty = 15;
-	else if ( ch->agi > 9 && ch->agi <= 13 )
+	else if ( ch->dex > 9 && ch->dex <= 13 )
 		nPenalty = 13;
-	else if ( ch->agi > 13 && ch->agi <= 15 )
+	else if ( ch->dex > 13 && ch->dex <= 15 )
 		nPenalty = 11;
-	else if ( ch->agi > 15 && ch->agi <= 18 )
+	else if ( ch->dex > 15 && ch->dex <= 18 )
 		nPenalty = 9;
 	else
 		nPenalty = 7;

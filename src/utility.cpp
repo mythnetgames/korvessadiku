@@ -1238,14 +1238,12 @@ get_eval_token (char **p, int *token_type, int *value)
         *token_type = TOKEN_DEX;
     else if (!strncmp (*p, "str", 3))
         *token_type = TOKEN_STR;
-    else if (!strncmp (*p, "aur", 3))
+    else if (!strncmp (*p, "cha", 3))
         *token_type = TOKEN_AUR;
     else if (!strncmp (*p, "con", 3))
         *token_type = TOKEN_CON;
-    else if (!strncmp (*p, "wil", 3))
+    else if (!strncmp (*p, "wis", 3))
         *token_type = TOKEN_WIL;
-    else if (!strncmp (*p, "agi", 3))
-        *token_type = TOKEN_AGI;
 
     if (*token_type)
     {
@@ -1296,13 +1294,13 @@ eval_att_eq (CHAR_DATA * ch, char **equation)
         else if (token_type == TOKEN_STR)
             right_side = GET_STR (ch);
         else if (token_type == TOKEN_AUR)
-            right_side = GET_AUR (ch);
+            right_side = GET_CHA (ch);
         else if (token_type == TOKEN_CON)
             right_side = GET_CON (ch);
         else if (token_type == TOKEN_WIL)
-            right_side = GET_WIL (ch);
+            right_side = GET_WIS (ch);
         else if (token_type == TOKEN_AGI)
-            right_side = GET_AGI (ch);
+            right_side = GET_DEX (ch);
 
         else
             return -12350;
@@ -1366,12 +1364,10 @@ eval_cap (CHAR_DATA * ch, char *equation)
         primary = GET_CON (ch);
     else if (!str_cmp (attribute_1, "dex"))
         primary = GET_DEX (ch);
-    else if (!str_cmp (attribute_1, "agi"))
-        primary = GET_AGI (ch);
-    else if (!str_cmp (attribute_1, "aur"))
-        primary = GET_AUR (ch);
-    else if (!str_cmp (attribute_1, "wil"))
-        primary = GET_WIL (ch);
+    else if (!str_cmp (attribute_1, "cha"))
+        primary = GET_CHA (ch);
+    else if (!str_cmp (attribute_1, "wis"))
+        primary = GET_WIS (ch);
     else if (!str_cmp (attribute_1, "int"))
         primary = GET_INT (ch);
 
@@ -1382,12 +1378,10 @@ eval_cap (CHAR_DATA * ch, char *equation)
         secondary = GET_CON (ch);
     else if (!str_cmp (attribute_2, "dex"))
         secondary = GET_DEX (ch);
-    else if (!str_cmp (attribute_2, "agi"))
-        secondary = GET_AGI (ch);
-    else if (!str_cmp (attribute_2, "aur"))
-        secondary = GET_AUR (ch);
-    else if (!str_cmp (attribute_2, "wil"))
-        secondary = GET_WIL (ch);
+    else if (!str_cmp (attribute_2, "cha"))
+        secondary = GET_CHA (ch);
+    else if (!str_cmp (attribute_2, "wis"))
+        secondary = GET_WIS (ch);
     else if (!str_cmp (attribute_2, "int"))
         secondary = GET_INT (ch);
 
@@ -1397,12 +1391,10 @@ eval_cap (CHAR_DATA * ch, char *equation)
         tertiary = GET_CON (ch);
     else if (!str_cmp (attribute_3, "dex"))
         tertiary = GET_DEX (ch);
-    else if (!str_cmp (attribute_3, "agi"))
-        tertiary = GET_AGI (ch);
-    else if (!str_cmp (attribute_3, "aur"))
-        tertiary = GET_AUR (ch);
-    else if (!str_cmp (attribute_3, "wil"))
-        tertiary = GET_WIL (ch);
+    else if (!str_cmp (attribute_3, "cha"))
+        tertiary = GET_CHA (ch);
+    else if (!str_cmp (attribute_3, "wis"))
+        tertiary = GET_WIS (ch);
     else if (!str_cmp (attribute_3, "int"))
         tertiary = GET_INT (ch);
 

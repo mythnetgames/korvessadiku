@@ -908,11 +908,10 @@ void
 		entry->innate_abilities = atoi (row[RACE_AFFECTS]);
 		entry->str_mod = atoi (row[RACE_STR_MOD]);
 		entry->dex_mod = atoi (row[RACE_DEX_MOD]);
-		entry->agi_mod = atoi (row[RACE_AGI_MOD]);
 		entry->con_mod = atoi (row[RACE_CON_MOD]);
-		entry->wil_mod = atoi (row[RACE_WIL_MOD]);
+		entry->wis_mod = atoi (row[RACE_WIS_MOD]);
 		entry->int_mod = atoi (row[RACE_INT_MOD]);
-		entry->aur_mod = atoi (row[RACE_AUR_MOD]);
+		entry->cha_mod = atoi (row[RACE_CHA_MOD]);
 		entry->native_tongue = atoi (row[RACE_NATIVE_TONGUE]);
 		entry->min_age = atoi (row[RACE_MIN_AGE]);
 		entry->max_age = atoi (row[RACE_MAX_AGE]);
@@ -1058,16 +1057,14 @@ int
 			looked_up = entry->str_mod;
 		else if (which_var == RACE_DEX_MOD)
 			looked_up = entry->dex_mod;
-		else if (which_var == RACE_AGI_MOD)
-			looked_up = entry->agi_mod;
 		else if (which_var == RACE_CON_MOD)
 			looked_up = entry->con_mod;
-		else if (which_var == RACE_WIL_MOD)
-			looked_up = entry->wil_mod;
+		else if (which_var == RACE_WIS_MOD)
+			looked_up = entry->wis_mod;
 		else if (which_var == RACE_INT_MOD)
 			looked_up = entry->int_mod;
-		else if (which_var == RACE_AUR_MOD)
-			looked_up = entry->aur_mod;
+		else if (which_var == RACE_CHA_MOD)
+			looked_up = entry->cha_mod;
 		else if (which_var == RACE_NATIVE_TONGUE)
 			looked_up = entry->native_tongue;
 		else if (which_var == RACE_MIN_AGE)
@@ -1170,16 +1167,14 @@ char *
 			looked_up = entry->str_mod;
 		else if (which_var == RACE_DEX_MOD)
 			looked_up = entry->dex_mod;
-		else if (which_var == RACE_AGI_MOD)
-			looked_up = entry->agi_mod;
 		else if (which_var == RACE_CON_MOD)
 			looked_up = entry->con_mod;
-		else if (which_var == RACE_WIL_MOD)
-			looked_up = entry->wil_mod;
+		else if (which_var == RACE_WIS_MOD)
+			looked_up = entry->wis_mod;
 		else if (which_var == RACE_INT_MOD)
 			looked_up = entry->int_mod;
-		else if (which_var == RACE_AUR_MOD)
-			looked_up = entry->aur_mod;
+		else if (which_var == RACE_CHA_MOD)
+			looked_up = entry->cha_mod;
 		else if (which_var == RACE_NATIVE_TONGUE)
 			looked_up = entry->native_tongue;
 		else if (which_var == RACE_MIN_AGE)
@@ -3178,23 +3173,21 @@ void
 		ch->str = 25;
 	if (ch->dex > 25)
 		ch->dex = 25;
-	if (ch->agi > 25)
-		ch->agi = 25;
-	if (ch->aur > 25)
-		ch->aur = 25;
+	if (ch->cha > 25)
+		ch->cha = 25;
 	if (ch->con > 25)
 		ch->con = 25;
-	if (ch->wil > 25)
-		ch->wil = 25;
+	if (ch->wis > 25)
+		ch->wis = 25;
 	if (ch->intel > 25)
 		ch->intel = 25;
 
 	ch->tmp_str = ch->str;
 	ch->tmp_dex = ch->dex;
-	ch->tmp_agi = ch->agi;
 	ch->tmp_con = ch->con;
-	ch->tmp_aur = ch->aur;
+	ch->tmp_cha = ch->cha;
 	ch->tmp_intel = ch->intel;
+	ch->tmp_wis = ch->wis;
 }
 
 void
@@ -3480,10 +3473,9 @@ void
 	tch->con = tch->pc->start_con;
 	tch->dex = tch->pc->start_dex;
 	tch->intel = tch->pc->start_intel;
-	tch->wil = tch->pc->start_wil;
-	tch->aur = tch->pc->start_aur;
+	tch->wis = tch->pc->start_wis;
+	tch->cha = tch->pc->start_cha;
 	tch->con = tch->pc->start_con;
-	tch->agi = tch->pc->start_agi;
 
 	apply_race_affects (tch);
 
@@ -3493,14 +3485,12 @@ void
 		tch->con += atoi (lookup_race_variable (tch->race, RACE_CON_MOD));
 	if (lookup_race_variable (tch->race, RACE_DEX_MOD))
 		tch->dex += atoi (lookup_race_variable (tch->race, RACE_DEX_MOD));
-	if (lookup_race_variable (tch->race, RACE_AGI_MOD))
-		tch->agi += atoi (lookup_race_variable (tch->race, RACE_AGI_MOD));
 	if (lookup_race_variable (tch->race, RACE_INT_MOD))
 		tch->intel += atoi (lookup_race_variable (tch->race, RACE_INT_MOD));
-	if (lookup_race_variable (tch->race, RACE_WIL_MOD))
-		tch->wil += atoi (lookup_race_variable (tch->race, RACE_WIL_MOD));
-	if (lookup_race_variable (tch->race, RACE_AUR_MOD))
-		tch->aur += atoi (lookup_race_variable (tch->race, RACE_AUR_MOD));
+	if (lookup_race_variable (tch->race, RACE_WIS_MOD))
+		tch->wis += atoi (lookup_race_variable (tch->race, RACE_WIS_MOD));
+	if (lookup_race_variable (tch->race, RACE_CHA_MOD))
+		tch->cha += atoi (lookup_race_variable (tch->race, RACE_CHA_MOD));
 
 	if ((tch->height = calculate_race_height (tch)) == -1)
 		tch->height = calculate_size_height (tch);
@@ -3586,27 +3576,24 @@ CHAR_DATA *
 
 	ch->str = atoi (row[22]);
 	ch->intel = atoi (row[23]);
-	ch->wil = atoi (row[24]);
+	ch->wis = atoi (row[24]);
 	ch->con = atoi (row[25]);
 	ch->dex = atoi (row[26]);
-	ch->aur = atoi (row[27]);
-	ch->agi = atoi (row[28]);
-	ch->pc->start_str = atoi (row[29]);
-	ch->pc->start_intel = atoi (row[30]);
-	ch->pc->start_wil = atoi (row[31]);
-	ch->pc->start_con = atoi (row[32]);
-	ch->pc->start_dex = atoi (row[33]);
-	ch->pc->start_aur = atoi (row[34]);
-	ch->pc->start_agi = atoi (row[35]);
+	ch->cha = atoi (row[27]);
+	ch->pc->start_str = atoi (row[28]);
+	ch->pc->start_intel = atoi (row[29]);
+	ch->pc->start_wis = atoi (row[30]);
+	ch->pc->start_con = atoi (row[31]);
+	ch->pc->start_dex = atoi (row[32]);
+	ch->pc->start_cha = atoi (row[33]);
 	ch->tmp_str = ch->str;
 	ch->tmp_intel = ch->intel;
-	ch->tmp_wil = ch->wil;
+	ch->tmp_wis = ch->wis;
 	ch->tmp_con = ch->con;
 	ch->tmp_dex = ch->dex;
-	ch->tmp_aur = ch->aur;
-	ch->tmp_agi = ch->agi;
+	ch->tmp_cha = ch->cha;
 
-	ch->time.played = atoi (row[36]);
+	ch->time.played = atoi (row[34]);
 	ch->time.birth = atoi (row[37]);
 	ch->time.logon = time (0);
 
@@ -4047,7 +4034,7 @@ CHAR_DATA *
 		ch->coldload_id = get_next_coldload_id (1);
 
 	ch->max_hit = 40 + GET_CON (ch) * CONSTITUTION_MULTIPLIER;
-	ch->max_shock = 40 + GET_WIL(ch) * CONSTITUTION_MULTIPLIER;
+	ch->max_shock = 40 + GET_WIS(ch) * CONSTITUTION_MULTIPLIER;
 
 	// Set armor by race
 	ch->armor = lookup_race_int(ch->race, RACE_ARMOR);
@@ -4210,8 +4197,8 @@ void
 		mysql_safe_query
 			("UPDATE %s.pfiles SET keywords = '%s', account = '%s', sdesc = '%s', ldesc = '%s', description = '%s', msg = '%s', create_comment = '%s', create_state = %d, "
 			"nanny_state = %d, role = %d, role_summary = '%s', role_body = '%s', role_date = '%s', role_poster = '%s', role_cost = %d, app_cost = %d, level = %d, sex = %d, deity = %d, "
-			"race = %d, room = %d, str = %d, intel = %d, wil = %d, con = %d, dex = %d, aur = %d, agi = %d, start_str = %d, start_intel = %d, start_wil = %d, start_con = %d, start_dex = %d, start_aur = %d, "
-			"start_agi = %d, played = %d, birth = %d, time = %d, offense = %d, hit = %d, maxhit = %d, nat_attack_type = %d, move = %d, maxmove = %d, circle = %d, ppoints = %d, fightmode = %d, color = %d, "
+			"race = %d, room = %d, str = %d, intel = %d, wis = %d, con = %d, dex = %d, cha = %d, start_str = %d, start_intel = %d, start_wis = %d, start_con = %d, start_dex = %d, start_cha = %d, "
+			"played = %d, birth = %d, time = %d, offense = %d, hit = %d, maxhit = %d, nat_attack_type = %d, move = %d, maxmove = %d, circle = %d, ppoints = %d, fightmode = %d, color = %d, "
 			"speaks = %d, flags = %d, plrflags = %d, boatvnum = %d, speed = %d, mountspeed = %d, sleepneeded = %d, autotoll = %d, coldload = %d, affectedby = %d, "
 			"affects = '%s', age = %d, intoxication = %d, hunger = %d, thirst = %d, height = %d, frame = %d, damage = %d, lastregen = %d, lastroom = %d, harness = %d, maxharness = %d, "
 			"lastlogon = %d, lastlogoff = %d, lastdis = %d, lastconnect = %d, lastdied = %d, hooded = %d, immenter = '%s', immleave = '%s', sitelie = '%s', voicestr = '%s', clans = '%s', skills = '%s', "
@@ -4227,10 +4214,9 @@ void
 			ch->pc->special_role ? ch->pc->special_role->poster : "~",
 			ch->pc->special_role ? ch->pc->special_role->cost : 0,
 			ch->pc->app_cost, ch->pc->level, ch->sex, ch->deity, ch->race,
-			ch->in_room, ch->str, ch->intel, ch->wil, ch->con, ch->dex, ch->aur,
-			ch->agi, ch->pc->start_str, ch->pc->start_intel, ch->pc->start_wil,
-			ch->pc->start_con, ch->pc->start_dex, ch->pc->start_aur,
-			ch->pc->start_agi,
+			ch->in_room, ch->str, ch->intel, ch->wis, ch->con, ch->dex, ch->cha,
+			ch->pc->start_str, ch->pc->start_intel, ch->pc->start_wis,
+			ch->pc->start_con, ch->pc->start_dex, ch->pc->start_cha,
 			(int) (ch->time.played + time (0) - ch->time.logon),
 			(int) ch->time.birth, (int) time (0), ch->offense, ch->hit,
 			ch->max_hit, ch->nat_attack_type, ch->move, ch->max_move, ch->circle,
@@ -4271,8 +4257,8 @@ void
 		mysql_safe_query
 			("INSERT INTO %s.pfiles (name, keywords, account, sdesc, ldesc, description, msg, create_comment, create_state, "
 			"nanny_state, role, role_summary, role_body, role_date, role_poster, role_cost, app_cost, level, sex, deity, "
-			"race, room, str, intel, wil, con, dex, aur, agi, start_str, start_intel, start_wil, start_con, start_dex, start_aur, "
-			"start_agi, played, birth, time, offense, hit, maxhit, nat_attack_type, move, maxmove, circle, ppoints, fightmode, color, "
+			"race, room, str, intel, wis, con, dex, cha, start_str, start_intel, start_wis, start_con, start_dex, start_cha, "
+			"played, birth, time, offense, hit, maxhit, nat_attack_type, move, maxmove, circle, ppoints, fightmode, color, "
 			"speaks, flags, plrflags, boatvnum, speed, mountspeed, sleepneeded, autotoll, coldload, affectedby, "
 			"affects, age, intoxication, hunger, thirst, height, frame, damage, lastregen, lastroom, harness, maxharness, "
 			"lastlogon, lastlogoff, lastdis, lastconnect, lastdied, hooded, immenter, immleave, sitelie, voicestr, clans, skills, "
@@ -4280,7 +4266,7 @@ void
 			"d_age, d_eyes, d_length, d_color, d_style, d_height, d_frame, d_feat1, d_feat2, d_feat3, d_feat4, scents, aff_mod) VALUES "
 			"('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, "
 			"%d, %d, '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, "
-			"%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, "
+			"%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, "
 			"%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, "
 			"%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, "
 			"'%s', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, "
@@ -4298,10 +4284,9 @@ void
 			ch->pc->special_role ? ch->pc->special_role->poster : "~",
 			ch->pc->special_role ? ch->pc->special_role->cost : 0,
 			ch->pc->app_cost, ch->pc->level, ch->sex, ch->deity, ch->race,
-			ch->in_room, ch->str, ch->intel, ch->wil, ch->con, ch->dex, ch->aur,
-			ch->agi, ch->pc->start_str, ch->pc->start_intel, ch->pc->start_wil,
-			ch->pc->start_con, ch->pc->start_dex, ch->pc->start_aur,
-			ch->pc->start_agi,
+			ch->in_room, ch->str, ch->intel, ch->wis, ch->con, ch->dex, ch->cha,
+			ch->pc->start_str, ch->pc->start_intel, ch->pc->start_wis,
+			ch->pc->start_con, ch->pc->start_dex, ch->pc->start_cha,
 			(int) (ch->time.played + time (0) - ch->time.logon),
 			(int) ch->time.birth, (int) time (0), ch->offense, ch->hit,
 			ch->max_hit, ch->nat_attack_type, ch->move, ch->max_move, ch->circle,

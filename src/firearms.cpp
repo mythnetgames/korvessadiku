@@ -6075,13 +6075,13 @@ else
   if (ch->fighting)
   {
 
-    if (ch->agi <= 9)
+    if (ch->dex <= 9)
       ch->balance += -14;
-    else if (ch->agi > 9 && ch->agi <= 13)
+    else if (ch->dex > 9 && ch->dex <= 13)
       ch->balance += -12;
-    else if (ch->agi > 13 && ch->agi <= 15)
+    else if (ch->dex > 13 && ch->dex <= 15)
       ch->balance += -10;
-    else if (ch->agi > 15 && ch->agi <= 18)
+    else if (ch->dex > 15 && ch->dex <= 18)
       ch->balance += -8;
     else
       ch->balance += -6;
@@ -7896,7 +7896,7 @@ else
         if ((GET_FLAG(tch, FLAG_LEAVING) || GET_FLAG(tch, FLAG_ENTERING)) || (tch->moves && !IS_SET(tch->moves->flags, MF_CRAWL)) || (get_affect(tch, AFFECT_COVER)))
         {
           // Base is our willpower.
-          int base = GET_WIL(tch);
+          int base = GET_WIS(tch);
 
           // -12% chance if it's a small room.
           if (IS_SET(tch->room->room_flags, SMALL_ROOM))

@@ -238,7 +238,7 @@ shock_gain (CHAR_DATA * ch)
 
     /* Shock_rate is 100 moves per 5 mins  ( * 10000 for granularity ) */
 
-    shock_rate = 10000 * GET_WIL (ch) * UPDATE_PULSE / (12 * 16);
+    shock_rate = 10000 * GET_WIS (ch) * UPDATE_PULSE / (12 * 16);
 
     gain = shock_rate;
 

@@ -1499,11 +1499,9 @@ void reval( CHAR_DATA * ch, char * arg, room_prog_var *& variable_list ) {
 			return;
 		} else if ( !str_cmp( rbuf, "int" ) && GET_INT (ch) >= nStat ) {
 			return;
-		} else if ( !str_cmp( rbuf, "wil" ) && GET_WIL (ch) >= nStat ) {
+		} else if ( !str_cmp( rbuf, "wis" ) && GET_WIS (ch) >= nStat ) {
 			return;
-		} else if ( !str_cmp( rbuf, "aur" ) && GET_AUR (ch) >= nStat ) {
-			return;
-		} else if ( !str_cmp( rbuf, "agi" ) && GET_AGI (ch) >= nStat ) {
+		} else if ( !str_cmp( rbuf, "cha" ) && GET_CHA (ch) >= nStat ) {
 			return;
 		}
 		ifin[ nNest ] = 1;
@@ -1523,11 +1521,9 @@ void reval( CHAR_DATA * ch, char * arg, room_prog_var *& variable_list ) {
 			return;
 		} else if ( !str_cmp( rbuf, "int" ) && GET_INT (ch) >= nStat ) {
 			return;
-		} else if ( !str_cmp( rbuf, "wil" ) && GET_WIL (ch) >= nStat ) {
+		} else if ( !str_cmp( rbuf, "wis" ) && GET_WIS (ch) >= nStat ) {
 			return;
-		} else if ( !str_cmp( rbuf, "aur" ) && GET_AUR (ch) >= nStat ) {
-			return;
-		} else if ( !str_cmp( rbuf, "agi" ) && GET_AGI (ch) >= nStat ) {
+		} else if ( !str_cmp( rbuf, "cha" ) && GET_CHA (ch) >= nStat ) {
 			return;
 		}
 		ifin[ nNest ] = 1;
@@ -6749,14 +6745,12 @@ void r_info( CHAR_DATA *ch, std::string argument, room_prog_var *& variable_list
 			value = MAKE_STRING( GET_STR( tch ) );
 		else if ( buf.find( "dex" ) != std::string::npos )
 			value = MAKE_STRING( GET_DEX( tch ) );
-		else if ( buf.find( "agi" ) != std::string::npos )
-			value = MAKE_STRING( GET_AGI( tch ) );
-		else if ( buf.find( "wil" ) != std::string::npos )
-			value = MAKE_STRING( GET_WIL( tch ) );
+		else if ( buf.find( "wis" ) != std::string::npos )
+			value = MAKE_STRING( GET_WIS( tch ) );
 		else if ( buf.find( "int" ) != std::string::npos )
 			value = MAKE_STRING( GET_INT( tch ) );
-		else if ( buf.find( "aur" ) != std::string::npos )
-			value = MAKE_STRING( GET_AUR( tch ) );
+		else if ( buf.find( "cha" ) != std::string::npos )
+			value = MAKE_STRING( GET_CHA( tch ) );
 		else if ( buf.find( "room" ) != std::string::npos ) {
 			argument = one_argument( argument, buf );
 			if ( buf.empty() )
@@ -6923,14 +6917,14 @@ void r_info( CHAR_DATA *ch, std::string argument, room_prog_var *& variable_list
 				value = MAKE_STRING(GET_STR(tch));
 			} else if ( buf.find( "dex" ) != std::string::npos ) {
 				value = MAKE_STRING(GET_DEX(tch));
-			} else if ( buf.find( "agi" ) != std::string::npos ) {
-				value = MAKE_STRING(GET_AGI(tch));
-			} else if ( buf.find( "wil" ) != std::string::npos ) {
-				value = MAKE_STRING(GET_WIL(tch));
+			} else if ( buf.find( "dex" ) != std::string::npos ) {
+				value = MAKE_STRING(GET_DEX(tch));
+			} else if ( buf.find( "wis" ) != std::string::npos ) {
+				value = MAKE_STRING(GET_WIS(tch));
 			} else if ( buf.find( "int" ) != std::string::npos ) {
 				value = MAKE_STRING(GET_INT(tch));
-			} else if ( buf.find( "aur" ) != std::string::npos ) {
-				value = MAKE_STRING(GET_AUR(tch));
+			} else if ( buf.find( "cha" ) != std::string::npos ) {
+				value = MAKE_STRING(GET_CHA(tch));
 			} else if ( buf.find( "fallback" ) != std::string::npos ) {
 				if ( tch->mob )
 					value = MAKE_STRING(tch->mob->fallback);
@@ -7361,14 +7355,14 @@ void r_setval( CHAR_DATA *ch, std::string argument ) {
 				GET_STR(tch) = atoi( argument.c_str() );
 			} else if ( buf.find( "dex" ) != std::string::npos ) {
 				GET_DEX(tch) = atoi( argument.c_str() );
-			} else if ( buf.find( "agi" ) != std::string::npos ) {
-				GET_AGI(tch) = atoi( argument.c_str() );
-			} else if ( buf.find( "wil" ) != std::string::npos ) {
-				GET_WIL(tch) = atoi( argument.c_str() );
+			} else if ( buf.find( "dex" ) != std::string::npos ) {
+				GET_DEX(tch) = atoi( argument.c_str() );
+			} else if ( buf.find( "wis" ) != std::string::npos ) {
+				GET_WIS(tch) = atoi( argument.c_str() );
 			} else if ( buf.find( "int" ) != std::string::npos ) {
 				GET_INT(tch) = atoi( argument.c_str() );
-			} else if ( buf.find( "aur" ) != std::string::npos ) {
-				GET_AUR(tch) = atoi( argument.c_str() );
+			} else if ( buf.find( "cha" ) != std::string::npos ) {
+				GET_CHA(tch) = atoi( argument.c_str() );
 			} else if ( buf.find( "con" ) != std::string::npos ) {
 				GET_CON(tch) = atoi( argument.c_str() );
 			} else if ( buf.find( "skill" ) != std::string::npos ) // skill <skillname>

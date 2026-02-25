@@ -505,7 +505,7 @@ soma_ten_second_affect (CHAR_DATA * ch, AFFECTED_TYPE * af)
     {
     case SOMA_NERVES_HEADACHE:
 
-        stat = GET_WIL (ch);
+        stat = GET_WIS (ch);
         save = number (1, (stat > 20) ? stat : 20);
 
         if (save > stat)
@@ -596,7 +596,7 @@ soma_ten_second_affect (CHAR_DATA * ch, AFFECTED_TYPE * af)
         break;
         
     case SOMA_BLUNT_SEVLEG:
-        stat = GET_WIL (ch);
+        stat = GET_WIS (ch);
         save = number (1, (stat > 20) ? stat : 20);
         if (save > stat && GET_POS(ch) > SIT)
         {
@@ -616,7 +616,7 @@ soma_ten_second_affect (CHAR_DATA * ch, AFFECTED_TYPE * af)
         break;
 
     case SOMA_BLUNT_L_SEVARM:
-        stat = GET_WIL (ch);
+        stat = GET_WIS (ch);
         save = number (1, (stat > 20) ? stat : 20);
         if (save > stat)
         {
@@ -636,7 +636,7 @@ soma_ten_second_affect (CHAR_DATA * ch, AFFECTED_TYPE * af)
         break;
 
     case SOMA_BLUNT_R_SEVARM:
-        stat = GET_WIL (ch);
+        stat = GET_WIS (ch);
         save = number (1, (stat > 20) ? stat : 20);
         if (save > stat)
         {
@@ -656,7 +656,7 @@ soma_ten_second_affect (CHAR_DATA * ch, AFFECTED_TYPE * af)
         break;
 
     case SOMA_BLUNT_SEVHEAD:
-        stat = GET_WIL (ch);
+        stat = GET_WIS (ch);
         save = number (1, (stat > 20) ? stat : 20);
         if (GET_POS (ch) > SIT && !IS_SUBDUEE(ch))
         {
@@ -679,7 +679,7 @@ soma_ten_second_affect (CHAR_DATA * ch, AFFECTED_TYPE * af)
                 sprintf(buf, "$n stumbles, falling to $s knees.");
                 act (buf, true, ch, 0, 0, TO_ROOM);
                 GET_POS (ch) = REST;
-                add_second_affect (SA_STAND, ((25-GET_WIL(ch))+number(1,3)), ch, NULL, NULL, 0);
+                add_second_affect (SA_STAND, ((25-GET_WIS(ch))+number(1,3)), ch, NULL, NULL, 0);
                 if (is_outdoors(ch->room))
                 {
                     object__enviro(ch, NULL, COND_DIRT, 5, HITLOC_NONE);
@@ -745,7 +745,7 @@ soma_ten_second_affect (CHAR_DATA * ch, AFFECTED_TYPE * af)
                 act ("Suffering floods your body, dropping you to your knees.", true, ch, 0, 0, TO_CHAR | _ACT_FORMAT);
                 act ("$n collapses to $s knees, $s fall accompanied by a groan of suffering.", true, ch, 0, 0, TO_ROOM | _ACT_FORMAT);
                 GET_POS (ch) = REST;
-                add_second_affect (SA_STAND, ((25-GET_AGI(ch))+number(1,3)), ch, NULL, NULL, 0);
+                add_second_affect (SA_STAND, ((25-GET_DEX(ch))+number(1,3)), ch, NULL, NULL, 0);
             }
             break;
         case 6:

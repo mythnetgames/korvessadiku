@@ -815,13 +815,13 @@ do_throw(CHAR_DATA* ch, char* argument, int cmd)
 			}
 		}
 
-		if (ch->agi <= 9)
+		if (ch->dex <= 9)
 			ch->balance += -14;
-		else if (ch->agi > 9 && ch->agi <= 13)
+		else if (ch->dex > 9 && ch->dex <= 13)
 			ch->balance += -12;
-		else if (ch->agi > 13 && ch->agi <= 15)
+		else if (ch->dex > 13 && ch->dex <= 15)
 			ch->balance += -10;
-		else if (ch->agi > 15 && ch->agi <= 18)
+		else if (ch->dex > 15 && ch->dex <= 18)
 			ch->balance += -8;
 		else
 			ch->balance += -6;
@@ -1925,7 +1925,7 @@ do_hit(CHAR_DATA* ch, char* argument, int cmd)
 	}
 
 	/*
-	if(get_soma_affect(ch, SOMA_PLANT_VISIONS) && number(0,30) > GET_WIL(ch))
+	if(get_soma_affect(ch, SOMA_PLANT_VISIONS) && number(0,30) > GET_WIS(ch))
 	{
 	act ("You're paralyzed with fear, and unable to undertake such an action!", false, ch, 0, 0, TO_CHAR);
 	return;
@@ -2194,13 +2194,13 @@ do_hit(CHAR_DATA* ch, char* argument, int cmd)
 		(GET_POS(ch) == FIGHT ||
 			GET_POS(ch) == STAND) && victim != ch->fighting)
 	{
-		if (ch->agi <= 9)
+		if (ch->dex <= 9)
 			ch->balance += -8;
-		else if (ch->agi > 9 && ch->agi <= 13)
+		else if (ch->dex > 9 && ch->dex <= 13)
 			ch->balance += -7;
-		else if (ch->agi > 13 && ch->agi <= 15)
+		else if (ch->dex > 13 && ch->dex <= 15)
 			ch->balance += -6;
-		else if (ch->agi > 15 && ch->agi <= 18)
+		else if (ch->dex > 15 && ch->dex <= 18)
 			ch->balance += -5;
 		else
 			ch->balance += -3;
@@ -2243,7 +2243,7 @@ do_hit(CHAR_DATA* ch, char* argument, int cmd)
 		{
 			if (ch->fighting->fighting == ch)
 			{
-				agi_diff = GET_AGI(ch) - GET_AGI(ch->fighting);
+				agi_diff = GET_DEX(ch) - GET_DEX(ch->fighting);
 
 				if (agi_diff > number(-10, 10) && (number(0, 19) != 0))
 				{
@@ -2326,7 +2326,7 @@ do_strike(CHAR_DATA* ch, char* argument, int cmd)
 	}
 
 	/*
-	if(get_soma_affect(ch, SOMA_PLANT_VISIONS) && number(0,30) > GET_WIL(ch))
+	if(get_soma_affect(ch, SOMA_PLANT_VISIONS) && number(0,30) > GET_WIS(ch))
 	{
 	act ("You're paralyzed with fear, and unable to undertake such an action!", false, ch, 0, 0, TO_CHAR);
 	return;
@@ -2825,7 +2825,7 @@ retreat(CHAR_DATA* ch, int direction, CHAR_DATA* leader)
 	if (!ch->following || ch->fighting || leader) // Why are we checking !ch->following?
 	{
 		//duration = 40;
-		duration = 70 - GET_AUR(leader ? leader : ch) * 3; // Add modification to allow folks with higher AUR to be able to group retreat faster. 0309142344 -Nimrod
+		duration = 70 - GET_CHA(leader ? leader : ch) * 3; // Add modification to allow folks with higher AUR to be able to group retreat faster. 0309142344 -Nimrod
 		duration = duration >= 10 ? duration : 10; // Limit lowest retreat time to 10. 
 
 		sprintf(buf, "%s has ordered %s to retreat.  Time basis is %d.\n", char_short(leader), char_short(ch), duration);
@@ -2852,14 +2852,14 @@ retreat(CHAR_DATA* ch, int direction, CHAR_DATA* leader)
 		{
 		// penalty or bonus depending on your luck and ability.
 		duration += number (12,20);
-		duration -= MAX(ch->wil,ch->con);
+		duration -= MAX(ch->wis,ch->con);
 		}
 
 		// defensive stance bonus
 		duration -= (IS_SET (ch->flags, FLAG_PACIFIST)) ? (5) : (ch->fight_mode);
 
 		// agility roll bonus
-		duration -= number (1, ch->agi);*/
+		duration -= number (1, ch->dex);*/
 
 		magic_add_affect(ch, AFFECT_GROUP_RETREAT, duration, 0, 0, 0, direction);
 	}
@@ -3267,7 +3267,7 @@ do_aide(CHAR_DATA* ch, char* argument, int cmd)
 	}
 
 	/*
-	if(get_soma_affect(ch, SOMA_PLANT_VISIONS) && number(0,30) > GET_WIL(ch))
+	if(get_soma_affect(ch, SOMA_PLANT_VISIONS) && number(0,30) > GET_WIS(ch))
 	{
 	act ("You're paralyzed with fear, and unable to undertake such an action!", false, ch, 0, 0, TO_CHAR);
 	return;
@@ -3512,13 +3512,13 @@ do_aide(CHAR_DATA* ch, char* argument, int cmd)
 		(GET_POS(ch) == FIGHT ||
 			GET_POS(ch) == STAND) && victim != ch->fighting)
 	{
-		if (ch->agi <= 9)
+		if (ch->dex <= 9)
 			ch->balance += -8;
-		else if (ch->agi > 9 && ch->agi <= 13)
+		else if (ch->dex > 9 && ch->dex <= 13)
 			ch->balance += -7;
-		else if (ch->agi > 13 && ch->agi <= 15)
+		else if (ch->dex > 13 && ch->dex <= 15)
 			ch->balance += -6;
-		else if (ch->agi > 15 && ch->agi <= 18)
+		else if (ch->dex > 15 && ch->dex <= 18)
 			ch->balance += -5;
 		else
 			ch->balance += -3;
@@ -3561,7 +3561,7 @@ do_aide(CHAR_DATA* ch, char* argument, int cmd)
 		{
 			if (ch->fighting->fighting == ch)
 			{
-				agi_diff = GET_AGI(ch) - GET_AGI(ch->fighting);
+				agi_diff = GET_DEX(ch) - GET_DEX(ch->fighting);
 
 				if (agi_diff > number(-10, 10) && (number(0, 19) != 0))
 				{

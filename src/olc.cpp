@@ -40,9 +40,8 @@ const char *apply_types[] =
     "Strength",
     "Dexterity",
     "Intelligence",
+    "Wisdom",
     "Charisma",
-    "Aura",
-    "Will",
     "Constitution",
     "Sex",
     "Age",
@@ -1333,17 +1332,10 @@ fwrite_mobile (CHAR_DATA * tmob, FILE * fp)
              tmob->height,
              tmob->frame, tmob->mob->noaccess_flags, tmob->cell_3, tmob->room_pos, tmob->mob->fallback, tmob->mob->armortype);
 
-    if (world_version_out < 6)
-        fprintf (fp, "%d %d %d %d %d %d %d\n",
-                 tmob->str,
-                 tmob->intel,
-                 tmob->wil, tmob->aur, tmob->dex, tmob->con, tmob->speaks);
-    else
-        fprintf (fp, "%d %d %d %d %d %d %d %d\n",
-                 tmob->str,
-                 tmob->intel,
-                 tmob->wil,
-                 tmob->aur, tmob->dex, tmob->con, tmob->speaks, tmob->agi);
+    fprintf (fp, "%d %d %d %d %d %d %d\n",
+             tmob->str,
+             tmob->intel,
+             tmob->wis, tmob->cha, tmob->dex, tmob->con, tmob->speaks);
 
     if (IS_SET (tmob->flags, FLAG_KEEPER) && !tmob->shop)
         tmob->flags &= ~FLAG_KEEPER;
@@ -5168,17 +5160,15 @@ do_minit (CHAR_DATA * ch, char *argument, int cmd)
     newmob->str = mob_start_stat;
     newmob->dex = mob_start_stat;
     newmob->intel = mob_start_stat;
-    newmob->wil = mob_start_stat;
-    newmob->aur = mob_start_stat;
+    newmob->wis = mob_start_stat;
+    newmob->cha = mob_start_stat;
     newmob->con = mob_start_stat;
-    newmob->agi = mob_start_stat;
     newmob->tmp_str = mob_start_stat;
     newmob->tmp_dex = mob_start_stat;
     newmob->tmp_intel = mob_start_stat;
-    newmob->tmp_wil = mob_start_stat;
-    newmob->tmp_aur = mob_start_stat;
+    newmob->tmp_wis = mob_start_stat;
+    newmob->tmp_cha = mob_start_stat;
     newmob->tmp_con = mob_start_stat;
-    newmob->tmp_agi = mob_start_stat;
     newmob->mob->damnodice = 1;
     newmob->mob->damsizedice = 2;
     newmob->intoxication = 0;
@@ -6486,9 +6476,9 @@ do_mobile_standards (CHAR_DATA *ch, CHAR_DATA *edit_mob, char *argument)
     edit_mob->con = two_buff;
     GET_CON (edit_mob) -= delta;
 
-    delta = edit_mob->wil - two_buff;
-    edit_mob->wil = two_buff;
-    GET_WIL (edit_mob) -= delta;
+    delta = edit_mob->wis - two_buff;
+    edit_mob->wis = two_buff;
+    GET_WIS (edit_mob) -= delta;
 
     one_buff = 0;
     two_buff = 0;
@@ -6609,9 +6599,9 @@ do_mobile_standards (CHAR_DATA *ch, CHAR_DATA *edit_mob, char *argument)
         break;
     }
 
-    delta = edit_mob->agi - two_buff;
-    edit_mob->agi = two_buff;
-    GET_AGI (edit_mob) -= delta;
+    delta = edit_mob->dex - two_buff;
+    edit_mob->dex = two_buff;
+    GET_DEX (edit_mob) -= delta;
 
     edit_mob->natural_delay = one_buff;
 
@@ -8322,12 +8312,10 @@ do_oset (CHAR_DATA * ch, char *argument, int cmd)
                     trap->avoid_atr = 3;
                 else if (!str_cmp(argument, "int"))
                     trap->avoid_atr = 4;
-                else if (!str_cmp(argument, "wil"))
+                else if (!str_cmp(argument, "wis"))
                     trap->avoid_atr = 5;
-                else if (!str_cmp(argument, "mut"))
+                else if (!str_cmp(argument, "cha"))
                     trap->avoid_atr = 6;
-                else if (!str_cmp(argument, "agi"))
-                    trap->avoid_atr = 7;
                 else
                 {
                     changed = false;
@@ -12335,19 +12323,19 @@ do_mset (CHAR_DATA * ch, char *argument, int cmd)
             }
         }
 
-        else if (!str_cmp (subcmd, "wil"))
+        else if (!str_cmp (subcmd, "wis"))
         {
             argument = one_argument (argument, buf);
 
             if (*buf == '0' || atoi (buf))
             {
-                delta = edit_mob->wil - atoi (buf);
-                edit_mob->wil = atoi (buf);
-                GET_WIL (edit_mob) -= delta;
+                delta = edit_mob->wis - atoi (buf);
+                edit_mob->wis = atoi (buf);
+                GET_WIS (edit_mob) -= delta;
             }
             else
             {
-                send_to_char ("Expected a value for wil.\n", ch);
+                send_to_char ("Expected a value for wis.\n", ch);
                 break;
             }
         }
@@ -14192,7 +14180,7 @@ do_mset (CHAR_DATA * ch, char *argument, int cmd)
             }
         }
 
-        else if (!str_cmp (subcmd, "aur"))
+        else if (!str_cmp (subcmd, "cha"))
         {
             argument = one_argument (argument, buf);
 
@@ -14204,36 +14192,13 @@ do_mset (CHAR_DATA * ch, char *argument, int cmd)
 
             if (*buf == '0' || atoi (buf))
             {
-                delta = edit_mob->aur - atoi (buf);
-                edit_mob->aur = atoi (buf);
-                GET_AUR (edit_mob) -= delta;
+                delta = edit_mob->cha - atoi (buf);
+                edit_mob->cha = atoi (buf);
+                GET_CHA (edit_mob) -= delta;
             }
             else
             {
-                send_to_char ("Expected a value for aur.\n", ch);
-                break;
-            }
-        }
-
-        else if (!str_cmp (subcmd, "agi"))
-        {
-            argument = one_argument (argument, buf);
-
-            if (atoi (buf) < 3 || atoi (buf) > 25)
-            {
-                send_to_char ("Expected a value of 3 to 25.\n", ch);
-                return;
-            }
-
-            if (*buf == '0' || atoi (buf))
-            {
-                delta = edit_mob->agi - atoi (buf);
-                edit_mob->agi = atoi (buf);
-                GET_AGI (edit_mob) -= delta;
-            }
-            else
-            {
-                send_to_char ("Expected a value for agi.\n", ch);
+                send_to_char ("Expected a value for cha.\n", ch);
                 break;
             }
         }

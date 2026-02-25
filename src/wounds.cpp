@@ -99,7 +99,7 @@ shock_to_char (CHAR_DATA * ch, CHAR_DATA * tch, int loc, int type, int impact, i
     {
         // If we've got some damage, and it's to the head and eyes, and we fail a big
         // will check, we suffer quadruple the shock damage.
-        if (impact && (loc == HITLOC_HEAD || loc == HITLOC_EYES) && (number(1,30) > GET_WIL(ch)))
+        if (impact && (loc == HITLOC_HEAD || loc == HITLOC_EYES) && (number(1,30) > GET_WIS(ch)))
         {
             impact *= 2;
         }
@@ -112,7 +112,7 @@ shock_to_char (CHAR_DATA * ch, CHAR_DATA * tch, int loc, int type, int impact, i
     {
         group_size = do_group_size(ch) - 1;
         // If we roll a less than our wil + group_size or we already have the affect, return 0.
-        if ((number(1, 25) < GET_WIL(ch) + group_size) || get_affect(ch, AFFECT_TRAUMA_SUSTAINED))
+        if ((number(1, 25) < GET_WIS(ch) + group_size) || get_affect(ch, AFFECT_TRAUMA_SUSTAINED))
         {
             return 0;
         }
@@ -142,7 +142,7 @@ shock_to_char (CHAR_DATA * ch, CHAR_DATA * tch, int loc, int type, int impact, i
     // knocked down to your knees and can't stand.
     if (new_tier <= 1)
     {
-        if (number(0,25) > GET_WIL(ch))
+        if (number(0,25) > GET_WIS(ch))
         {
             if (GET_POS(ch) > SIT)
             {

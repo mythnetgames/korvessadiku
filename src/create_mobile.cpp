@@ -1930,9 +1930,9 @@ randomize_mobile (CHAR_DATA * mob)
     }
 	
     CHAR_DATA *proto;
-    int attr_starters[] = { 16, 15, 12, 12, 11, 10, 8 };
-    int attr_priorities[] = { -1, -1, -1, -1, -1, -1, 1 };
-    int slots_taken[] = { 0, 0, 0, 0, 0, 0, 0 };
+    int attr_starters[] = { 16, 15, 12, 12, 11, 10 };
+    int attr_priorities[] = { -1, -1, -1, -1, -1, -1 };
+    int slots_taken[] = { 0, 0, 0, 0, 0, 0 };
     int i, roll, bonus;
     int type_bonus = 0;
 /*
@@ -1948,9 +1948,9 @@ randomize_mobile (CHAR_DATA * mob)
     if (lookup_race_int(mob->race, RACE_PC) &&
 		str_cmp(lookup_race_variable(mob->race, RACE_NAME), "Hosted-Terror"))
     {
-        for (i = 0; i <= 6; i++)
+        for (i = 0; i <= 5; i++)
         {
-            roll = number (0, 6);
+            roll = number (0, 5);
             if (slots_taken[roll])
             {
                 i--;
@@ -1963,7 +1963,7 @@ randomize_mobile (CHAR_DATA * mob)
 
         for (bonus = 8; bonus;)
         {
-            roll = number (0, 6);
+            roll = number (0, 5);
             if (attr_starters[attr_priorities[roll]] < 18)
             {
                 attr_starters[attr_priorities[roll]]++;
@@ -1974,18 +1974,16 @@ randomize_mobile (CHAR_DATA * mob)
         mob->str = attr_starters[attr_priorities[0]];
         mob->dex = attr_starters[attr_priorities[1]];
         mob->con = attr_starters[attr_priorities[2]];
-        mob->wil = attr_starters[attr_priorities[3]];
+        mob->wis = attr_starters[attr_priorities[3]];
         mob->intel = attr_starters[attr_priorities[4]];
-        mob->aur = attr_starters[attr_priorities[5]];
-        mob->agi = attr_starters[attr_priorities[6]];
+        mob->cha = attr_starters[attr_priorities[5]];
 
         mob->tmp_str = mob->str;
         mob->tmp_dex = mob->dex;
         mob->tmp_intel = mob->intel;
-        mob->tmp_aur = mob->aur;
-        mob->tmp_agi = mob->agi;
+        mob->tmp_cha = mob->cha;
         mob->tmp_con = mob->con;
-        mob->tmp_wil = mob->wil;
+        mob->tmp_wis = mob->wis;
 
         for (i = 1; i <= LAST_SKILL; i++)
             mob->skills[i] = 0;
@@ -4029,9 +4027,9 @@ new_randomize_mobile (CHAR_DATA * mob,
                       char *rAge, char *rHeight, char *rFrame, char *rEyes, char *rLength, char *rColor, char *rStyle, char *rOne, char *rTwo, char *rThree, char *rFour)
 {
     CHAR_DATA *proto;
-    int attr_starters[] = { 16, 15, 12, 12, 11, 10, 8 };
-    int attr_priorities[] = { -1, -1, -1, -1, -1, -1, 1 };
-    int slots_taken[] = { 0, 0, 0, 0, 0, 0, 0 };
+    int attr_starters[] = { 16, 15, 12, 12, 11, 10 };
+    int attr_priorities[] = { -1, -1, -1, -1, -1, -1 };
+    int slots_taken[] = { 0, 0, 0, 0, 0, 0 };
     int i, roll, bonus;
     int type_bonus = 0;
 
@@ -4046,9 +4044,9 @@ new_randomize_mobile (CHAR_DATA * mob,
 
     if (lookup_race_int(mob->race, RACE_PC))
     {
-        for (i = 0; i <= 6; i++)
+        for (i = 0; i <= 5; i++)
         {
-            roll = number (0, 6);
+            roll = number (0, 5);
             if (slots_taken[roll])
             {
                 i--;
@@ -4061,7 +4059,7 @@ new_randomize_mobile (CHAR_DATA * mob,
 
         for (bonus = 8; bonus;)
         {
-            roll = number (0, 6);
+            roll = number (0, 5);
             if (attr_starters[attr_priorities[roll]] < 18)
             {
                 attr_starters[attr_priorities[roll]]++;
@@ -4072,18 +4070,16 @@ new_randomize_mobile (CHAR_DATA * mob,
         mob->str = attr_starters[attr_priorities[0]];
         mob->dex = attr_starters[attr_priorities[1]];
         mob->con = attr_starters[attr_priorities[2]];
-        mob->wil = attr_starters[attr_priorities[3]];
+        mob->wis = attr_starters[attr_priorities[3]];
         mob->intel = attr_starters[attr_priorities[4]];
-        mob->aur = attr_starters[attr_priorities[5]];
-        mob->agi = attr_starters[attr_priorities[6]];
+        mob->cha = attr_starters[attr_priorities[5]];
 
         mob->tmp_str = mob->str;
         mob->tmp_dex = mob->dex;
         mob->tmp_intel = mob->intel;
-        mob->tmp_aur = mob->aur;
-        mob->tmp_agi = mob->agi;
+        mob->tmp_cha = mob->cha;
         mob->tmp_con = mob->con;
-        mob->tmp_wil = mob->wil;
+        mob->tmp_wis = mob->wis;
 
         for (i = 1; i <= LAST_SKILL; i++)
             mob->skills[i] = 0;

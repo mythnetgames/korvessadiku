@@ -1884,10 +1884,9 @@ void clear_char( CHAR_DATA * ch ) {
 		pc->start_str = 0;
 		pc->start_dex = 0;
 		pc->start_con = 0;
-		pc->start_wil = 0;
-		pc->start_aur = 0;
+		pc->start_wis = 0;
+		pc->start_cha = 0;
 		pc->start_intel = 0;
-		pc->start_agi = 0;
 		pc->load_count = 0;
 		pc->chargen_flags = 0;
 		pc->last_global_pc_msg = 0;

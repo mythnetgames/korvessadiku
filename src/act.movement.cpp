@@ -322,7 +322,7 @@ int ride_mount(CHAR_DATA *mount, CHAR_DATA *rider, int current, int target,
 				mount_speeds[speed], dirs[dir]);
 
 		GET_POS (rider) = SIT;
-		add_second_affect(SA_STAND, ((25 - GET_AGI(rider)) + number(1, 3)),
+		add_second_affect(SA_STAND, ((25 - GET_DEX(rider)) + number(1, 3)),
 				rider, NULL, NULL, 0);
 		rider->mount = NULL;
 		mount->mount = NULL;
@@ -358,7 +358,7 @@ int ride_mount(CHAR_DATA *mount, CHAR_DATA *rider, int current, int target,
 					"As $n %ss %s, $e stumbles before falling to the ground.",
 					mount_speeds[speed], dirs[dir]);
 			GET_POS (mount) = SIT;
-			add_second_affect(SA_STAND, ((25 - GET_AGI(mount)) + number(1, 3)),
+			add_second_affect(SA_STAND, ((25 - GET_DEX(mount)) + number(1, 3)),
 					mount, NULL, NULL, 0);
 		} else if (mod < 45) {
 			sprintf(buf,
@@ -371,7 +371,7 @@ int ride_mount(CHAR_DATA *mount, CHAR_DATA *rider, int current, int target,
 					"$n attempts to %ss %s but loses $s footing and hits the ground hard.",
 					mount_speeds[speed], dirs[dir]);
 			GET_POS (mount) = SIT;
-			add_second_affect(SA_STAND, ((25 - GET_AGI(mount)) + number(1, 3)),
+			add_second_affect(SA_STAND, ((25 - GET_DEX(mount)) + number(1, 3)),
 					mount, NULL, NULL, 0);
 			wound_to_char(mount, figure_location(mount, HITLOC_BODY),
 					dice(1, 8), 3, 0, 0, 0);
@@ -392,7 +392,7 @@ int ride_mount(CHAR_DATA *mount, CHAR_DATA *rider, int current, int target,
 					"$n attempts to %ss %s but trips and smashes in to the ground.",
 					mount_speeds[speed], dirs[dir]);
 			GET_POS (mount) = SIT;
-			add_second_affect(SA_STAND, ((30 - GET_AGI(mount)) + number(1, 3)),
+			add_second_affect(SA_STAND, ((30 - GET_DEX(mount)) + number(1, 3)),
 					mount, NULL, NULL, 0);
 			wound_to_char(mount, figure_location(mount, HITLOC_BODY),
 					dice(1, 12), 3, 0, 0, 0);
@@ -425,7 +425,7 @@ int ride_mount(CHAR_DATA *mount, CHAR_DATA *rider, int current, int target,
 			sprintf(buf3 + strlen(buf3),
 					" $N slides slowly from $n's back, landing with a thump on the ground.");
 			GET_POS (rider) = SIT;
-			add_second_affect(SA_STAND, ((25 - GET_AGI(rider)) + number(1, 3)),
+			add_second_affect(SA_STAND, ((25 - GET_DEX(rider)) + number(1, 3)),
 					rider, NULL, NULL, 0);
 			rider->mount = NULL;
 			mount->mount = NULL;
@@ -437,7 +437,7 @@ int ride_mount(CHAR_DATA *mount, CHAR_DATA *rider, int current, int target,
 			sprintf(buf3 + strlen(buf3),
 					" $N is jolted from $n's back, landing hard on the ground.");
 			GET_POS (rider) = SIT;
-			add_second_affect(SA_STAND, ((25 - GET_AGI(rider)) + number(1, 3)),
+			add_second_affect(SA_STAND, ((25 - GET_DEX(rider)) + number(1, 3)),
 					rider, NULL, NULL, 0);
 			wound_to_char(rider, figure_location(rider, HITLOC_BODY),
 					dice(1, 8), 3, 0, 0, 0);
@@ -457,7 +457,7 @@ int ride_mount(CHAR_DATA *mount, CHAR_DATA *rider, int current, int target,
 			sprintf(buf3 + strlen(buf3),
 					" $N is forcefully flung from $n's back, landing hard on the ground with a thud and a crunch.");
 			GET_POS (rider) = SIT;
-			add_second_affect(SA_STAND, ((25 - GET_AGI(rider)) + number(1, 3)),
+			add_second_affect(SA_STAND, ((25 - GET_DEX(rider)) + number(1, 3)),
 					rider, NULL, NULL, 0);
 			wound_to_char(rider, figure_location(rider, HITLOC_BODY),
 					dice(1, 12), 3, 0, 0, 0);
@@ -742,7 +742,7 @@ int swimming_check(CHAR_DATA * ch) {
 	if (!encumbered && !exhausted)
 		return 0;
 
-	check = ch->con * 2 + ch->str + ch->agi + 10 + number(0, 40)
+	check = ch->con * 2 + ch->str + ch->dex + 10 + number(0, 40)
 			- (armor_penalty(ch) * 10);
 
 	if (check > (int) encumb_percent) {
@@ -1088,7 +1088,7 @@ int check_climb(CHAR_DATA * ch) {
 	// Full metal, 30 - 70
 	// Full metal + fur: 20, 60.
 
-	check = ((ch->str * 2 + ch->agi * 2) - (armor_penalty(ch) * 10)
+	check = ((ch->str * 2 + ch->dex * 2) - (armor_penalty(ch) * 10)
 			+ number(-10, 30));
 
 	if (number(1, SKILL_CEILING) >= check) {
@@ -1576,7 +1576,7 @@ void enter_room(QE_DATA * qe) {
 
 	ch = qe->ch;
 
-	int swimability = ch->con * 2 + ch->str + ch->agi - 20 + number(0, 40);
+	int swimability = ch->con * 2 + ch->str + ch->dex - 20 + number(0, 40);
 	// constitution * 2 + strength + agility - 20 + 0-39
 
 	// If there is no character.
@@ -2907,7 +2907,7 @@ int calc_movement_charge(CHAR_DATA * ch, int dir, int wanted_time, int flags,
 	AFFECTED_TYPE *dragger;
 	ROOM_DATA *target_room;
 	ROOM_DIRECTION_DATA *room_exit;
-	int swimability = ((ch->str + ch->agi) * 2) - 20 + number(0, 40);
+	int swimability = ((ch->str + ch->dex) * 2) - 20 + number(0, 40);
 
 	room_exit = EXIT(ch, dir);
 
@@ -2972,7 +2972,7 @@ int calc_movement_charge(CHAR_DATA * ch, int dir, int wanted_time, int flags,
 
 	*walk_time = 0;
 
-	*walk_time = 2 * 13.0 * 5.0 / (GET_AGI (ch) ? GET_AGI(ch) : 13);
+	*walk_time = 2 * 13.0 * 5.0 / (GET_DEX (ch) ? GET_DEX(ch) : 13);
 
 	*walk_time += terrain_walk_time[ch->room->sector_type];
 
@@ -3996,7 +3996,7 @@ void initiate_move(CHAR_DATA * ch) {
 		}
 	}
 
-	if (stuck && number(1, 20) > GET_WIL(ch)) {
+	if (stuck && number(1, 20) > GET_WIS(ch)) {
 		sprintf(buf, "Pain shoots through your %s as you move.\n",
 				expand_wound_loc(location));
 		send_to_char(buf, ch);
@@ -4270,7 +4270,7 @@ void do_move(CHAR_DATA * ch, char *argument, int dir) {
 	// Old Somatics Code - put in by Tiamat again
 
 	if ((af = get_soma_affect(ch, SOMA_SHAKES))) {
-		if ((number(0, 25) > GET_CON(ch) || number(0, 25) > GET_WIL(ch))
+		if ((number(0, 25) > GET_CON(ch) || number(0, 25) > GET_WIS(ch))
 				&& (number(0, 1000) < af->a.soma.lvl_power)) {
 			if (get_affect(ch, MAGIC_HIDDEN) && would_reveal(ch))
 				remove_affect_type(ch, MAGIC_HIDDEN);
@@ -4283,7 +4283,7 @@ void do_move(CHAR_DATA * ch, char *argument, int dir) {
 			act(buf, true, ch, 0, 0, TO_ROOM);
 
 			GET_POS (ch) = SIT;
-			add_second_affect(SA_STAND, ((25 - GET_AGI(ch)) + number(1, 3)), ch,
+			add_second_affect(SA_STAND, ((25 - GET_DEX(ch)) + number(1, 3)), ch,
 					NULL, NULL, 0);
 			if (ch->following)
 				;
@@ -7938,7 +7938,7 @@ void do_push(CHAR_DATA *ch, char *argument, int cmd) {
 		send_to_char("You force your way in.\n", ch);
 		sprintf(buf, "$n forces $s way %sward.", direction[dir]);
 		act(buf, false, ch, 0, 0, TO_ROOM | _ACT_FORMAT);
-	} else if (check < GET_AGI(ch)) {
+	} else if (check < GET_DEX(ch)) {
 		send_to_char("You manage to squeeze your way in.\n", ch);
 		sprintf(buf, "$n squeezes $s way %sward.", direction[dir]);
 		act(buf, false, ch, 0, 0, TO_ROOM | _ACT_FORMAT);

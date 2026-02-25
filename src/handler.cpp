@@ -317,10 +317,10 @@ affect_modify (CHAR_DATA * ch, int type, int loc, int mod, int bitv,
     		case SPELL_STRENGTH:		GET_STR (ch) += mod;				return;
     		case SPELL_DEXTERITY:		GET_DEX (ch) += mod;				return;
     		case SPELL_INTELLIGENCE:	GET_INT (ch) += mod;				return;
-    		case SPELL_AURA:			GET_AUR (ch) += mod;				return;
-    		case SPELL_WILL:			GET_WIL (ch) += mod;				return;
+    		case SPELL_AURA:			GET_CHA (ch) += mod;				return;
+    		case SPELL_WILL:			GET_WIS (ch) += mod;				return;
     		case SPELL_CONSTITUTION:	GET_CON (ch) += mod;				return;
-    		case SPELL_AGILITY:			GET_AGI (ch) += mod;				return;
+    		case SPELL_AGILITY:			GET_DEX (ch) += mod;				return;
     		default:														break;
     	}
     */
@@ -359,12 +359,12 @@ affect_modify (CHAR_DATA * ch, int type, int loc, int mod, int bitv,
         case APPLY_INT:
             GET_INT (ch) += mod;
             break;
-        case APPLY_AUR:
-            GET_AUR (ch) += mod;
-            break;
-        case APPLY_WIL:
-            GET_WIL (ch) += mod;
+        case APPLY_WIS:
+            GET_WIS (ch) += mod;
             ch->max_move = calc_lookup (ch, REG_MISC, MISC_MAX_MOVE);
+            break;
+        case APPLY_CHA:
+            GET_CHA (ch) += mod;
             break;
         case APPLY_CON:
             GET_CON (ch) += mod;
@@ -378,9 +378,7 @@ affect_modify (CHAR_DATA * ch, int type, int loc, int mod, int bitv,
             }
             ch->max_move = calc_lookup (ch, REG_MISC, MISC_MAX_MOVE);
             break;
-        case APPLY_AGI:
-            GET_AGI (ch) += mod;
-            break;
+        /* APPLY_AGI removed — agility merged into dexterity */
         case APPLY_AGE:
             ch->time.birth += mod;
             break;
@@ -438,10 +436,10 @@ nullify_affects (CHAR_DATA * ch)
 
     ch->tmp_str = ch->str;
     ch->tmp_dex = ch->dex;
-    ch->tmp_intel = ch->intel;
-    ch->tmp_aur = ch->aur;
     ch->tmp_con = ch->con;
-    ch->tmp_wil = ch->wil;
+    ch->tmp_intel = ch->intel;
+    ch->tmp_wis = ch->wis;
+    ch->tmp_cha = ch->cha;
 }
 
 void
@@ -476,12 +474,12 @@ reapply_affects (CHAR_DATA * ch)
 
     /* Make certain values are between 0..25, not < 0 and not > 25! */
 
-    GET_DEX (ch) = MAX (0, MIN (GET_DEX (ch), 25));
-    GET_INT (ch) = MAX (0, MIN (GET_INT (ch), 25));
-    GET_WIL (ch) = MAX (0, MIN (GET_WIL (ch), 25));
-    GET_AUR (ch) = MAX (0, MIN (GET_AUR (ch), 25));
-    GET_CON (ch) = MAX (0, MIN (GET_CON (ch), 25));
     GET_STR (ch) = MAX (0, MIN (GET_STR (ch), 25));
+    GET_DEX (ch) = MAX (0, MIN (GET_DEX (ch), 25));
+    GET_CON (ch) = MAX (0, MIN (GET_CON (ch), 25));
+    GET_INT (ch) = MAX (0, MIN (GET_INT (ch), 25));
+    GET_WIS (ch) = MAX (0, MIN (GET_WIS (ch), 25));
+    GET_CHA (ch) = MAX (0, MIN (GET_CHA (ch), 25));
 }
 
 AFFECTED_TYPE *
@@ -1184,7 +1182,7 @@ char_to_room (CHAR_DATA * ch, int room_num)
             ("Your breathing becomes labored as the air grows thin...",
              false, ch, 0, 0, TO_CHAR);
             send_to_char ("\n", ch);
-            curr = MAX ((ch->con*2 + ch->str + ch->agi) * number (1, 3), 25);
+            curr = MAX ((ch->con*2 + ch->str + ch->dex) * number (1, 3), 25);
             magic_add_affect (ch, AFFECT_CHOKING, curr, 0, 0, 0, curr);
         }    
     }
@@ -1197,7 +1195,7 @@ char_to_room (CHAR_DATA * ch, int room_num)
             ("You take a deep breath just before entering the oxygen-deprived zone...",
              false, ch, 0, 0, TO_CHAR);
             send_to_char ("\n", ch);
-            curr = MAX ((ch->con*2 + ch->str + ch->agi) * number (1, 3), 25);
+            curr = MAX ((ch->con*2 + ch->str + ch->dex) * number (1, 3), 25);
             magic_add_affect (ch, AFFECT_CHOKING, curr, 0, 0, 0, curr);
         }
     }
@@ -1224,7 +1222,7 @@ char_to_room (CHAR_DATA * ch, int room_num)
             ("You take a deep breath just before plunging into the water...",
              false, ch, 0, 0, TO_CHAR);
             send_to_char ("\n", ch);
-            curr = MAX ((ch->con*2 + ch->str + ch->agi) * number (1, 3), 25);
+            curr = MAX ((ch->con*2 + ch->str + ch->dex) * number (1, 3), 25);
             magic_add_affect (ch, AFFECT_HOLDING_BREATH, curr, 0, 0, 0, curr);
         }
     }
@@ -5287,7 +5285,7 @@ setup_registry (void)
     add_registry (REG_MISC, MISC_DELAY_OFFSET, "(str + dex) / 6");
     add_registry (REG_MISC, MISC_MAX_CARRY_N, "dex / 3 + 4");
     add_registry (REG_MISC, MISC_MAX_CARRY_W, "str * 2500");
-    add_registry (REG_MISC, MISC_MAX_MOVE, "(con + wil) / 2 * 5 + 25");
+    add_registry (REG_MISC, MISC_MAX_MOVE, "(con + wis) / 2 * 5 + 25");
     add_registry (REG_MISC, MISC_STEAL_DEFENSE, "(int + dex) / 2");
 
     add_registry (REG_MAGIC_SPELLS, POISON_LETHARGY, "Lethargy");
@@ -5573,10 +5571,9 @@ void char_data::partial_deep_copy (CHAR_DATA *proto)
     this->str = proto->str;
     this->dex = proto->dex;
     this->intel = proto->intel;
-    this->aur = proto->aur;
+    this->cha = proto->cha;
     this->con = proto->con;
-    this->wil = proto->wil;
-    this->agi = proto->agi;
+    this->wis = proto->wis;
 
     this->flags = proto->flags;
     this->shop = proto->shop;
@@ -5618,8 +5615,8 @@ void char_data::partial_deep_copy (CHAR_DATA *proto)
     this->str = proto->str;
     this->dex = proto->dex;
     this->con = proto->con;
-    this->wil = proto->wil;
-    this->aur = proto->aur;
+    this->wis = proto->wis;
+    this->cha = proto->cha;
     this->intel = proto->intel;
 
     this->mob->currency_type = proto->mob->currency_type;
@@ -5657,18 +5654,16 @@ char_data::clear_char ()
     this->vehicle = NULL;
     this->str = 0;
     this->intel = 0;
-    this->wil = 0;
+    this->wis = 0;
     this->dex = 0;
     this->con = 0;
-    this->aur = 0;
-    this->agi = 0;
+    this->cha = 0;
     this->tmp_str = 0;
     this->tmp_intel = 0;
-    this->tmp_wil = 0;
+    this->tmp_wis = 0;
     this->tmp_dex = 0;
     this->tmp_con = 0;
-    this->tmp_aur = 0;
-    this->tmp_agi = 0;
+    this->tmp_cha = 0;
     for (int i = 0; i < MAX_SKILLS; i++)
     {
         this->skills[i] = 0;
@@ -6279,10 +6274,9 @@ pc_data::pc_data()
     this->start_str = 0;
     this->start_dex = 0;
     this->start_con = 0;
-    this->start_wil = 0;
-    this->start_aur = 0;
+    this->start_wis = 0;
+    this->start_cha = 0;
     this->start_intel = 0;
-    this->start_agi = 0;
     this->level = 0;
     this->boat_virtual = 0;
     this->mount_speed = 0;

@@ -217,15 +217,17 @@ CHAR_DATA *
 		fscanf (fp, "%d %d %d %d %d %d %d\n",
 			&mob->str,
 			&mob->intel,
-			&mob->wil, &mob->aur, &mob->dex, &mob->con, &mob->speaks);
-		mob->agi = 16;
+			&mob->wis, &mob->cha, &mob->dex, &mob->con, &mob->speaks);
 	}
 	else
+	{
+		int dummy_agi;
 		fscanf (fp, "%d %d %d %d %d %d %d %d\n",
 		&mob->str,
 		&mob->intel,
-		&mob->wil,
-		&mob->aur, &mob->dex, &mob->con, &mob->speaks, &mob->agi);
+		&mob->wis,
+		&mob->cha, &mob->dex, &mob->con, &mob->speaks, &dummy_agi);
+	}
 
 	if (lookup_race_int(mob->race, RACE_PC))
 	{
@@ -234,7 +236,7 @@ CHAR_DATA *
 		mob->hit = mob->max_hit;
 	}
 
-	mob->max_shock = 40 + mob->wil * CONSTITUTION_MULTIPLIER;
+	mob->max_shock = 40 + mob->wis * CONSTITUTION_MULTIPLIER;
 	mob->shock = mob->max_shock;
 
 	fscanf (fp, "%d %d\n", &mob->flags, &mob->mob->currency_type);
@@ -375,10 +377,9 @@ CHAR_DATA *
 	mob->tmp_str = mob->str;
 	mob->tmp_dex = mob->dex;
 	mob->tmp_intel = mob->intel;
-	mob->tmp_aur = mob->aur;
-	mob->tmp_wil = mob->wil;
+	mob->tmp_cha = mob->cha;
+	mob->tmp_wis = mob->wis;
 	mob->tmp_con = mob->con;
-	mob->tmp_agi = mob->agi;
 
 	mob->equip = NULL;
 
@@ -445,7 +446,7 @@ CHAR_DATA *
 	fix_offense (mob);
 
 	// Same calc as for health, but with willpower instead
-	mob->max_shock = 40 + mob->wil * 4;
+	mob->max_shock = 40 + mob->wis * 4;
 	mob->shock = mob->max_shock;
 
 	if (lookup_race_variable (mob->race, RACE_BODY_PROTO) != NULL)

@@ -882,28 +882,26 @@ typedef signed char shortint;
 #define APPLY_STR           1
 #define APPLY_DEX           2
 #define APPLY_INT		    3
-#define APPLY_CHA		    4
-#define APPLY_AUR		    5
-#define APPLY_WIL           6
-#define APPLY_CON           7
-#define APPLY_SEX           8
-#define APPLY_AGE           9
-#define APPLY_CHAR_WEIGHT	10
-#define APPLY_CHAR_HEIGHT	11
-#define APPLY_DEFENSE		12	/* Free - APPLY_DEFENSE not used */
-#define APPLY_HIT		    13
-#define APPLY_MOVE		    14
-#define APPLY_CASH		    15
-#define APPLY_AC		    16
-#define APPLY_ARMOR		    16
-#define APPLY_OFFENSE		17	/* Free - APPLY_OFFENSE not used */
-#define APPLY_DAMROLL		18
-#define APPLY_SAVING_PARA	19
-#define APPLY_SAVING_ROD	20
-#define APPLY_SAVING_PETRI	21
-#define APPLY_SAVING_BREATH	22
-#define APPLY_SAVING_SPELL	23
-#define APPLY_AGI			24
+#define APPLY_WIS           4
+#define APPLY_CHA		    5
+#define APPLY_CON           6
+#define APPLY_SEX           7
+#define APPLY_AGE           8
+#define APPLY_CHAR_WEIGHT	9
+#define APPLY_CHAR_HEIGHT	10
+#define APPLY_DEFENSE		11	/* Free - APPLY_DEFENSE not used */
+#define APPLY_HIT		    12
+#define APPLY_MOVE		    13
+#define APPLY_CASH		    14
+#define APPLY_AC		    15
+#define APPLY_ARMOR		    15
+#define APPLY_OFFENSE		16	/* Free - APPLY_OFFENSE not used */
+#define APPLY_DAMROLL		17
+#define APPLY_SAVING_PARA	18
+#define APPLY_SAVING_ROD	19
+#define APPLY_SAVING_PETRI	20
+#define APPLY_SAVING_BREATH	21
+#define APPLY_SAVING_SPELL	22
 
 /* Above 100, don't reapply upon restore of character. */
 
@@ -1005,19 +1003,17 @@ typedef signed char shortint;
 // people have upgraded their stats.
 
 #define TAL_STR1        ( 1 << 0 )
-#define TAL_AGI1        ( 1 << 1 )
-#define TAL_DEX1        ( 1 << 2 )
-#define TAL_CON1        ( 1 << 3 )
-#define TAL_INT1        ( 1 << 4 )
-#define TAL_WIL1        ( 1 << 5 )
-#define TAL_AUR1        ( 1 << 6 )
-#define TAL_STR2        ( 1 << 7 )
-#define TAL_AGI2        ( 1 << 8 )
-#define TAL_DEX2        ( 1 << 9 )
-#define TAL_CON2        ( 1 << 10 )
-#define TAL_INT2        ( 1 << 11 )
-#define TAL_WIL2        ( 1 << 12 )
-#define TAL_AUR2        ( 1 << 13 )
+#define TAL_DEX1        ( 1 << 1 )
+#define TAL_CON1        ( 1 << 2 )
+#define TAL_INT1        ( 1 << 3 )
+#define TAL_WIS1        ( 1 << 4 )
+#define TAL_CHA1        ( 1 << 5 )
+#define TAL_STR2        ( 1 << 6 )
+#define TAL_DEX2        ( 1 << 7 )
+#define TAL_CON2        ( 1 << 8 )
+#define TAL_INT2        ( 1 << 9 )
+#define TAL_WIS2        ( 1 << 10 )
+#define TAL_CHA2        ( 1 << 11 )
 #define TAL_CLIMB       ( 1 << 14 )  // Get a bonus to climb.
 #define TAL_SWIM        ( 1 << 15 )  // Get a bonus to swim.
 #define TAL_FLEE        ( 1 << 16 )  // Get a bonus to flee vs groups.
@@ -1080,13 +1076,12 @@ typedef signed char shortint;
 #define SAVE_NONE			0
 #define SAVE_EVADE			1
 #define SAVE_MAGIC_RESIST		2
-#define SAVE_AGI			3
-#define SAVE_DEX			4
+#define SAVE_DEX			3
+#define SAVE_CON			4
 #define SAVE_INTEL			5
-#define SAVE_WIL			6
-#define SAVE_AUR			7
-#define SAVE_CON			8
-#define SAVE_STR			9
+#define SAVE_WIS			6
+#define SAVE_CHA			7
+#define SAVE_STR			8
 
 /* Defines for what a successful save will result in */
 
@@ -1337,7 +1332,7 @@ typedef signed char shortint;
 
 /* skills */
 
-// weaponskills first
+// === COMBAT SKILLS (1-15) ===
 #define SKILL_DEFENSE		-3	/* Special cased; a pseudo skill */
 #define SKILL_OFFENSE		-2	/* Special cased; a pseudo skill */
 #define SKILL_BRAWLING		    1
@@ -1346,48 +1341,51 @@ typedef signed char shortint;
 #define SKILL_POLEARM   	    4
 #define SKILL_BLUDGEON      	5
 #define SKILL_DODGE		        6
-#define SKILL_DEFLECT         	7
+#define SKILL_PARRY           	7	/* Was DEFLECT */
 #define SKILL_SOLE_WIELD        8
 #define SKILL_DUAL_WIELD        9
-#define SKILL_AIM		        10
-#define SKILL_HANDGUN	    	11
-#define SKILL_RIFLE		        12
-#define SKILL_SMG       	    13
-#define SKILL_GUNNERY		    14
-#define SKILL_EXPLOSIVES	    15      // One day this will be awesome.
+#define SKILL_AIM		        10	/* Ranged aiming (bows) */
+#define SKILL_GRAPPLE	    	11	/* Was HANDGUN - now unarmed grappling */
+#define SKILL_SHORTBOW          12	/* Was RIFLE - moved bow skills to combat */
+#define SKILL_LONGBOW       	13	/* Was SMG */
+#define SKILL_CROSSBOW		    14	/* Was GUNNERY */
+#define SKILL_THROWN		    15	/* Was EXPLOSIVES - throwing weapons */
 
 #define LAST_WEAPON_SKILL       14      // The last real weaponskill we have.
 
-// ability skills second
+// === STEALTH / SUBTERFUGE SKILLS (16-19) ===
 #define SKILL_SNEAK         	16
 #define SKILL_HIDE          	17
 #define SKILL_STEAL         	18
-#define SKILL_PICK          	19
+#define SKILL_PICK          	19	/* Lockpicking */
+
+// === SOCIAL SKILLS (20-22) ===
 #define SKILL_HAGGLE       		20
-#define SKILL_HANDLE			21
-#define SKILL_HUNTING			22
+#define SKILL_PERSUASION		21	/* Was HANDLE */
+#define SKILL_STREETWISE		22	/* Was HUNTING - underworld knowledge */
+
+// === SURVIVAL SKILLS (23-27) ===
 #define SKILL_FIRSTAID			23
-#define SKILL_MEDICINE			24
+#define SKILL_TRACKING			24	/* Was MEDICINE - wilderness tracking */
 #define SKILL_FORAGE        	25
 #define SKILL_EAVESDROP         26
 #define SKILL_BUTCHERY			27
 
-// craft skills third
-#define SKILL_CHEMISTRY         28
-#define SKILL_MECHANICS         29
-#define SKILL_GUNSMITH          30
-#define SKILL_COMPUTEROLOGY     31
-#define SKILL_ELECTRONICS       32
-#define SKILL_BIOLOGY           33
+// === CRAFTING SKILLS (28-37) ===
+#define SKILL_HERBALISM         28	/* Was CHEMISTRY */
+#define SKILL_BLACKSMITHING     29	/* Was MECHANICS */
+#define SKILL_CARPENTRY         30	/* Was GUNSMITH */
+#define SKILL_APPRAISE          31	/* Was COMPUTEROLOGY - item/value assessment */
+#define SKILL_INVESTIGATION     32	/* Was ELECTRONICS - piecing together clues */
+#define SKILL_LORE              33	/* Was BIOLOGY - scholarly knowledge */
 #define SKILL_WEAPONCRAFT   	34
 #define SKILL_ARMORCRAFT		35
 #define SKILL_HANDICRAFT		36
 #define SKILL_ARTISTRY			37
 
-
-// odds and ends
+// === KNOWLEDGE & MISC SKILLS (38-55) ===
 #define SKILL_EDUCATION         38
-#define SKILL_VOODOO  	        39
+#define SKILL_SENSE_MOTIVE      39	/* Was VOODOO - reading people */
 #define SKILL_COMMON            40
 #define SKILL_METALCRAFT        41
 #define SKILL_LEATHERCRAFT      42
@@ -1401,18 +1399,20 @@ typedef signed char shortint;
 #define SKILL_EARTHENCRAFT      50
 #define SKILL_GARDENING         51
 #define SKILL_FARMING           52
-#define SKILL_SHORTBOW          53
-#define SKILL_LONGBOW           54
-#define SKILL_CROSSBOW          55
+#define SKILL_ATHLETICS         53	/* Was SHORTBOW duplicate - endurance/climbing */
+#define SKILL_BANDAGING         54	/* Was LONGBOW duplicate - basic wound care */
+#define SKILL_CHIRURGY          55	/* Was CROSSBOW duplicate - surgical treatment */
+
+// === LANGUAGES & LORE (56-65) ===
 #define SKILL_MUSIC             56
-#define SKILL_ASTRONOMY			57
-#define SKILL_ORKISH			58
-#define SKILL_WARGISH			59
-#define SKILL_DALISH			60
-#define SKILL_SINDARIN			61
-#define SKILL_KHUZDUL			62
-#define SKILL_TENGWAR			63
-#define SKILL_CIRITH			64
+#define SKILL_MEDITATION		57	/* Was ASTRONOMY - ritual/meditation */
+#define SKILL_PERCEPTION		58	/* Was ORKISH - spotting hidden things */
+#define SKILL_HANDLE            59	/* Was WARGISH - animal handling */
+#define SKILL_HUNTING			60	/* Was DALISH - tracking game */
+#define SKILL_ENDURANCE			61	/* Was SINDARIN - stamina management */
+#define SKILL_ADAPTABILITY		62	/* Was KHUZDUL - environmental resistance */
+#define SKILL_CLIMBING			63	/* Was TENGWAR - scaling surfaces */
+#define SKILL_SWIMMING			64	/* Was CIRITH - water traversal */
 #define SKILL_WARCRAFT			65
 
 #define LAST_SKILL		SKILL_WARCRAFT
@@ -2469,13 +2469,97 @@ struct memory_data
 struct char_ability_data
 {
     int str;
-    int intel;
-    int wil;
     int dex;
     int con;
-    int aur;
-    int agi;
+    int intel;
+    int wis;
+    int cha;
 };
+
+/* =============================================================== */
+/*                    KORVESSA: SOCIAL STANDING SYSTEM              */
+/* =============================================================== */
+
+/* Standing faction IDs */
+#define STANDING_CIVIC_ORDER     0
+#define STANDING_LABORERS        1
+#define STANDING_MERCHANTS       2
+#define STANDING_NOBILITY        3
+#define STANDING_UNDERBELLY      4
+#define STANDING_WATCHER_CULT    5
+#define STANDING_SCHOLARS        6
+#define STANDING_FEYLIKS         7
+#define MAX_STANDING_FACTIONS    8
+
+/* Standing threshold tiers */
+#define STANDING_TIER_HATED      -2000
+#define STANDING_TIER_DISTRUSTED -200
+#define STANDING_TIER_NEUTRAL_LO -199
+#define STANDING_TIER_NEUTRAL_HI  199
+#define STANDING_TIER_FAVORED     200
+#define STANDING_TIER_TRUSTED    1000
+
+/* Standing tier labels returned by get_standing_tier_name() */
+/* Hated: <= -2000, Distrusted: -2000 to -200, Neutral: -199 to +199 */
+/* Favored: +200 to +999, Trusted: +1000+ */
+
+struct standing_data
+{
+    int values[MAX_STANDING_FACTIONS];  /* Per-faction numeric standing */
+};
+
+/* =============================================================== */
+/*                    KORVESSA: PERSONALITY SYSTEM                  */
+/* =============================================================== */
+
+/* Personality IDs (chosen at chargen, never changes) */
+#define PERSONALITY_NONE         0
+#define PERSONALITY_STALWART     1
+#define PERSONALITY_SHARP_EYED   2
+#define PERSONALITY_ARTIFICER    3
+#define PERSONALITY_SILVER_TONGUE 4
+#define PERSONALITY_HIDDEN       5
+#define PERSONALITY_DEVOTED      6
+#define PERSONALITY_INSIGHTFUL   7
+#define PERSONALITY_FREEHANDS    8
+#define MAX_PERSONALITIES        9
+
+/* =============================================================== */
+/*                    KORVESSA: XP ECONOMY                         */
+/* =============================================================== */
+
+#define XP_DAILY_CAP            200
+#define XP_TRAINING_POINT_COST  200
+#define XP_MINOR_NPC_COST       400
+#define XP_STORY_NOTICE_COST    600
+#define XP_PLOT_PROGRESSION_COST 4200
+
+struct xp_data
+{
+    int total_xp;          /* Lifetime XP earned */
+    int available_xp;      /* Unspent XP */
+    int training_points;   /* Accumulated training points */
+    int xp_today;          /* XP earned since last daily reset */
+    time_t last_reset;     /* Timestamp of last daily XP reset */
+};
+
+/* =============================================================== */
+/*                    KORVESSA: CHARACTER FACTS                    */
+/* =============================================================== */
+
+struct char_facts
+{
+    char *known_name;       /* "Anea the Smith's Daughter" */
+    char *apparent_age;     /* "Mid 20s" */
+    char *appearance_notes; /* "Walks with a limp" */
+    char *common_rumors;    /* "Works odd hours near the mines" */
+    char *known_affiliations; /* "Often seen at laborer taverns" */
+    int reputation_tier;    /* 0=Minor, 1=Moderate, 2=Strong */
+};
+
+#define REPUTATION_MINOR     0
+#define REPUTATION_MODERATE  1
+#define REPUTATION_STRONG    2
 
 struct newbie_hint
 {
@@ -3234,10 +3318,9 @@ struct pc_data
     int start_str;
     int start_dex;
     int start_con;
-    int start_wil;
-    int start_aur;
     int start_intel;
-    int start_agi;
+    int start_wis;
+    int start_cha;
     int load_count;		/* See load_pc */
     int unused_02;		// formerly 'common'
     int chargen_flags;
@@ -3267,8 +3350,14 @@ struct pc_data
     bool admin_loaded;
     int time_last_activity;
     int is_guide;
-    int profession;
+    int profession;        /* Now repurposed as personality_id (PERSONALITY_*) */
     int power_level;
+
+    /* --- KORVESSA ADDITIONS --- */
+    int personality;                    /* PERSONALITY_STALWART..PERSONALITY_FREEHANDS */
+    struct standing_data standing;      /* Per-faction standing values */
+    struct xp_data xp;                 /* XP economy tracking */
+    struct char_facts *facts;          /* Public knowledge / character facts */
 
     // Japh's corruptiopn fixes;
     pc_data();
@@ -3417,19 +3506,17 @@ struct char_data
     SHOP_DATA *shop;
     CHAR_DATA *vehicle;		/* Char that is the vehicle */
     int str;
-    int intel;
-    int wil;
     int dex;
     int con;
-    int aur;
-    int agi;
+    int intel;
+    int wis;
+    int cha;
     int tmp_str;
-    int tmp_intel;
-    int tmp_wil;
     int tmp_dex;
     int tmp_con;
-    int tmp_aur;
-    int tmp_agi;
+    int tmp_intel;
+    int tmp_wis;
+    int tmp_cha;
     shortint skills[MAX_SKILLS];
     AFFECTED_TYPE *hour_affects;
     OBJ_DATA *equip;
@@ -3682,10 +3769,9 @@ struct race_data
     int str_mod;
     int con_mod;
     int dex_mod;
-    int agi_mod;
     int int_mod;
-    int wil_mod;
-    int aur_mod;
+    int wis_mod;
+    int cha_mod;
     int native_tongue;
     int min_age;
     int max_age;
@@ -3760,38 +3846,37 @@ struct race_data
 #define RACE_STR_MOD		9
 #define RACE_CON_MOD		10
 #define RACE_DEX_MOD		11
-#define RACE_AGI_MOD		12
-#define RACE_INT_MOD		13
-#define RACE_WIL_MOD		14
-#define RACE_AUR_MOD		15
-#define RACE_MIN_AGE		16
-#define RACE_MAX_AGE		17
-#define RACE_MIN_HEIGHT		18
-#define RACE_MAX_HEIGHT		19
-#define RACE_FEM_HT_DIFF	20
-#define RACE_NATIVE_TONGUE	21
-#define RACE_SKILL_MODS		22
-#define RACE_CREATED_BY		23
-#define RACE_LAST_MODIFIED	24
-#define RACE_MAX_HIT		25
-#define RACE_MAX_MOVE		26
-#define RACE_ARMOR			27
-#define RACE_GROUP_NOUN		28
-#define RACE_TRACKS			29
-#define RACE_CORPSE			30
-#define RACE_TYPE			31
-#define RACE_DOOR_BITS		32
-#define RACE_BOT_BITS		33
-#define RACE_NOMAD			34
-#define RACE_ALERT			35
-#define RACE_MOVEMENT		36
-#define RACE_NAT_ATTACK_TYPE    37
-#define RACE_DAMNODICE          38
-#define RACE_DAMSIZEDICE        39
-#define RACE_DAMROLL            40
-#define RACE_NATURAL_DELAY      41
+#define RACE_INT_MOD		12
+#define RACE_WIS_MOD		13
+#define RACE_CHA_MOD		14
+#define RACE_MIN_AGE		15
+#define RACE_MAX_AGE		16
+#define RACE_MIN_HEIGHT		17
+#define RACE_MAX_HEIGHT		18
+#define RACE_FEM_HT_DIFF	19
+#define RACE_NATIVE_TONGUE	20
+#define RACE_SKILL_MODS		21
+#define RACE_CREATED_BY		22
+#define RACE_LAST_MODIFIED	23
+#define RACE_MAX_HIT		24
+#define RACE_MAX_MOVE		25
+#define RACE_ARMOR			26
+#define RACE_GROUP_NOUN		27
+#define RACE_TRACKS			28
+#define RACE_CORPSE			29
+#define RACE_TYPE			30
+#define RACE_DOOR_BITS		31
+#define RACE_BOT_BITS		32
+#define RACE_NOMAD			33
+#define RACE_ALERT			34
+#define RACE_MOVEMENT		35
+#define RACE_NAT_ATTACK_TYPE    36
+#define RACE_DAMNODICE          37
+#define RACE_DAMSIZEDICE        38
+#define RACE_DAMROLL            39
+#define RACE_NATURAL_DELAY      40
 
-#define LAST_RACE			41
+#define LAST_RACE			40
 
 #define RACE_TRACKS_SMALL    1	 // Only leave tracks if bleeding
 #define RACE_TRACKS_NEVER    2	 // Never, ever leave tracks.

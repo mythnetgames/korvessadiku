@@ -598,7 +598,7 @@ calculate_mana_cost (CHAR_DATA * ch, AFFECTED_TYPE * spell)
     cost = 10;
 
   cost += number (1, 7);
-  cost -= ch->aur / 5;
+  cost -= ch->cha / 5;
 
   cost += spell->a.spell.magnitude * 3.5;
 
@@ -1556,11 +1556,11 @@ process_spell_save (CHAR_DATA * ch, void *target, int id, int target_type)
 	      process_spell_results (ch, tch, id, save);
 	    }
 	  break;
-	case SAVE_WIL:
+	case SAVE_WIS:
 	  if (ch->in_room == tch->in_room)
 	    send_to_room ("\n", ch->in_room);
 	  penalty = caster_magic_skill (ch) / 15;
-	  if ((save = (tch->wil - penalty) <= number (1, 25)))
+	  if ((save = (tch->wis - penalty) <= number (1, 25)))
 	    {
 	      act
 		("You manage to fight off the effect encroaching upon your mind.",
@@ -2429,7 +2429,7 @@ check_psionic_talents (CHAR_DATA * ch)
   char *date;
   time_t time_now;
 
-  if (is_newbie (ch) || ch->aur <= 15)
+  if (is_newbie (ch) || ch->cha <= 15)
     {
       return;
     }
@@ -2458,25 +2458,25 @@ check_psionic_talents (CHAR_DATA * ch)
       return;
     }
 
-  if (ch->aur < 16)
+  if (ch->cha < 16)
     return;
-  else if (ch->aur == 16)
+  else if (ch->cha == 16)
     chance = 5;
-  else if (ch->aur == 17)
+  else if (ch->cha == 17)
     chance = 10;
-  else if (ch->aur == 18)
+  else if (ch->cha == 18)
     chance = 20;
-  else if (ch->aur == 19)
+  else if (ch->cha == 19)
     chance = 30;
-  else if (ch->aur == 20)
+  else if (ch->cha == 20)
     chance = 45;
-  else if (ch->aur == 21)
+  else if (ch->cha == 21)
     chance = 50;
-  else if (ch->aur == 22)
+  else if (ch->cha == 22)
     chance = 60;
-  else if (ch->aur == 23)
+  else if (ch->cha == 23)
     chance = 70;
-  else if (ch->aur == 24)
+  else if (ch->cha == 24)
     chance = 80;
   else
     chance = 95;
@@ -2566,18 +2566,18 @@ setup_new_character (CHAR_DATA * tch)
   tch->str = tch->pc->start_str;
   tch->dex = tch->pc->start_dex;
   tch->intel = tch->pc->start_intel;
-  tch->wil = tch->pc->start_wil;
-  tch->aur = tch->pc->start_aur;
+  tch->wis = tch->pc->start_wis;
+  tch->cha = tch->pc->start_cha;
   tch->con = tch->pc->start_con;
-  tch->agi = tch->pc->start_agi;
+  tch->dex = tch->pc->start_dex;
 
   tch->tmp_str = tch->str;
   tch->tmp_con = tch->con;
   tch->tmp_intel = tch->intel;
-  tch->tmp_wil = tch->wil;
-  tch->tmp_aur = tch->aur;
+  tch->tmp_wis = tch->wis;
+  tch->tmp_cha = tch->cha;
   tch->tmp_dex = tch->dex;
-  tch->tmp_agi = tch->agi;
+  tch->tmp_dex = tch->dex;
 
   tch->max_hit = 10 + 6 * GET_CON (tch);
 
@@ -3167,7 +3167,7 @@ int
 resisted (CHAR_DATA * ch, CHAR_DATA * enemy, int spell)
 {
   if ((number (1, 20) + (ch->circle - enemy->circle) +
-       (ch->wil - enemy->wil)) <= GET_WIL (enemy))
+       (ch->wis - enemy->wis)) <= GET_WIS (enemy))
     return 0;
 
   return 1;
@@ -3804,7 +3804,7 @@ do_sense (CHAR_DATA * ch, char *argument, int cmd)
       return;
     }
 
-  aura = MIN (GET_AUR (tch), 22);
+  aura = MIN (GET_CHA (tch), 22);
 
   if (aura <= 9)
     aura = 12;
@@ -3910,7 +3910,7 @@ delayed_bolt (CHAR_DATA * ch)
 
   if (reflect)
     {
-      if ((number (1, 22) - (tch->wil - ch->wil)) <= tch->wil)
+      if ((number (1, 22) - (tch->wis - ch->wis)) <= tch->wis)
 	{
 	  act
 	    ("A wave of psychic energies slams into your mind, but you grit your teeth and manage to hold it at bay.",
@@ -4022,8 +4022,8 @@ post_prescience (DESCRIPTOR_DATA * d)
 
   ch = d->character;
 
-  sprintf (buf, "#3%s:#0 %d Aura, %d Prescience.",
-	   GET_NAME (ch), GET_AUR (ch), ch->skills[SKILL_VOODOO]);
+  sprintf (buf, "#3%s:#0 %d Charisma, %d Prescience.",
+	   GET_NAME (ch), GET_CHA (ch), ch->skills[SKILL_VOODOO]);
 
   add_message (1, "Prescience", -5, GET_NAME (ch), date, buf, "",
 	       ch->delay_who, MF_DREAM);

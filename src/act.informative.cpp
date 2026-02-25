@@ -5235,7 +5235,7 @@ void delayed_search(CHAR_DATA * ch) {
 
 	// So, assume 12 int, 10 aur, 12 wil, you'll get a search score between 37 and 77
 
-	search = ((ch->intel * 2.5) + (ch->aur / 2) + ch->wil) - 10 + number(0, 40);
+	search = ((ch->intel * 2.5) + (ch->cha / 2) + ch->wis) - 10 + number(0, 40);
 	search_base = int(search);
 
 	// If a character is wearing an enclosed helm, or something covering their face, then their search ability is significantly reduced.
@@ -7191,19 +7191,18 @@ void do_score(CHAR_DATA * ch, char *argument, int cmd) {
 	if (!IS_SET(ch->flags, FLAG_GUEST)) {
 		if (IS_MORTAL(ch))
 			sprintf(buf,
-					"Str[#2%s#0] Dex[#2%s#0] Con[#2%s#0] Int[#2%s#0] Wil[#2%s#0] Agi[#2%s#0] Pre[#2%s#0]\n",
+					"Str[#2%s#0] Dex[#2%s#0] Con[#2%s#0] Int[#2%s#0] Wis[#2%s#0] Cha[#2%s#0]\n",
 					verbal_stats[get_stat_range(GET_STR(ch))],
 					verbal_stats[get_stat_range(GET_DEX(ch))],
 					verbal_stats[get_stat_range(GET_CON(ch))],
 					verbal_stats[get_stat_range(GET_INT(ch))],
-					verbal_stats[get_stat_range(GET_WIL(ch))],
-					verbal_stats[get_stat_range(GET_AGI(ch))],
-					verbal_stats[get_stat_range(GET_AUR(ch))]);
+					verbal_stats[get_stat_range(GET_WIS(ch))],
+					verbal_stats[get_stat_range(GET_CHA(ch))]);
 		else
 			sprintf(buf,
-					"Str[#2%d#0] Dex[#2%d#0] Con[#2%d#0] Int[#2%d#0] Wil[#2%d#0] Pre[#2%d#0] Agi[#2%d#0]\n",
+					"Str[#2%d#0] Dex[#2%d#0] Con[#2%d#0] Int[#2%d#0] Wis[#2%d#0] Cha[#2%d#0]\n",
 					GET_STR(ch), GET_DEX(ch), GET_CON(ch), GET_INT(ch),
-					GET_WIL(ch), GET_AUR(ch), GET_AGI(ch));
+					GET_WIS(ch), GET_CHA(ch));
 
 		send_to_char("\n", ch);
 		send_to_char(buf, ch);
@@ -7820,14 +7819,11 @@ void do_talents(CHAR_DATA * ch, char *argument, int cmd) {
 		if (IS_SET(ch->talents, TAL_INT1))
 			sprintf(buf + strlen(buf),
 					"      #2Upgraded Attribute:#0 Intelligence\n");
-		if (IS_SET(ch->talents, TAL_WIL1))
+		if (IS_SET(ch->talents, TAL_WIS1))
 			sprintf(buf + strlen(buf),
-					"      #2Upgraded Attribute:#0 Willpower\n");
-		if (IS_SET(ch->talents, TAL_AUR1))
-			sprintf(buf + strlen(buf), "      #2Upgraded Attribute:#0 Aura\n");
-		if (IS_SET(ch->talents, TAL_AGI1))
-			sprintf(buf + strlen(buf),
-					"      #2Upgraded Attribute:#0 Agility\n");
+					"      #2Upgraded Attribute:#0 Wisdom\n");
+		if (IS_SET(ch->talents, TAL_CHA1))
+			sprintf(buf + strlen(buf), "      #2Upgraded Attribute:#0 Charisma\n");
 	}
 
 	send_to_char(buf, ch);
@@ -10029,13 +10025,13 @@ void do_where(CHAR_DATA * ch, char *argument, int cmd) {
 						if (d->original) {
 							sprintf(strFmtName + 2, "%-16s #3[%2d]#0",
 									d->original->tname,
-									(check_aura) ? (d->character->aur) : (rpp));
+									(check_aura) ? (d->character->cha) : (rpp));
 							sprintf(strFmtAnim, " (as #5%s#0)",
 									fname(d->character->tname));
 						} else {
 							sprintf(strFmtName + 2, "%-16s #3[%2d]#0",
 									d->character->tname,
-									(check_aura) ? (d->character->aur) : (rpp));
+									(check_aura) ? (d->character->cha) : (rpp));
 							strcpy(strFmtAnim, "");
 						}
 
@@ -10566,7 +10562,7 @@ void directional_scan(CHAR_DATA * ch, int dir, int mode, int cmd) {
 
 	// Determines how easily you can spot hidden people through a first-room scan.
 
-	scan_base = (ch->intel * 2.5 + ch->wil + ch->aur * .5) - 10 + number(0, 40);
+	scan_base = (ch->intel * 2.5 + ch->wis + ch->cha * .5) - 10 + number(0, 40);
 
 	// Wearing a covering helm or mask reduces your chance to spot hidden folk.
 

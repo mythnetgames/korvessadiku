@@ -81,10 +81,9 @@ const char *attrs[] =
 	"str",
 	"dex",
 	"con",
-	"wil",
 	"int",
-	"aur",
-	"agi",
+	"wis",
+	"cha",
 	"\n"
 };
 
@@ -4627,16 +4626,13 @@ void
 			attr_value = GET_CON (ch);
 			break;
 		case 3:
-			attr_value = GET_WIL (ch);
-			break;
-		case 4:
 			attr_value = GET_INT (ch);
 			break;
-		case 5:
-			attr_value = GET_AUR (ch);
+		case 4:
+			attr_value = GET_WIS (ch);
 			break;
-		case 6:
-			attr_value = GET_AGI (ch);
+		case 5:
+			attr_value = GET_CHA (ch);
 			break;
 		}
 

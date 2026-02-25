@@ -3431,9 +3431,9 @@ nanny_choose_pc (DESCRIPTOR_DATA * d, char *argument)
         d->character->hit = d->character->max_hit;	// in terms of wound-endurance.
     }
 
-    if (d->character->max_shock != 40 + d->character->wil * CONSTITUTION_MULTIPLIER)
+    if (d->character->max_shock != 40 + d->character->wis * CONSTITUTION_MULTIPLIER)
     {
-        d->character->max_shock = 40 + d->character->wil * CONSTITUTION_MULTIPLIER;	// All humanoids are roughly the same,
+        d->character->max_shock = 40 + d->character->wis * CONSTITUTION_MULTIPLIER;	// All humanoids are roughly the same,
         d->character->shock = d->character->max_shock;	// in terms of wound-endurance.
     }
 
@@ -4061,9 +4061,9 @@ attribute_priorities (DESCRIPTOR_DATA * d, char *arg)
     int attr;
     int i;
     CHAR_DATA *ch = d->character;
-    int attr_starters[] = { 16, 15, 12, 12, 11, 8 }; // missing a 10, this gets auto-assigned to aur. Missing so it doesn't get a random boost
-    int attr_averages[] = { 12, 12, 12, 12, 12, 10, 12 };
-    int attr_priorities[] = { -1, -1, -1, -1, -1, -1, -1 };
+    int attr_starters[] = { 16, 15, 13, 12, 11, 10 };
+    int attr_averages[] = { 12, 12, 12, 12, 12, 12 };
+    int attr_priorities[] = { -1, -1, -1, -1, -1, -1 };
     char buf[MAX_STRING_LENGTH];
     char msg[MAX_STRING_LENGTH];
     bool average = false;
@@ -4078,7 +4078,7 @@ attribute_priorities (DESCRIPTOR_DATA * d, char *arg)
         {
             SEND_TO_Q ("\n#2Please enter all attributes in descending "
                        "priority.\nExample:  STR DEX"
-                       " CON WIL INT AGI#0\n", d);
+                       " CON INT WIS CHA#0\n", d);
             d->connected = CON_CREATION;
             return;
         }
@@ -4092,16 +4092,6 @@ attribute_priorities (DESCRIPTOR_DATA * d, char *arg)
         attr = index_lookup (attrs, buf);
 
         if (attr == -1)
-        {
-            sprintf (msg, "\n#1'%s' is not recognized as an attribute.\n#0",
-                     buf);
-            SEND_TO_Q (msg, d);
-            return;
-        }
-
-        // We're not worrying about aura for now.
-
-        if (attr == 5)
         {
             sprintf (msg, "\n#1'%s' is not recognized as an attribute.\n#0",
                      buf);
@@ -4124,10 +4114,7 @@ attribute_priorities (DESCRIPTOR_DATA * d, char *arg)
     {
         for (bonus = 10; bonus;)
         {
-            attr = number (0, 6);
-
-            while (attr == 5)
-                attr = number (0, 6);
+            attr = number (0, 5);
 
             if (attr_averages[attr] < 14)
             {
@@ -4136,24 +4123,19 @@ attribute_priorities (DESCRIPTOR_DATA * d, char *arg)
             }
         }
 
-        /* Assign actual numbers */
+        /* Assign actual numbers: attrs order is str, dex, con, int, wis, cha */
         ch->str = attr_averages[0];
         ch->dex = attr_averages[1];
         ch->con = attr_averages[2];
-        ch->wil = attr_averages[3];
-        ch->intel = attr_averages[4];
-        ch->aur = 10; // Give them a base rate of aura for now.
-        ch->agi = attr_averages[6];
+        ch->intel = attr_averages[3];
+        ch->wis = attr_averages[4];
+        ch->cha = attr_averages[5];
 
     }
     else
     {
         for (bonus = 8; bonus;)
         {
-	  /* Rather than boosting a particular attr directly and doing the logic for a skip, this boosts one of the six
-	     starting point values as long as it's < 18. At the end, the six starting point values will be mapped onto
-	     attrs 0-4,6 (skipping aur:5) based on the priority array
-	  */
             int slot = number (0, 5);
 
             if (attr_starters[slot] < 18)
@@ -4163,32 +4145,21 @@ attribute_priorities (DESCRIPTOR_DATA * d, char *arg)
             }
         }
 
-        /* Assign actual numbers */
+        /* Assign actual numbers: attrs order is str, dex, con, int, wis, cha */
         ch->str = attr_starters[attr_priorities[0]];
         ch->dex = attr_starters[attr_priorities[1]];
         ch->con = attr_starters[attr_priorities[2]];
-        ch->wil = attr_starters[attr_priorities[3]];
-        ch->intel = attr_starters[attr_priorities[4]];
-        ch->aur = 10; // Give them a base rate of aura for now.
-        ch->agi = attr_starters[attr_priorities[6]];
+        ch->intel = attr_starters[attr_priorities[3]];
+        ch->wis = attr_starters[attr_priorities[4]];
+        ch->cha = attr_starters[attr_priorities[5]];
     }
 
     ch->pc->start_str = ch->str;
     ch->pc->start_dex = ch->dex;
     ch->pc->start_con = ch->con;
-    ch->pc->start_wil = ch->wil;
     ch->pc->start_intel = ch->intel;
-    ch->pc->start_aur = ch->aur;
-    ch->pc->start_agi = ch->agi;
-
-    /* Reset skills */
-    // Edited this out, because professions has been moved before
-    // attribute assignment.
-    //for (skill = 1; skill < MAX_SKILLS; skill++)
-    //  {
-    //    d->character->skills[skill] = 0;
-    //    d->character->pc->skills[skill] = 0;
-    //  }
+    ch->pc->start_wis = ch->wis;
+    ch->pc->start_cha = ch->cha;
 }
 
 void
@@ -4699,9 +4670,9 @@ race_selection (DESCRIPTOR_DATA * d, char *arg)
             sprintf (buf + strlen (buf), " -Dex");
     }
 
-    if (atoi (row[RACE_AGI_MOD]) != 0)
+    if (atoi (row[RACE_DEX_MOD]) != 0)
     {
-        if (atoi (row[RACE_AGI_MOD]) > 0)
+        if (atoi (row[RACE_DEX_MOD]) > 0)
             sprintf (buf + strlen (buf), " +Agi");
         else
             sprintf (buf + strlen (buf), " -Agi");
@@ -4715,17 +4686,17 @@ race_selection (DESCRIPTOR_DATA * d, char *arg)
             sprintf (buf + strlen (buf), " -Int");
     }
 
-    if (atoi (row[RACE_WIL_MOD]) != 0)
+    if (atoi (row[RACE_WIS_MOD]) != 0)
     {
-        if (atoi (row[RACE_WIL_MOD]) > 0)
+        if (atoi (row[RACE_WIS_MOD]) > 0)
             sprintf (buf + strlen (buf), " +Wil");
         else
             sprintf (buf + strlen (buf), " -Wil");
     }
 
-    if (atoi (row[RACE_AUR_MOD]) != 0)
+    if (atoi (row[RACE_CHA_MOD]) != 0)
     {
-        if (atoi (row[RACE_AUR_MOD]) > 0)
+        if (atoi (row[RACE_CHA_MOD]) > 0)
             sprintf (buf + strlen (buf), " +Aur");
         else
             sprintf (buf + strlen (buf), " -Aur");
@@ -8425,7 +8396,7 @@ create_menu_actions (DESCRIPTOR_DATA * d, char *arg)
             return;
         }
 
-		if (!ch->str || !ch->dex || !ch->con || !ch->intel || !ch->wil || !ch->aur || !ch->agi)
+		if (!ch->str || !ch->dex || !ch->con || !ch->intel || !ch->wis || !ch->cha)
         {
             SEND_TO_Q
             ("\n#2You need to select some attributes. Please type ATTRIBUTES to do so.#0\n\n",

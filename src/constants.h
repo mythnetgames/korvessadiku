@@ -2,7 +2,8 @@
 //
 /// constants.h - General Pre-Defined Constants
 //
-/// Shadows of Isildur RPI Engine++
+/// Korvessa RPI Engine
+/// Based on Shadows of Isildur RPI Engine++
 /// Copyright (C) 2005-2006 C. W. McHenry
 /// Authors: C. W. McHenry (traithe@middle-earth.us)
 ///          Jonathan W. Webb (sighentist@middle-earth.us)
@@ -31,18 +32,18 @@
 
 #define ENCRYPT_PASS		"w01fm3a7"
 
-#define STAFF_EMAIL		"staff@laketownrpi.us"
+#define STAFF_EMAIL		"staff@korvessa.net"
 
-#define APP_EMAIL		"staff@laketownrpi.us"
-#define CODE_EMAIL		"staff@laketownrpi.us"
-#define PET_EMAIL		"staff@laketownrpi.us"
-#define REPORT_EMAIL		"staff@laketownrpi.us"
+#define APP_EMAIL		"staff@korvessa.net"
+#define CODE_EMAIL		"staff@korvessa.net"
+#define PET_EMAIL		"staff@korvessa.net"
+#define REPORT_EMAIL		"staff@korvessa.net"
 
 #define IMPLEMENTOR_ACCOUNT	"Holmes"
-#define SERVER_LOCATION		"http://laketownrpi.us"
+#define SERVER_LOCATION		"http://korvessa.net"
 
-#define MUD_NAME		"SoI-Laketown RPI"
-#define MUD_EMAIL		"staff@laketownrpi.us"
+#define MUD_NAME		"Korvessa"
+#define MUD_EMAIL		"staff@korvessa.net"
 
 /* Be sure to define without trailing slashes! */
 
