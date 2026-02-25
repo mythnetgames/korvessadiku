@@ -13,6 +13,7 @@
 #include <time.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdexcept>
 
 #include "structs.h"
 #include "account.h"
@@ -29,15 +30,16 @@
 int
 armor_penalty (CHAR_DATA * ch)
 {
-    /* Amour provides inherent restrictions to movement, not just added weight.
+    /* Armour provides inherent restrictions to movement, not just added weight.
      Measures armour on legs, body, arms, about and over.
 
      We add up all the spots covered, timesing the percent of the body covered
      by an arbitrary "hinderance" value of that type of armour:
 
-     Cloth is 1.
-     Metal is 3.
-     Everything else is 2.
+     Cloth and leather is 1
+	 Hardened leather is 2
+	 Mail and scale is 3
+	 Plate is 4
 
      Secondary armour is only half as hindering.
 
@@ -54,77 +56,70 @@ armor_penalty (CHAR_DATA * ch)
      */
 
     OBJ_DATA *eq = NULL;
-
-    int prim_locs[MAX_HITLOC] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    int sec_locs[MAX_HITLOC] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-    float i = 0;
+    float prim_locs = 0;
+    float sec_locs = 0;
+	float total = 0;
+	float water_adj = 0;
 
     for (eq = ch->equip; eq; eq = eq->next_content)
     {
+		// slight addition for waterlogged items
+		water_adj =	eq->enviro_conds[COND_WATER] > 75 ? 1.15 :
+					eq->enviro_conds[COND_WATER] > 50 ? 1.10 :
+					eq->enviro_conds[COND_WATER] > 25 ? 1.05 :
+														1;
+																
         for (int location = 0; location < MAX_HITLOC; location++)
         {
             if (GET_ITEM_TYPE(eq) == ITEM_ARMOR && IS_SET(eq->o.od.value[2], 1 << location))
             {
-                if (eq->o.armor.armor_type == 1)
-                    prim_locs[location] += 3 * body_tab[0][location].percent;
-                else if (eq->o.armor.armor_type == 0)
-                    prim_locs[location] += 1 * body_tab[0][location].percent;
-                else
-                    prim_locs[location] += 2 * body_tab[0][location].percent;
-            }
+																
+				total +=	eq->o.armor.armor_type == 0 	? 1 * body_tab[0][location].percent * water_adj : //Fur
+							eq->o.armor.armor_type == 1 	? 1 * body_tab[0][location].percent * water_adj : //Leather
+							eq->o.armor.armor_type == 2 	? 2 * body_tab[0][location].percent * water_adj : //Hardened leather
+							eq->o.armor.armor_type == 3 	? 3 * body_tab[0][location].percent * water_adj : //Mail
+							eq->o.armor.armor_type == 4 	? 3 * body_tab[0][location].percent * water_adj : //Scale
+															  4 * body_tab[0][location].percent * water_adj; //Plate								  
+		    }
 
             if (GET_ITEM_TYPE(eq) == ITEM_ARMOR && IS_SET(eq->o.od.value[3], 1 << location))
             {
-                if (eq->o.armor.armor_type == 1)
-                    sec_locs[location] += 0.75 * body_tab[0][location].percent;
-                else if (eq->o.armor.armor_type == 0)
-                    sec_locs[location] += 0.25 * body_tab[0][location].percent;
-                else
-                    sec_locs[location] += 0.50 * body_tab[0][location].percent;
-            }
-
-            // We add an extra 5~10% weight for water-logged items.
-            if (eq->enviro_conds[COND_WATER] > 25)
-            {
-                double enviro_tier = eq->enviro_conds[COND_WATER] > 75 ? 1.15 : eq->enviro_conds[COND_WATER] > 50 ? 1.10 : 1.05;
-                prim_locs[location] = sec_locs[location] * enviro_tier;
-                sec_locs[location] = sec_locs[location] * enviro_tier;
+				total += 	eq->o.armor.armor_type == 0 	? 0.50 * body_tab[0][location].percent * water_adj : //Fur
+							eq->o.armor.armor_type == 1 	? 0.50 * body_tab[0][location].percent * water_adj : //Leather
+							eq->o.armor.armor_type == 2 	? 1.00 * body_tab[0][location].percent * water_adj : //Hardened leather
+							eq->o.armor.armor_type == 3 	? 1.50 * body_tab[0][location].percent * water_adj : //Mail
+							eq->o.armor.armor_type == 4 	? 1.50 * body_tab[0][location].percent * water_adj : //Scale
+															  1.00 * body_tab[0][location].percent * water_adj; //Plate	
             }
         }
     }
 
-    for (int ind = 0; ind < MAX_HITLOC; ind++)
-    {
-        i += prim_locs[ind];
-        i += sec_locs[ind];
-    }
-
-    i = i / 105;
-
-    if (i >= 3) // full suit of chain or scale, with or without fur
-        return 3;
-    else if (i >= 2) // full suit of leather plus fur, or leather and chain + scale
-        return 2;
-    else if (i >= 1) // full suit of leather sans fur, only chain/scale hauberk, or quilted + fur
-        return 1;
-    else // incomplete leather, or full quilted.
-        return 0;
+    total /= 105;
+	
+	total = (	total >= 4 ? 4 :  // plate or full suit of scale/mail layered with leather
+				total >= 3 ? 3 :  // full suit of chain or scale
+				total >= 2 ? 2 :  // leather with a chain hauberk
+				total >= 1 ? 1 :  // full leather
+						     0 ); // nothing
+				
+	return total;
+        
 }
 
 // Determines a ch's armour word: what we'll use to describe them.
 int
 armor_descript (CHAR_DATA * ch)
 {
-    /* Amour provides inherent restrictions to movement, not just added weight.
+    /* Armour provides inherent restrictions to movement, not just added weight.
      Measures armour on legs, body, arms, about and over.
      Armour that covers multiple spots is deemed to be better proportioned to take
      the weight.
 
-     Cloth is 1.
-     Metal and Kevlar is 2.
-     Ceramic is 3
-     Power is 4.
+	 Cloth and leather is 1
+	 Hardened leather is 2
+	 Mail and Scale is 3
+	 Plate is 4
+	 
 
      If the total is 4, return 1
      If the total is 6, return 2
@@ -132,7 +127,50 @@ armor_descript (CHAR_DATA * ch)
      If the total is 12, return 5.
      */
 
-    OBJ_DATA *eq = NULL;
+	 OBJ_DATA *eq = NULL;
+    float prim_locs = 0;
+    float sec_locs = 0;
+	float total = 0;
+	float water_adj = 0;
+
+    for (eq = ch->equip; eq; eq = eq->next_content)
+    {												
+        for (int location = 0; location < MAX_HITLOC; location++)
+        {
+            if (GET_ITEM_TYPE(eq) == ITEM_ARMOR && IS_SET(eq->o.od.value[2], 1 << location))
+            {
+																
+				total +=	eq->o.armor.armor_type == 0 	? 1 * body_tab[0][location].percent : //Fur
+							eq->o.armor.armor_type == 1 	? 1 * body_tab[0][location].percent : //Leather
+							eq->o.armor.armor_type == 2 	? 2 * body_tab[0][location].percent : //Hardened leather
+							eq->o.armor.armor_type == 3 	? 3 * body_tab[0][location].percent : //Mail
+							eq->o.armor.armor_type == 4 	? 3 * body_tab[0][location].percent : //Scale
+															  4 * body_tab[0][location].percent ; //Plate								  
+		    }
+
+            if (GET_ITEM_TYPE(eq) == ITEM_ARMOR && IS_SET(eq->o.od.value[3], 1 << location))
+            {
+				total += 	eq->o.armor.armor_type == 0 	? 0.50 * body_tab[0][location].percent : //Fur
+							eq->o.armor.armor_type == 1 	? 0.50 * body_tab[0][location].percent : //Leather
+							eq->o.armor.armor_type == 2 	? 1.00 * body_tab[0][location].percent : //Hardened leather
+							eq->o.armor.armor_type == 3 	? 1.50 * body_tab[0][location].percent : //Mail
+							eq->o.armor.armor_type == 4 	? 1.50 * body_tab[0][location].percent : //Scale
+															  1.00 * body_tab[0][location].percent ; //Plate	
+            }
+        }
+    }
+
+    total /= 100;
+	
+	total = (	total >= 4 ? 4 :  // plate or full suit of scale/mail layered with leather
+				total >= 3 ? 3 :  // full suit of chain or scale
+				total >= 2 ? 2 :  // leather with a chain hauberk
+				total >= 1 ? 1 :  // full leather
+						     0 ); // nothing
+				
+	return total;
+	 
+    /* OBJ_DATA *eq = NULL;
 
     int prim_locs[MAX_HITLOC] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int sec_locs[MAX_HITLOC] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -145,6 +183,8 @@ armor_descript (CHAR_DATA * ch)
         {
             if (GET_ITEM_TYPE(eq) == ITEM_ARMOR && IS_SET(eq->o.od.value[2], 1 << location))
             {
+				
+				
                 if (eq->o.armor.armor_type == 0)
                     prim_locs[location] += 1 * body_tab[0][location].percent;
                 else if (eq->o.armor.armor_type == 1 || eq->o.armor.armor_type == 2)
@@ -186,7 +226,7 @@ armor_descript (CHAR_DATA * ch)
     else if (i >= 1) // full suit of leather sans fur, only chain/scale hauberk, or quilted + fur
         return 1;
     else // incomplete leather, or full quilted.
-        return 0;
+        return 0; */
 }
 
 int
@@ -519,9 +559,13 @@ point_update (void)
         if (!ch->room)
             continue;
 
-        if (!IS_NPC (ch) && ch->room)
-            zone_table[ch->room->zone].player_in_zone++;
-
+	if (!IS_NPC (ch) && ch->room)
+	  {
+	    int z = ch->room->zone;
+	    if (z>=0 && z<=99)
+	      zone_table[ch->room->zone].player_in_zone++;
+	  }
+	    
         room = ch->room;
 
         *ch->short_descr = tolower (*ch->short_descr);
@@ -741,29 +785,37 @@ point_update (void)
         else
             reduceIntox++;
 
-        //Application RPP cost
+        //Application RPP cost - deduct points from account after character has played sufficient time
         if (!ch)
             continue;
 
-        if (!IS_NPC (ch) && ch->pc->app_cost && ch->descr())
+        if (!IS_NPC (ch))
         {
-            playing_time =
-                real_time_passed (time (0) - ch->time.logon + ch->time.played, 0);
-            if (playing_time.hour >= 10 && ch->descr()->acct)
-            {
+	  if (!ch->pc)
+	    {
+	      // ERROR. A mob should not be "not an NPC" while lacking a PC descriptor
+	      // Nimrod wants this error to stay silent, so no logging/announcement
 
-                ch->descr()->acct->pay_application_cost (ch->pc->app_cost);
-                ch->pc->app_cost = 0;
-                save_char (ch, true);
-            }
-        }
+	    }
+	  else if (ch->pc->app_cost && ch->descr()) // Otherwise require that the app cost points to begin a deduction and that a valid descriptor exists [i.e. has an online socket connection, IIRC]
+	    {
+	      
+	      playing_time = real_time_passed (time (0) - ch->time.logon + ch->time.played, 0);
+	      if (playing_time.hour >= 10 && ch->descr()->acct)
+		{
+		  ch->descr()->acct->pay_application_cost (ch->pc->app_cost);
+		  ch->pc->app_cost = 0;   // Set to 0 to cut out of this loop early on subsequent visits, besides not paying multiple times
+		  save_char (ch, true);
+		}
+	    }
+	}
 
         //Remove New Player Flag
         if (!IS_NPC (ch) && IS_SET (ch->plr_flags, NEW_PLAYER_TAG))
         {
             playing_time =
                 real_time_passed (time (0) - ch->time.logon + ch->time.played, 0);
-            if (playing_time.hour > 12)
+            if (playing_time.hour > NEW_PLAYER_TAG_DURATION_HOURS)
             {
                 ch->plr_flags &= ~NEW_PLAYER_TAG;
                 act
@@ -973,10 +1025,16 @@ point_update (void)
             if (time (0) >= af->a.spell.modifier)
             {
                 send_to_char
-                ("#6OOC: Your craft delay timer has expired. You may resume crafting delayed items.#0\n",
+                ("#6OOC: Your activity delay timer has expired.#0\n",
                  ch);
                 remove_affect_type (ch, MAGIC_CRAFT_DELAY);
             }
+			if ((abs(time (0) + ACTIVITY_TIMER_MAX - af->a.spell.modifier )) < 8)
+			{
+			 send_to_char
+                ("#6OOC: Your activity delay timer has dropped below maximum.#0\n",
+                 ch);
+			}
         }
 
         if ((af = get_affect (ch, AFFECT_UPGRADE_DELAY)))
@@ -984,7 +1042,7 @@ point_update (void)
             if (time (0) >= af->a.spell.modifier)
             {
                 send_to_char
-                ("#6OOC: Your upgrade delay timer has experied. You may now used the upgrade command again.#0\n",
+                ("#6OOC: Your upgrade delay timer has expired. You may now use the upgrade command again.#0\n",
                  ch);
                 remove_affect_type (ch, AFFECT_UPGRADE_DELAY);
             }
@@ -1782,7 +1840,10 @@ skill_learn (CHAR_DATA *ch, int skill)
 }
 
 
-// Tht.is function is called to determine whether a player has gone over their skill cap or not.
+// This function is called to determine whether a player has gone over their skill cap or not.
+// Mode 0 = bool reply about whether /skill/ more points can be added
+// Mode 1 = return current skill point usage
+// Mode 2 = return max skill points
 
 int
 skill_max (CHAR_DATA *ch, int skill, int mode)
@@ -1794,9 +1855,14 @@ skill_max (CHAR_DATA *ch, int skill, int mode)
     if (ch->intel > 20)
         skillmax = 1100;
     else if (ch-> intel < 10)
-        skillmax = 550;
+        skillmax = 725;
     else
-        skillmax = 550 + (40 * (ch->intel - 10));
+        skillmax = 725 + (40 * (ch->intel - 10));
+    
+    if (mode == 2)
+      {
+	return skillmax;
+      }
 
     for (i = 0; i <= LAST_SKILL; i++)
     {
@@ -1851,8 +1917,8 @@ int combat_skill_use(CHAR_DATA *ch, int skill)
         returned = 1;
         
 	// Can't get above 60 if you're in the Arena.
-	if (vnum_to_room(ch->in_room)->zone == 75)
-		return 0;
+	//if (vnum_to_room(ch->in_room)->zone == 75)
+		//return 0;
 		
     if (value >= 50)
     {

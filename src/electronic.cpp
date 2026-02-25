@@ -415,34 +415,10 @@ CHAR_DATA * robot_constructor(OBJ_DATA *robot)
 		(tch->d_feat3 && !str_cmp(tch->d_feat3, "combat")) ||
 		(tch->d_feat4 && !str_cmp(tch->d_feat4, "combat")))
 	{
-		tch->skills[SKILL_DEFLECT] += 40;
-		tch->skills[SKILL_DODGE] += 40;
-		tch->skills[SKILL_AIM] += 40;
-		 tch->skills[SKILL_BRAWLING] += 40;
-		tch->skills[SKILL_SMALL_BLADE] += 40;
-		tch->skills[SKILL_LONG_BLADE] += 40;
-		tch->skills[SKILL_POLEARM] += 40;
-		tch->skills[SKILL_BLUDGEON] += 40;
-		tch->skills[SKILL_SOLE_WIELD] += 40;
-		tch->skills[SKILL_DUAL_WIELD] += 40;
-		
-	}
-	
-	if ((tch->d_feat1 && !str_cmp(tch->d_feat1, "combatant")) ||
-		(tch->d_feat2 && !str_cmp(tch->d_feat2, "combatant")) ||
-		(tch->d_feat3 && !str_cmp(tch->d_feat3, "combatant")) ||
-		(tch->d_feat4 && !str_cmp(tch->d_feat4, "combatant")))
-	{
-		tch->skills[SKILL_DEFLECT] += 40;
-		tch->skills[SKILL_DODGE] += 40;
-		tch->skills[SKILL_AIM] += 40;
-		 tch->skills[SKILL_BRAWLING] += 40;
-		tch->skills[SKILL_SMALL_BLADE] += 40;
-		tch->skills[SKILL_LONG_BLADE] += 40;
-		tch->skills[SKILL_POLEARM] += 40;
-		tch->skills[SKILL_BLUDGEON] += 40;
-		tch->skills[SKILL_SOLE_WIELD] += 40;
-		tch->skills[SKILL_DUAL_WIELD] += 40;
+		tch->skills[SKILL_BRAWLING] += 20;
+		tch->skills[SKILL_DEFLECT] += 20;
+		tch->skills[SKILL_DODGE] += 20;
+		tch->skills[SKILL_AIM] += 20;
 	}
 
 	if ((tch->d_feat1 && !str_cmp(tch->d_feat1, "melee")) ||
@@ -450,13 +426,13 @@ CHAR_DATA * robot_constructor(OBJ_DATA *robot)
 		(tch->d_feat3 && !str_cmp(tch->d_feat3, "melee")) ||
 		(tch->d_feat4 && !str_cmp(tch->d_feat4, "melee")))
 	{
-	    tch->skills[SKILL_BRAWLING] += 40;
-		tch->skills[SKILL_SMALL_BLADE] += 40;
-		tch->skills[SKILL_LONG_BLADE] += 40;
-		tch->skills[SKILL_POLEARM] += 40;
-		tch->skills[SKILL_BLUDGEON] += 40;
-		tch->skills[SKILL_SOLE_WIELD] += 40;
-		tch->skills[SKILL_DUAL_WIELD] += 40;
+	    tch->skills[SKILL_BRAWLING] += 20;
+		tch->skills[SKILL_SMALL_BLADE] += 20;
+		tch->skills[SKILL_LONG_BLADE] += 20;
+		tch->skills[SKILL_POLEARM] += 20;
+		tch->skills[SKILL_BLUDGEON] += 20;
+		tch->skills[SKILL_SOLE_WIELD] += 20;
+		tch->skills[SKILL_DUAL_WIELD] += 20;
 	}
 
 	if ((tch->d_feat1 && !str_cmp(tch->d_feat1, "firearms")) ||
@@ -538,7 +514,7 @@ CHAR_DATA * robot_constructor(OBJ_DATA *robot)
 		tch->size = 1;
 		tch->height = 90;
 		tch->frame = 3;
-		tch->max_hit = 155;
+		tch->max_hit = 100;
 
 		if (miner)
 		{
@@ -547,20 +523,20 @@ CHAR_DATA * robot_constructor(OBJ_DATA *robot)
 		}
 		else
 		{
-			tch->str = 25;
-			tch->tmp_str = 25;
+			tch->str = 15;
+			tch->tmp_str = 15;
 		}
 
-		tch->con = 20;
-		tch->tmp_con = 20;
+		tch->con = 15;
+		tch->tmp_con = 15;
 
 		if (tch->skills[SKILL_SNEAK])
 			tch->skills[SKILL_SNEAK] -= 20;
 		if (tch->skills[SKILL_HIDE])
 			tch->skills[SKILL_HIDE] -= 20;
-	//encumbered = (GET_STR (ch) * enc_tab[0].str_mult_wt < IS_CARRYING_W (ch) - 250);
-        tch->mob->damnodice = 1;
-        tch->mob->damsizedice = 4;
+
+        tch->mob->damnodice = 2;
+        tch->mob->damsizedice = 5;
 		tch->mob->damroll = 2;
 
 		// 2.5 minutes per hour in battery for big robots.
@@ -1283,7 +1259,7 @@ void do_deactivate (CHAR_DATA *ch, char *argument, int cmd)
 	}
 	else
 	{
-		act("$n could not power down - please email a log of this to holmes@parallelrpi.com", false, ch, 0, 0, TO_ROOM | _ACT_FORMAT);
+		act("$n could not power down - please email a log of this to staff@laketownrpi.us", false, ch, 0, 0, TO_ROOM | _ACT_FORMAT);
 		return;
 	}
 

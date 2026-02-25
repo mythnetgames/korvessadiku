@@ -1,6 +1,41 @@
+# build outputs
+bin/
 *.o
-login.php
-.vscode/c_cpp_properties.json
-.vscode/settings.json
-/.rpi_engine/*
-/regions/*
+*.a
+*.so
+*.exe
+
+# runtime / mud data (adjust as needed)
+logs/
+log/
+run/
+tmp/
+core
+core.*
+
+# common mud/player/world dirs (keep these out of git)
+pp/
+bp/
+tp/
+players/
+player/
+world/
+area/
+areas/
+data/
+db/
+database/
+*.db
+*.sqlite
+*.sqlite3
+
+# secrets
+.env
+*.key
+*.pem
+
+# editor junk
+.DS_Store
+*.swp
+.vscode/
+.idea/

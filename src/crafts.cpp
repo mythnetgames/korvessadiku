@@ -20,7 +20,6 @@
 #include "group.h"
 #include "utility.h"
 
-
 #define s(a) send_to_char (a "\n", ch);
 
 extern rpie::server engine;
@@ -353,6 +352,7 @@ void
 	OBJ_DATA *target_obj = NULL;
 	SUBCRAFT_HEAD_DATA *subcraft;
 	AFFECTED_TYPE *af;
+	AFFECTED_TYPE *c_aff;
 	bool sectors = false;
 	bool pass = false;
 	bool seasonchk = false;
@@ -416,11 +416,14 @@ void
 	craft_affect->a.craft->target_ch = target_ch;
 	craft_affect->a.craft->target_obj = target_obj;
 
-	if (get_affect (ch, MAGIC_CRAFT_DELAY)
-		&& (craft_affect->a.craft->subcraft->delay || craft_affect->a.craft->subcraft->faildelay) && IS_MORTAL (ch) && !engine.in_test_mode ())
+	if ((c_aff = get_affect (ch, MAGIC_CRAFT_DELAY))
+		&& (craft_affect->a.craft->subcraft->delay || craft_affect->a.craft->subcraft->faildelay) 
+		&& IS_MORTAL (ch) 
+		&& !engine.in_test_mode ()
+		&& ((c_aff->a.spell.modifier - time (0)) > ACTIVITY_TIMER_MAX ))
 	{
 		act
-			("Sorry, but your OOC craft delay timer is still in place. You'll receive a notification when it expires and you're free to craft delayed items again.",
+			("Sorry, but your OOC activity timer is full. You'll receive a notification when it expires.",
 			false, ch, 0, 0, TO_CHAR | _ACT_FORMAT);
 		return;
 	}
@@ -724,8 +727,8 @@ void
 			send_to_char (buf, ch);
 		}
 
-		if (phase->tool != nullptr)
-        missing_item_msg (ch, phase->tool, "Tool required:  ");
+		if (phase->tool != NULL)
+			missing_item_msg (ch, phase->tool, "Tool required:  ");
 
 		for (i = 0; i < MAX_ITEMS_PER_SUBCRAFT; i++)
 		{
@@ -844,13 +847,13 @@ void
 
 	if (craft->delay > 0)
 	{
-		sprintf (buf, "#6OOC Delay Timer:#0 %d RL Hours\n", craft->delay);
+		sprintf (buf, "#6OOC Delay Timer:#0 %d RL Minutes\n", craft->delay);
 		send_to_char (buf, ch);
 	}
 
 	if (craft->faildelay > 0)
 	{
-		sprintf (buf, "#6OOC Failure Timer:#0 %d RL Hours\n", craft->faildelay);
+		sprintf (buf, "#6OOC Failure Timer:#0 %d RL Minutes\n", craft->faildelay);
 		send_to_char (buf, ch);
 	}
 
@@ -1076,10 +1079,34 @@ void
 			sprintf (command, "%s", buf);
 
 		CREATE (tcraft, SUBCRAFT_HEAD_DATA, 1);
+		//Ceredir's attempt begin
+		for (craft = crafts; craft; craft = craft->next)
+		{
+			if (!craft->next)
+			{
+				CREATE (craft->next, SUBCRAFT_HEAD_DATA, 1);
+				break;
+			}
+		}
 		memset (tcraft, 0, sizeof (SUBCRAFT_HEAD_DATA));
 		memcpy (tcraft, ch->pc->edit_craft, sizeof (SUBCRAFT_HEAD_DATA));
-
-		CREATE (tcraft->phases, PHASE_DATA, 1);
+		
+		tcraft->craft_name = add_hash (craft_name);
+		tcraft->subcraft_name = add_hash (subcraft);
+		tcraft->command = add_hash (command);
+		tcraft->next = NULL;
+		craft->next = tcraft;
+		ch->pc->edit_craft = tcraft;
+		send_to_char ("Craft cloned; new craft opened for editing.\n", ch);
+		if (!IS_SET (tcraft->subcraft_flags, SCF_OBSCURE))
+					mysql_safe_query ("INSERT INTO new_crafts VALUES ('%s', '%s', '%s', '%s')",
+					tcraft->command,
+					tcraft->subcraft_name,
+					tcraft->craft_name,
+					ch->tname);
+		return;
+		
+/*		CREATE (tcraft->phases, PHASE_DATA, 1);
 		memset (tcraft->phases, 0, sizeof (PHASE_DATA));
 		memcpy (tcraft->phases, ch->pc->edit_craft->phases, sizeof (PHASE_DATA));
 
@@ -1094,33 +1121,7 @@ void
 
 			memcpy (tcraft->obj_items, ch->pc->edit_craft->obj_items,
 				sizeof (DEFAULT_ITEM_DATA));
-		}
-
-		ch->pc->edit_craft = NULL;
-		tcraft->craft_name = add_hash (craft_name);
-		tcraft->subcraft_name = add_hash (subcraft);
-		tcraft->command = add_hash (command);
-		tcraft->next = NULL;
-
-		for (craft = crafts; craft; craft = craft->next)
-		{
-			if (!craft->next)
-			{
-				CREATE (craft->next, SUBCRAFT_HEAD_DATA, 1);
-				craft->next = tcraft;
-				ch->pc->edit_craft = tcraft;
-				send_to_char ("Craft cloned; new craft opened for editing.\n", ch);
-
-				if (!IS_SET (tcraft->subcraft_flags, SCF_OBSCURE))
-					mysql_safe_query ("INSERT INTO new_crafts VALUES 									('%s', '%s', '%s', '%s')",
-					tcraft->command,
-					tcraft->subcraft_name,
-					tcraft->craft_name,
-					ch->tname);
-
-				return;
-			}
-		}
+		} */
 	} //else if (!str_cmp (buf, "clone"))
 
 	//Immortal options - list by catagory
@@ -1681,26 +1682,31 @@ void
 {
 	if (*flag_vnum == '(' || *flag_vnum == ')')
 		return;
-
-	if (vc_category(flag_vnum))
+	if (vc_category(flag_vnum)  && i < 1)  // Added check on i to bpypass possibility of vars->manual being equal to a vc_category 0213142228 -Nimrod
 	{
 		vars->category = str_dup(flag_vnum);
 		return;
 	}
-
-	if (i == 1)
+	
+	if (i == 1)  // Added new manual value 0213142229 -Nimrod
 	{
-		vars->from = atoi(flag_vnum);
+		vars->manual = str_dup(flag_vnum);
 		return;
 	}
 
 	if (i == 2)
 	{
-		vars->pos = atoi(flag_vnum);
+		vars->from = atoi(flag_vnum);
 		return;
 	}
 
 	if (i == 3)
+	{
+		vars->pos = atoi(flag_vnum);
+		return;
+	}
+
+	if (i == 4)
 	{
 		vars->to = atoi(flag_vnum);
 		return;
@@ -1910,7 +1916,7 @@ PHASE_DATA *
 }
 
 char *
-	read_extended_text (FILE * fp, char *first_line)
+	read_extended_text (FILE * fp, char *first_line)  //Mark
 {
 	int continues;
 	char line[MAX_STRING_LENGTH];
@@ -2665,7 +2671,7 @@ void
 
 	if (!engine.in_play_mode ())
 	{
-		system ("./ordercrafts.pl ../regions/crafts");
+		system ("./ordercrafts.rb ../regions/crafts");
 	}
 
 	if (!(fp_crafts = fopen (CRAFTS_FILE, "r")))
@@ -4256,7 +4262,7 @@ int
 	PHASE_DATA *phase;
 	int seconds = 0, skill = 0, numskills = 0;
 
-	seconds = craft->delay * 60 * 60;
+	seconds = craft->delay * 60; // * 60;
 
 	for (phase = craft->phases; phase; phase = phase->next)
 	{
@@ -4293,7 +4299,7 @@ int
 	PHASE_DATA *phase;
 	int seconds = 0, skill = 0, numskills = 0;
 
-	seconds = craft->faildelay * 60 * 60;
+	seconds = craft->faildelay * 60; // * 60;
 
 	for (phase = craft->phases; phase; phase = phase->next)
 	{
@@ -4361,6 +4367,7 @@ void
 	CRAFT_VARIABLE_DATA *vars = NULL;
 	int item_required[MAX_ITEMS_PER_SUBCRAFT];
 	char buf[MAX_STRING_LENGTH];
+	AFFECTED_TYPE *c_aff;
 
 	for (int i = 0; i < MAX_ITEMS_PER_SUBCRAFT; i++)
 	{
@@ -4641,7 +4648,7 @@ void
 	}
 
 	/* Deducts uses from a component-type item */
-	for (i = 0; i < MAX_DEFAULT_ITEMS; i++)
+	for (i = 0; i < MAX_DEFAULT_ITEMS + 1; i++) // Added + 1 to for statement to take care of manual varcats 02141400017 -Nimrod
 	{
 		item = af->a.craft->subcraft->obj_items[i];
 
@@ -4651,7 +4658,7 @@ void
 		if (item->phase != phase)
 			continue;
 
-		for (int j = 0; j < MAX_DEFAULT_ITEMS; j++)
+		for (int j = 0; j < MAX_DEFAULT_ITEMS; j++) //MAX_DEFAULT_ITEMS is currently 40
 		{
 			vars = subcraft->craft_variable[j];
 
@@ -4661,34 +4668,50 @@ void
 			if (vars->phase != phase)
 				continue;
 
-			if (vars->from != i)
+			if (vars->from != i && vars->from != 99)  // If it's 99 it is a manual varcat, we don't want to break here. -Nimrod
 				continue;
 
-			if (!obj_list[i])
+			if (!obj_list[i] && vars->from != 99) // If it's 99 then there is a manual varcat, we don't want to break here. -Nim
 				continue;
 
 			if (vars && *vars->category)
 			{
-				for (int h = 0; h < 10; h++)
+				for (int h = 0; h < 10; h++) // Setting up to 10 variables.
 				{
-					if (obj_list[i]->var_color[h] && str_cmp (obj_list[i]->var_color[h], "(null)") &&
+				  if (vars->from !=99)
+				  {
+				  
+				  	if (obj_list[i]->var_color[h] && str_cmp (obj_list[i]->var_color[h], "(null)") &&
 						obj_list[i]->var_cat[h] && str_cmp (obj_list[i]->var_cat[h], "(null)"))
 					{
 						if (!str_cmp(vars->category, obj_list[i]->var_cat[h]))
 						{
-							//sprintf(buf, "Vars->to: %d, Vars->pos: %d, Obj_list[i]->var_color[h]: %s, i: %d, j: %d, h: %d.", vars->to, vars->pos, obj_list[i]->var_color[h], i, j, h);
-							//send_to_gods(buf);
+						//	 sprintf(buf, "Vars->to: %d, Vars->pos: %d, Obj_list[i]->var_color[h]: %s, i: %d, j: %d, h: %d.", vars->to, vars->pos, obj_list[i]->var_color[h], i, j, h);
+							// send_to_gods(buf);
 							subcraft->load_color[vars->to][vars->pos] = str_dup(obj_list[i]->var_color[h]);
 							subcraft->load_cat[vars->to][vars->pos] = str_dup(vars->category);
-							//send_to_gods("subcraft->load_color[vars->to][vars->pos]");
-							//send_to_gods(subcraft->load_color[vars->to][vars->pos]);
-							//send_to_gods("obj_list[i]->var_color[h]");
-							//send_to_gods(obj_list[i]->var_color[h]);
-							//send_to_gods("vars->category");
-							//send_to_gods(vars->category);
+							// send_to_gods("subcraft->load_color[vars->to][vars->pos]");
+							// send_to_gods(subcraft->load_color[vars->to][vars->pos]);
+							// send_to_gods("obj_list[i]->var_color[h]");
+							// send_to_gods(obj_list[i]->var_color[h]);
+							// send_to_gods("vars->category");
+							// send_to_gods(vars->category);
 
 						}
 					}
+				  }
+				  else if (vars->to == h)
+				  {
+				    // Pass manual variable if it exists
+					
+					  // send_to_gods("It is a manual variable.");
+					  // send_to_gods(vars->category);
+					  // send_to_gods(vars->manual);
+					
+					  subcraft->load_color[vars->to][vars->pos] = str_dup(vars->manual);
+					  subcraft->load_cat[vars->to][vars->pos] = str_dup(vars->category);
+					
+				  } 
 				}
 			}
 		}
@@ -5565,7 +5588,8 @@ void
 
 		if (af->a.craft->subcraft->faildelay)
 		{
-			delay_time = time (0) + figure_craft_faildelay (ch, af->a.craft->subcraft);
+			delay_time = (((c_aff = get_affect (ch, MAGIC_CRAFT_DELAY)) ? c_aff->a.spell.modifier : time (0)) + figure_craft_faildelay (ch, af->a.craft->subcraft));
+			remove_affect_type (ch, MAGIC_CRAFT_DELAY);
 			magic_add_affect (ch, MAGIC_CRAFT_DELAY, -1, delay_time, 0, 0, 0);
 		}
 
@@ -5741,7 +5765,9 @@ void
 
 	if (af->a.craft->subcraft->delay && !af->a.craft->phase)
 	{
-		delay_time = time (0) + figure_craft_delay (ch, af->a.craft->subcraft);
+	    delay_time = (((c_aff = get_affect (ch, MAGIC_CRAFT_DELAY)) ? c_aff->a.spell.modifier : time (0)) + figure_craft_delay (ch, af->a.craft->subcraft));
+		// delay_time = time (0) + figure_craft_delay (ch, af->a.craft->subcraft);
+		remove_affect_type (ch, MAGIC_CRAFT_DELAY);
 		magic_add_affect (ch, MAGIC_CRAFT_DELAY, -1, delay_time, 0, 0, 0);
 	}
 
@@ -6332,7 +6358,7 @@ void
 	if (!*buf)
 	{
 		send_to_char
-			("How many OOC hours did you want to set the delay timer to?\nUse <cset delay X fail> for failure delay.\n",
+			("How many OOC minutes did you want to set the delay timer to?\nUse <cset delay X fail> for failure delay.\n",
 			ch);
 		return;
 	}
@@ -6340,7 +6366,7 @@ void
 	if (!isdigit (*buf))
 	{
 		send_to_char
-			("You must specify a number of RL hours to set the timer to.\n",
+			("You must specify a number of RL minutes to set the timer to.\n",
 			ch);
 		return;
 	}
@@ -6739,11 +6765,11 @@ void
 
 	/** delay **/
 	if (craft->delay)
-		sprintf (b_buf + strlen (b_buf), "  #6OOC Delay Timer:#0 %d RL Hours\n",
+		sprintf (b_buf + strlen (b_buf), "  #6OOC Delay Timer:#0 %d RL Minutes\n",
 		craft->delay);
 
 	if (craft->faildelay)
-		sprintf (b_buf + strlen (b_buf), "  #6OOC Delay Timer:#0 %d RL Hours\n",
+		sprintf (b_buf + strlen (b_buf), "  #6OOC Delay Timer:#0 %d RL Minutes\n",
 		craft->faildelay);
 
 	if (craft->failure)

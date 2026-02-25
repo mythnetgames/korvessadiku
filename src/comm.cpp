@@ -286,7 +286,7 @@ game_loop (int s)
     bool first_loop = true;
     extern bool grunge_arena_fight;	// Defined in arena.c
     extern QE_DATA *quarter_event_list;
- 
+
     timerclear (&null_time);	/* a define in sys/time.h */
     FD_ZERO (&readfds);
     FD_ZERO (&writefds);
@@ -447,6 +447,8 @@ game_loop (int s)
 
 
 
+        /* process_commands; */
+
         for (point = descriptor_list; point; point = next_to_process)
         {
             next_to_process = point->next;
@@ -535,93 +537,97 @@ game_loop (int s)
                                          "*** Press return to continue - 'q' to quit *** ");
 
                 else if (!point->connected)
-                {
-					if (!point->character)
-						continue;
-
-                    std::string prompt = "";
-                    if (point->character->flags & FLAG_NOPROMPT)
-                    {
-                        if (point->character->flags & FLAG_WIZINVIS)
-                            prompt +=  "##";
-                    }
+		  {
+		    if (!point->character)
+		      continue;
+		    
+		    std::ostringstream prompt;
+		    if (point->character->flags & FLAG_NOPROMPT)
+		      {
+			if (point->character->flags & FLAG_WIZINVIS)
+			  prompt << "##";
+		      }
                     else
-                    {
-                        prompt += '<';
-
+		      {
+			prompt << '<';
+			
                         if (IS_NPC (point->character))
-                        {
-                            prompt += '=';
-                        }
-
+			  {
+                            prompt << '=';
+			  }
+			
                         if (point->character->flags & FLAG_WIZINVIS)
-                        {
-                            prompt += "##";
-                        }
-
+			  {
+                            prompt << "##";
+			  }
+			
                         if (point->character->flags & FLAG_ANON)
+			  {
+			    prompt << "##";
+			  }
+			
+                        prompt << wound_total (point->character, true);
+			
+                        prompt << " / ";
+                        prompt << shock_bar (point->character, true);
+			
+                        prompt << " / ";
+                        prompt << fatigue_bar (point->character, true);
+
+                       /* if (get_affect (point->character, AFFECT_HOLDING_BREATH))
                         {
-                            prompt += "##";
+			    prompt << " / ";
+                            prompt << breath_bar (point->character, true);
                         }
-
-						prompt += wound_total (point->character, true);
-
-                        prompt += " / ";
-                        prompt += shock_bar (point->character, true);
-
-                        prompt += " / ";
-                        prompt += fatigue_bar (point->character, true);
-
-                    /*  if (get_affect (point->character, AFFECT_HOLDING_BREATH))
-                        {
-                            prompt += " / ";
-                            prompt += breath_bar (point->character, true);
-                        } */
-
+		       */
                         if (get_affect (point->character, AFFECT_CHOKING))
-                        {
-                            prompt += " / ";
-                            prompt += choke_bar (point->character, true);
-                        }  
-						
+			  {
+			    prompt << " / ";
+                            prompt << choke_bar (point->character, true);
+			  }
+			
                         if (point->character->plr_flags & COMBAT_DISPLAY && point->character->fighting)
-                        {
-                            prompt += " / #5";
-                            prompt += char_short(point->character->fighting);
-                            prompt += "#0:";
-                            prompt += wound_total(point->character->fighting, true);
-                        }
+			  {
+                            prompt << " / #5";
+                            prompt << char_short(point->character->fighting);
+                            prompt << "#0:";
+                            prompt << wound_total(point->character->fighting, true);
+			  }
 
                         if (point->character->aiming_at)
-                        {
-
+			  {
+			    
                             if (point->character->aim == 20)
-                                prompt += " / #6point blank#0";
+			      prompt << " / #6point blank#0";
                             else if (point->character->aim == 11)
-                                prompt += " / #2aimed#0";
+			      prompt << " / #2aimed#0";
                             else if (point->character->aim >= 5)
-                                prompt += " / #3aiming#0";
+			      prompt << " / #3aiming#0";
                             else
-                                prompt += " / #1aiming#0";
+			      prompt << " / #1aiming#0";
 
 
-                            //prompt += " / " + MAKE_STRING(point->character->aim);
+                            //prompt << " / " <<  MAKE_STRING(point->character->aim);
                         }
 
                         if (point->character->bleeding_prompt || get_affect (point->character, AFFECT_INTERNAL))
-                        {
-                            prompt += " / #1bleeding#0";
-                        }
-
+			  {
+			    prompt << " / #1bleeding#0";
+			  }
+			
                         if (get_affect (point->character, MAGIC_HIDDEN))
-                        {
-                            prompt += " / #5hidden#0";
-                        }
+			  {
+                            prompt << " / #5hidden#0";
+			  }
 
-
-                    }
-                    prompt += "> ";
-                    write_to_descriptor (point, prompt.c_str ());
+			if (point->character->plr_flags & DEBUG_PROMPT)
+			  {			
+			    prompt << " / DELAY:" <<  point->character->delay << " PD:" << point->character->primary_delay << " SD:" << point->character->secondary_delay;
+			  }
+			
+		      }
+                    prompt << "> ";
+                    write_to_descriptor (point, prompt.str().c_str());
                 }
 
                 point->prompt_mode = 0;
@@ -635,6 +641,7 @@ game_loop (int s)
 
         if (!(pulse % SECOND_PULSE))
         {
+			 
             second_affect_update ();
             if (pending_reboot)
                 check_reboot ();
@@ -688,6 +695,9 @@ game_loop (int s)
 
         if (!(pulse % (10 * SECOND_PULSE)))
             ten_second_update ();
+			
+	//	if (!(pulse % (SECOND_PULSE * 60 / PULSES_PER_SEC)))
+	//		add_a_minute();
 
         if (knockout)
         {
@@ -806,7 +816,13 @@ game_loop (int s)
             cleanup_the_dead (0);
             knockout = 0;
         }
-
+/*
+		if (!(pulse % (SECOND_PULSE * 240))) // Every four real life minutes
+		{
+		  send_to_gods("Calling update room tracks.");
+		   update_room_tracks ();
+		}
+		*/
         if (time (0) >= next_hour_update)
         {
             hourly_update ();
@@ -1560,7 +1576,7 @@ highlight (char *source)
 /* higher-level communication */
 
 //////////////////////////////////////////////////////////////////////////////
-// act()
+// act() act_function
 //////////////////////////////////////////////////////////////////////////////
 //
 /// \brief  Show an action relative to the actors and watchers.
@@ -1778,7 +1794,7 @@ act (char *action_message, int hide_invisible, CHAR_DATA * ch,
                     case 'N':
                         tch = (CHAR_DATA *) vict_obj;
                         i = PERS (tch, to);
-                        if (GET_TRUST (to) && is_hooded (tch))
+                        if (GET_TRUST (to) && tch && is_hooded (tch))
                         {
                             strcpy (immbuf2, i);
                             sprintf (immbuf2, "%s (%s)", i, tch->tname);

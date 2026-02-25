@@ -98,44 +98,46 @@ const char *sizes_named[] =
 
 const char *econ_flags[] =
 {
-	"earth",			// 1 << 0
-	"spaceship",			// 1 << 1
-	"futuristic",			// 1 << 2
-	"ruins",			// 1 << 3
-	"generic",			// 1 << 4
-	"junk",			// 1 << 5
-	"fine",			// 1 << 6
-	"poor",			// 1 << 7
-	"raw",			// 1 << 8
-	"cooked",			// 1 << 9
-	"admin",			// 1 << 10
-	"BUG",			// 1 << 11
-	"practice",			// 1 << 12
-	"used",			// 1 << 13
-	"nobarter",                   // 1 << 14
-	"alien",                      // 1 << 15
-	"mutant",                     // 1 << 16
-	"ordinary",                   // 1 << 17
-	"good",                       // 1 << 18
-	"superb",                     // 1 << 19
-	"epic",                       // 1 << 20
-	"trash",                      // 1 << 21
-	"antique",                    // 1 << 22
-	"cheap",                      // 1 << 23
-	"PCMake",
-	"Grungetown",
-	"Carthage",
-	"TramCity",
-	"Mandira",
-	"NoMansTown",
-	"\n"
+  "Trash",			// 1 << 0
+  "Poor",			// 1 << 1
+  "Ordinary",                   // 1 << 2
+  "Good",     	                // 1 << 3
+  "Superb",			// 1 << 4
+  "Epic",			// 1 << 5
+  "Raw",			// 1 << 5
+  "Cooked",                     // 1 << 6
+  "Artisan",	                // 1 << 7
+  "PCMake",			// 1 << 8
+  "nobarter",                   // 1 << 9
+  "Practice",                   // 1 << 10
+  "Fish",			// 1 << 11
+  "Alcohol",			// 1 << 12
+  "Elven",			// 1 << 13
+  "Dwarven",			// 1 << 14
+  "Orcish",			// 1 << 15
+  "Mordorian",			// 1 << 16
+  "Northman",                   // 1 << 17
+  "Beorning",	                // 1 << 18
+  "Rohan",                      // 1 << 19
+  "Gondor",                     // 1 << 20
+  "Shire",                      // 1 << 21
+  "Dorwinion",                  // 1 << 22
+  "Rhun",	                // 1 << 23
+  "Unique",                     // 1 << 24
+  "Meat",                       // 1 << 25
+  "Grain",                      // 1 << 26
+  "Vegetable",                  // 1 << 27
+  "Dairy",                      // 1 << 28
+  "Herb",                       // 1 << 29
+  "Spice",                      // 1 << 30
+  "\n"
 };
 
 // Text of resource types.
 // IMPORTANT - must have the same amount of entries in it as does econ flags,
 // because the resource system piggy-backs off of it. Got to love these shortcuts!
 
-const char *resources[] =
+const char *resources[] =  // 19 plus \n
 {
 	"coal",
 	"iron",
@@ -629,9 +631,10 @@ float
 	}
 
 
-	// If an object is damaged, then folks are going to be much less likely to want to purchase it.
+	// If an object is damaged, then folks are going to be much less likely to want to purchase it. 
+	// - Edited by Ceredir 2015/05/11 to change the multipliers from 100 to 1.00 and so on, as it should be
 
-	int damage_modifier[6] = {100, 75, 50, 25, 5, 0};
+	float damage_modifier[6] = {1.00, 0.75, 0.50, 0.25, 0.5, 0};
 
 	if (!engine.in_test_mode ())
 		if (obj->damage)
@@ -964,9 +967,9 @@ void
 			{
 				char *p;
 
-				sprintf(buf, "#3Fail#0: #2%s#0 for #6%s#0 credits.", row[10], row[5]);
+				sprintf(buf, "#3Fail#0: #2%s#0 for #6%s#0 coins.", row[10], row[5]);
 
-				sprintf(buf3, "At this time, #2%s#0 #3failed to be bought#0 for #6%d#0 credits.\n\n"
+				sprintf(buf3, "At this time, #2%s#0 #3failed to be bought#0 for #6%d#0 coins.\n\n"
 					"The item was ordered for sale by #5%s#0.",
 					row[10], atoi(row[5]), row[7]);                                      
 
@@ -1078,7 +1081,7 @@ void
 		if (price <= 0)
 		{
 			name_to_ident (ch, buf2);			
-			sprintf(buf, "%s You need to nominate a price in chips you are willing to pay for this order.", buf2);
+			sprintf(buf, "%s You need to nominate a price in coins you are willing to pay for this order.", buf2);
 			do_whisper (keeper, buf, 83);
 			return;
 		}
@@ -1219,13 +1222,13 @@ void
 			if (!can_subtract_money (ch, fee + price, keeper->mob->currency_type))
 			{
 				name_to_ident (ch, buf2);
-				sprintf (buf, "%s You don't seem to have enough credits to place for that order.", buf2);
+				sprintf (buf, "%s You don't seem to have enough coins to place for that order.", buf2);
 				do_whisper (keeper, buf, 83);
 				return;
 			}
 
 			name_to_ident (ch, buf2);
-			sprintf(buf, "%s I will now pay #6%d#0 chips to the first person who can fill your order. In addition, I have taken #6%d#0 chips for my services. I will let you know when your order has been fulfilled - you will then be able to #6ORDER RETRIEVE#0 to receive your item. If no one fills your order in One Lunar Day, I will remove your order, allow you to retrieve your money, but keep my fee.\n", buf2, price, fee);
+			sprintf(buf, "%s I will now pay #6%d#0 chips to the first person who can fill your order. In addition, I have taken #6%d#0 coins for my services. I will let you know when your order has been fulfilled - you will then be able to #6ORDER RETRIEVE#0 to receive your item. If no one fills your order in One Lunar Day, I will remove your order, allow you to retrieve your money, but keep my fee.\n", buf2, price, fee);
 			do_whisper (keeper, buf, 83);
 			subtract_money(ch, fee + price, keeper->mob->currency_type);
 
@@ -1811,9 +1814,9 @@ void
 				char *p;
 
 				sprintf(buf, "The Auctioneer: #5%s#0", row[2]);
-				sprintf(buf2, "Purchase of #2%s#0 for #6%s#0 credits", obj_short_desc(obj), row[5]);
+				sprintf(buf2, "Purchase of #2%s#0 for #6%s#0 coins", obj_short_desc(obj), row[5]);
 				sprintf(buf3, "The item you had ordered for purchase with #5%s#0 has been bought.\n\n"
-					"After the auctioneers commission, you have spent #6%s#0 credits on the sale of #2%s#0.\n\n"
+					"After the auctioneers commission, you have spent #6%s#0 coins on the sale of #2%s#0.\n\n"
 					"Visit #5%s#0 to '#6retrieve#0' your item.\n", row[2], row[5], obj_short_desc(obj), row[2]);
 				reformat_string (buf3, &p);
 
@@ -1841,9 +1844,9 @@ void
 			{
 				char *p;
 
-				sprintf(buf, "#3Bought#0: #2%s#0 for #6%s#0 credits.", obj_short_desc(obj), row[5]);
+				sprintf(buf, "#3Bought#0: #2%s#0 for #6%s#0 coins.", obj_short_desc(obj), row[5]);
 
-				sprintf(buf3, "At this time, #2%s#0 was #3sold#0 for #6%d#0 credits by #5%s#0.\n\n"
+				sprintf(buf3, "At this time, #2%s#0 was #3sold#0 for #6%d#0 coins by #5%s#0.\n\n"
 					"The item was ordered for sale by #5%s#0.",
 					obj_short_desc(obj), atoi(row[5]), char_short(ch), row[7]);                                      
 
@@ -2110,7 +2113,7 @@ int
 #define NO_SUCH_ITEM1 "Don't seem to have that in my inventory. Would you like to buy something else?"
 #define NO_SUCH_ITEM2 "I don't see that particular item. Perhaps you misplaced it?"
 #define MISSING_CASH1 "A little too expensive for me now -- why don't you try back later?"
-#define MISSING_CASH2 "You're a little short on credits, I see; come back when you can afford it."
+#define MISSING_CASH2 "You're a little short on coins, I see; come back when you can afford it."
 #define DO_NOT_BUY    "I don't buy those sorts of things, I'm afraid."
 
 void
@@ -2605,7 +2608,7 @@ void
 		}
 	}
 	money += amount;
-
+/*
 	if (keeper->mob->currency_type == CURRENCY_FOOD)
 	{
 
@@ -2652,7 +2655,7 @@ void
 			obj_to_room (obj, store->vnum);
 			money %= 1000;
 		}
-
+*/
 		if (money / 100)
 		{
 			obj = load_object (14016);
@@ -2661,7 +2664,7 @@ void
 			money %= 100;
 		}
 
-		if (money / 50)
+/*		if (money / 50)
 		{
 			obj = load_object (14015);
 			obj->count = money / 50;
@@ -2676,7 +2679,7 @@ void
 			obj_to_room (obj, store->vnum);
 			money %= 20;
 		}
-
+*/
 		if (money / 10)
 		{
 			obj = load_object (14013);
@@ -2684,7 +2687,7 @@ void
 			obj_to_room (obj, store->vnum);
 			money %= 10;
 		}
-
+/*
 		if (money / 5)
 		{
 			obj = load_object (14012);
@@ -2692,14 +2695,14 @@ void
 			obj_to_room (obj, store->vnum);
 			money %= 5;
 		}
-
+*/
 		if (money)
 		{
 			obj = load_object (14011);
 			obj->count = money;
 			obj_to_room (obj, store->vnum);
 		}
-	}
+//	}
 }
 
 void
@@ -2732,7 +2735,7 @@ void
 	}
 
 	money -= cost;
-
+/*
 	if (keeper->mob->currency_type == CURRENCY_FOOD)
 	{
 		if (money / 240)
@@ -2772,6 +2775,7 @@ void
 	}
 	else if (keeper->mob->currency_type == CURRENCY_PHOENIX)
 	{
+	
 		if (money / 1000)
 		{
 			obj = load_object (14017);
@@ -2779,7 +2783,7 @@ void
 			obj_to_room (obj, store->vnum);
 			money %= 1000;
 		}
-
+*/
 		if (money / 100)
 		{
 			obj = load_object (14016);
@@ -2787,7 +2791,7 @@ void
 			obj_to_room (obj, store->vnum);
 			money %= 100;
 		}
-
+/*
 		if (money / 50)
 		{
 			obj = load_object (14015);
@@ -2803,7 +2807,7 @@ void
 			obj_to_room (obj, store->vnum);
 			money %= 20;
 		}
-
+*/
 		if (money / 10)
 		{
 			obj = load_object (14013);
@@ -2811,7 +2815,7 @@ void
 			obj_to_room (obj, store->vnum);
 			money %= 10;
 		}
-
+/*
 		if (money / 5)
 		{
 			obj = load_object (14012);
@@ -2819,14 +2823,14 @@ void
 			obj_to_room (obj, store->vnum);
 			money %= 5;
 		}
-
+*/
 		if (money)
 		{
 			obj = load_object (14011);
 			obj->count = money;
 			obj_to_room (obj, store->vnum);
 		}
-	}
+	//}
 }
 
 void
@@ -3680,7 +3684,7 @@ void
 			keepers_cost = calculate_sale_price (tobj, keeper, ch, buy_count, true, false);
 			keepers_cost = keepers_cost * (100 + discount) / 100;
 			keepers_cost = (int) keepers_cost;
-			sprintf (buf, "You have opted to purchase #2%s#0, for a total of %d credit%s. To confirm, please use the ACCEPT command.\n", obj_short_desc (tobj), (int) keepers_cost, (int) keepers_cost > 1 ? "s" : "");
+			sprintf (buf, "You have opted to purchase #2%s#0, for a total of %d coin%s. To confirm, please use the ACCEPT command.\n", obj_short_desc (tobj), (int) keepers_cost, (int) keepers_cost > 1 ? "s" : "");
 			sprintf(buf + strlen(buf), "\nThe long description of this object will be: #2%s#0\n", tobj->description);
 			sprintf(buf + strlen(buf), "\nThe full description of this object will be:");
 			sprintf(buf + strlen(buf), "\n#2%s#0\n", tobj->full_description);
@@ -3700,7 +3704,7 @@ void
 		}
 		else
 		{
-			sprintf (buf, "You have opted to purchase #2%s#0, for a total of %d credit%s. To confirm, please use the ACCEPT command.", obj_short_desc (obj), (int) keepers_cost, (int) keepers_cost > 1 ? "s" : "");
+			sprintf (buf, "You have opted to purchase #2%s#0, for a total of %d coin%s. To confirm, please use the ACCEPT command.", obj_short_desc (obj), (int) keepers_cost, (int) keepers_cost > 1 ? "s" : "");
 			ch->purchase_obj = obj;
 		}
 
@@ -3798,14 +3802,14 @@ void
 	if (ch->room->zone == 5 || ch->room->zone == 6)
 	{
 		sprintf (buf,
-			"%s You're lucky I gave it to you for %d credit%s, maggot.",
+			"%s You're lucky I gave it to you for %d coin%s, maggot.",
 			buf2, (int) keepers_cost, (int) keepers_cost > 1 ? "s" : "");
 	}
 	else
 	{
 		sprintf (buf, "%s A veritable steal at ", buf2);
 		sprintf (buf + strlen (buf),
-			"%d credit%s! Enjoy it, my friend.", (int) keepers_cost,
+			"%d coin%s! Enjoy it, my friend.", (int) keepers_cost,
 			(int) keepers_cost > 1 ? "s" : "");
 	}
 
@@ -3913,7 +3917,7 @@ void
 }
 int
 	keeper_uses_currency_type (int currency_type, OBJ_DATA * obj)
-{
+{/*
 	if (currency_type == CURRENCY_FOOD)
 	{
 		if (obj->nVirtual == 50093 || obj->nVirtual == 50092
@@ -3922,11 +3926,10 @@ int
 	}
 	else if (currency_type == CURRENCY_PHOENIX)
 	{
-		if (obj->nVirtual == 14011 || obj->nVirtual == 14012
-			|| obj->nVirtual == 14013 || obj->nVirtual == 14014
-			|| obj->nVirtual == 14015 || obj->nVirtual == 14016 || obj->nVirtual == 14017)
+	*/
+		if (obj->nVirtual == 14011 || obj->nVirtual == 14013 || obj->nVirtual == 14016 )
 			return 1;
-	}
+	//}
 	return 0;
 }
 
@@ -4063,97 +4066,7 @@ void
 		}
 	}
 
-	if (keeper->mob->currency_type == CURRENCY_FOOD)
-	{
-		if (money / 240)
-		{
-			obj = load_object (50093);
-			obj->count = money / 240;
-			if (tobj)
-				obj_to_obj (obj, tobj);
-			else
-				obj_to_char (obj, ch);
-			denom[0] = money / 240;
-			money %= 240;
-		}
-
-		if (money / 25)
-		{
-			obj = load_object (50092);
-			obj->count = money / 25;
-			if (tobj)
-				obj_to_obj (obj, tobj);
-			else
-				obj_to_char (obj, ch);
-			denom[1] = money / 25;
-			money %= 25;
-		}
-
-		if (money / 5)
-		{
-			obj = load_object (50091);
-			obj->count = money / 5;
-			if (tobj)
-				obj_to_obj (obj, tobj);
-			else
-				obj_to_char (obj, ch);
-			denom[2] = money / 5;
-			money %= 5;
-		}
-
-		if (money)
-		{
-			obj = load_object (50090);
-			obj->count = money;
-			if (tobj)
-				obj_to_obj (obj, tobj);
-			else
-				obj_to_char (obj, ch);
-			denom[3] = money;
-		}
-
-		send_to_char ("\n", ch);
-		if (tobj)
-			sprintf (buf,
-			"$N gives you the following credits, which you tuck away in #2%s#0:",
-			obj_short_desc (tobj));
-		else
-			sprintf (buf, "$N gives you the following credits:");
-
-		act (buf, true, ch, 0, keeper, TO_CHAR | _ACT_FORMAT);
-
-		*buf = '\0';
-
-		if (denom[0])
-			sprintf (buf + strlen (buf),
-			"   #2%d condensed food ration%s#0\n", denom[0],
-			denom[0] > 1 ? "s" : "");
-		if (denom[1])
-			sprintf (buf + strlen (buf), "   #2%d weighty food ration%s#0\n",
-			denom[1], denom[1] > 1 ? "s" : "");
-		if (denom[2])
-			sprintf (buf + strlen (buf),
-			"   #2%d packaged food ration%s#0\n", denom[2],
-			denom[2] > 1 ? "s" : "");
-		if (denom[3])
-			sprintf (buf + strlen (buf), "   #2%d small, wrapped food ration%s#0\n",
-			denom[3], denom[3] > 1 ? "s" : "");
-	}
-	else if (keeper->mob->currency_type == CURRENCY_PHOENIX)
-	{
-		if (money / 1000)
-		{
-			obj = load_object (14017);
-			obj->count = money / 1000;
-			if (tobj)
-				obj_to_obj (obj, tobj);
-			else
-				obj_to_char (obj, ch);
-			denom[0] = money / 1000;
-			money %= 1000;
-		}
-
-		if (money / 100)
+	if (money / 100)
 		{
 			obj = load_object (14016);
 			obj->count = money / 100;
@@ -4165,31 +4078,7 @@ void
 			money %= 100;
 		}
 
-		if (money / 50)
-		{
-			obj = load_object (14015);
-			obj->count = money / 50;
-			if (tobj)
-				obj_to_obj (obj, tobj);
-			else
-				obj_to_char (obj, ch);
-			denom[2] = money / 50;
-			money %= 50;
-		}
-
-		if (money / 20)
-		{
-			obj = load_object (14014);
-			obj->count = money / 20;
-			if (tobj)
-				obj_to_obj (obj, tobj);
-			else
-				obj_to_char (obj, ch);
-			denom[3] = money / 20;
-			money %= 20;
-		}
-
-		if (money / 10)
+	if (money / 10)
 		{
 			obj = load_object (14013);
 			obj->count = money / 10;
@@ -4199,18 +4088,6 @@ void
 				obj_to_char (obj, ch);
 			denom[4] = money / 10;
 			money %= 10;
-		}
-
-		if (money / 5)
-		{
-			obj = load_object (14012);
-			obj->count = money / 5;
-			if (tobj)
-				obj_to_obj (obj, tobj);
-			else
-				obj_to_char (obj, ch);
-			denom[5] = money / 5;
-			money %= 5;
 		}
 
 		if (money)
@@ -4227,10 +4104,10 @@ void
 		send_to_char ("\n", ch);
 		if (tobj)
 			sprintf (buf,
-			"$N gives you the following chips, which you tuck away in #2%s#0:",
+			"$N gives you the following coins, which you tuck away in #2%s#0:",
 			obj_short_desc (tobj));
 		else
-			sprintf (buf, "$N gives you the following chips:");
+			sprintf (buf, "$N gives you the following coins:");
 
 		act (buf, true, ch, 0, keeper, TO_CHAR | _ACT_FORMAT);
 
@@ -4240,7 +4117,7 @@ void
 			sprintf (buf + strlen (buf), "   #2%d gold-flecked circular chip%s#0\n",
 			denom[0], denom[0] > 1 ? "s" : "");
 		if (denom[1])
-			sprintf (buf + strlen (buf), "   #2%d black circular chip%s#0\n",
+			sprintf (buf + strlen (buf), "   #2%d gold coin%s#0\n",
 			denom[1], denom[1] > 1 ? "s" : "");
 		if (denom[2])
 			sprintf (buf + strlen (buf), "   #2%d green circular chip%s#0\n",
@@ -4249,15 +4126,15 @@ void
 			sprintf (buf + strlen (buf), "   #2%d yellow circular chip%s#0\n",
 			denom[3], denom[3] > 1 ? "s" : "");
 		if (denom[4])
-			sprintf (buf + strlen (buf), "   #2%d blue circular chip%s#0\n",
+			sprintf (buf + strlen (buf), "   #2%d silver coin%s#0\n",
 			denom[4], denom[4] > 1 ? "s" : "");
 		if (denom[5])
 			sprintf (buf + strlen (buf), "   #2%d red circular chip%s#0\n",
 			denom[5], denom[5] > 1 ? "s" : "");
 		if (denom[6])
-			sprintf (buf + strlen (buf), "   #2%d white circular chip%s#0\n",
+			sprintf (buf + strlen (buf), "   #2%d copper coin%s#0\n",
 			denom[6], denom[6] > 1 ? "s" : "");
-	}
+	
 
 
 	send_to_char (buf, ch);
@@ -4649,7 +4526,7 @@ void
 
 		keepers_cost = keepers_cost * (100 + discount) / 100;
 
-		sprintf (buf + strlen (buf), "%d credit%s", (int) keepers_cost,
+		sprintf (buf + strlen (buf), "%d coin%s", (int) keepers_cost,
 			(int) keepers_cost > 1 ? "s" : "");
 
 		strcat (buf, ".");
@@ -4675,7 +4552,7 @@ void
 	if (keepers_cost < 1)
 	{
 		name_to_ident (ch, buf2);
-		sprintf (buf, "%s Bah, that isn't even worth my time!", buf2);
+		sprintf (buf, "%s Pah, that's not even worth one coin! Don't you have any more?", buf2);
 		do_whisper (keeper, buf, 83);
 		return;
 	}
@@ -4847,7 +4724,7 @@ void
 
 	*buf3 = '\0';
 
-	sprintf (buf3, "%d credit%s", (int) keepers_cost,
+	sprintf (buf3, "%d coin%s", (int) keepers_cost,
 		(int) keepers_cost > 1 ? "s" : "");
 
 	keepers_cost = (int) keepers_cost;
@@ -4910,7 +4787,7 @@ void
 
 	if (coins->count < count)
 	{
-		send_to_char ("You don't have that many credits to exchange.\n", ch);
+		send_to_char ("You don't have that many coins to exchange.\n", ch);
 		return;
 	}
 
@@ -5222,7 +5099,7 @@ void
 		{
 			sprintf (buf + strlen (buf),
 				"\n    Total for #6%s %d#0: Sales #2%d cp#0, Purchases #2%d cp#0.\n\n"
-				"    Current credits on hand: #2%d cp#0.\n",
+				"    Current coins on hand: #2%d cp#0.\n",
 				month_short_name[(int) last_month], (int) last_year,
 				nAmtSold, nAmtBought, keeper_has_money (keeper, 0));
 		}
@@ -5231,7 +5108,7 @@ void
 			sprintf (buf + strlen (buf),
 				"\n    Total for #6%s %d#0: Sales #2%d cp#0, Purchases #2%d cp#0.\n\n"
 				"    Total for period:    Sales #2%d cp#0, Purchases #2%d cp#0.\n"
-				"    Current credits on hand:  #2%d cp#0.\n",
+				"    Current coins on hand:  #2%d cp#0.\n",
 				month_short_name[(int) last_month], (int) last_year,
 				nAmtSold, nAmtBought, nTAmtSold, nTAmtBought,
 				keeper_has_money (keeper, 0));
@@ -5362,7 +5239,7 @@ void
 		&& !can_subtract_money (ch, 20, keeper->mob->currency_type))
 	{
 		name_to_ident (ch, buf2);
-		sprintf (buf, "%s You seem to be a bit short on credits right now.", buf2);
+		sprintf (buf, "%s You seem to be a bit short on coins right now.", buf2);
 		do_whisper (keeper, buf, 83);
 		return;
 	}
@@ -5624,7 +5501,7 @@ void
 
 			seen_tollkeeper = 1;
 
-			sprintf (buf, "$n wants %d credit%s to cross %s.",
+			sprintf (buf, "$n wants %d coin%s to cross %s.",
 				af->a.toll.charge,
 				af->a.toll.charge == 1 ? "" : "s", dirs[af->a.toll.dir]);
 			act (buf, false, tch, 0, ch, TO_VICT);
@@ -5736,7 +5613,7 @@ void
 
 	if (!can_subtract_money (ch, af->a.toll.charge, tch->mob->currency_type))
 	{
-		send_to_char ("You don't have enough credits to pay the toll.\n", ch);
+		send_to_char ("You don't have enough coins to pay the toll.\n", ch);
 		return;
 	}
 
@@ -5805,7 +5682,7 @@ void
 
 	if (max_toll < af->a.toll.charge)
 	{
-		sprintf (buf, "$N wants a %d credit toll.", af->a.toll.charge);
+		sprintf (buf, "$N wants a %d coin toll.", af->a.toll.charge);
 		act (buf, false, ch, 0, tch, TO_CHAR);
 		return;
 	}
@@ -5813,7 +5690,7 @@ void
 	if (!can_subtract_money
 		(ch, af->a.toll.charge * tolls, tch->mob->currency_type))
 	{
-		send_to_char ("You don't have enough credits to pay the tolls.\n", ch);
+		send_to_char ("You don't have enough coins to pay the tolls.\n", ch);
 		return;
 	}
 
@@ -6084,7 +5961,7 @@ void
 
 	if (af_collector->a.toll.charge > max_pay)
 	{
-		sprintf (buf, "$N wants %d credit%s per toll.",
+		sprintf (buf, "$N wants %d coin%s per toll.",
 			af_collector->a.toll.charge,
 			af_collector->a.toll.charge == 1 ? "" : "s");
 		act (buf, false, ch, 0, collector, TO_CHAR);
@@ -6101,18 +5978,18 @@ void
 	if (!can_subtract_money
 		(ch, af_collector->a.toll.charge * num_payees, currency_type))
 	{
-		send_to_char ("You don't have enough credits to pay the toll.\n", ch);
+		send_to_char ("You don't have enough coins to pay the toll.\n", ch);
 		return;
 	}
 
 	act ("$n pays $N a toll for:", false, ch, 0, collector, TO_NOTVICT);
 
-	sprintf (buf, "$n pays you a toll of %d credit%s for:",
+	sprintf (buf, "$n pays you a toll of %d coin%s for:",
 		af_collector->a.toll.charge * num_payees,
 		af_collector->a.toll.charge * num_payees == 1 ? "" : "s");
 	act (buf, false, ch, 0, collector, TO_VICT);
 
-	sprintf (buf, "You pay $N a toll of %d credit%s for:",
+	sprintf (buf, "You pay $N a toll of %d coin%s for:",
 		af_collector->a.toll.charge * num_payees,
 		af_collector->a.toll.charge * num_payees == 1 ? "" : "s");
 	act (buf, false, ch, 0, collector, TO_CHAR);
@@ -6451,17 +6328,9 @@ void
 			next_obj = tobj->next_content;
 			if (GET_ITEM_TYPE (tobj) == ITEM_MONEY)
 			{
-				if ((currency_type == CURRENCY_FOOD
-					&& (tobj->nVirtual >= 50090 && tobj->nVirtual <= 50093)))
-				{
-					money += ((int) tobj->farthings) * tobj->count;
-					obj_from_obj (&tobj, 0);
-					extract_obj (tobj);
-					ch->delay_obj = obj;
-					container = true;
-				}
-				else if ((currency_type == CURRENCY_PHOENIX
-					&& (tobj->nVirtual >= 14011 && tobj->nVirtual <= 14017)))
+			//	if ((currency_type == CURRENCY_PHOENIX
+			//		&& (tobj->nVirtual >= 14011 && tobj->nVirtual <= 14017)))
+				if ( tobj->nVirtual == 14011 || tobj->nVirtual == 14013 || tobj->nVirtual == 14016 )
 				{
 					money += ((int) tobj->farthings) * tobj->count;
 					obj_from_obj (&tobj, 0);
@@ -6476,7 +6345,7 @@ void
 	if ((obj = ch->right_hand))
 	{
 		if (GET_ITEM_TYPE (obj) == ITEM_MONEY)
-		{
+		{/*
 			if ((currency_type == CURRENCY_FOOD
 				&& (obj->nVirtual >= 50090 && obj->nVirtual <= 50093)))
 			{
@@ -6486,6 +6355,8 @@ void
 			}
 			else if ((currency_type == CURRENCY_PHOENIX
 				&& (obj->nVirtual >= 14011 && obj->nVirtual <= 14017)))
+				*/
+			if ( obj->nVirtual == 14011 || obj->nVirtual == 14013 || obj->nVirtual == 14016 )
 			{
 				money += ((int) ch->right_hand->farthings) * ch->right_hand->count;
 				extract_obj (ch->right_hand);
@@ -6498,7 +6369,7 @@ void
 			{
 				next_obj = tobj->next_content;
 				if (GET_ITEM_TYPE (tobj) == ITEM_MONEY)
-				{
+				{/*
 					if ((currency_type == CURRENCY_FOOD
 						&& (tobj->nVirtual >= 50090
 						&& tobj->nVirtual <= 50093)))
@@ -6512,6 +6383,8 @@ void
 					else if ((currency_type == CURRENCY_PHOENIX
 						&& (tobj->nVirtual >= 14011
 						&& tobj->nVirtual <= 14017)))
+						*/
+					if ( tobj->nVirtual == 14011 || tobj->nVirtual == 14013 || tobj->nVirtual == 14016 )
 					{
 						money += ((int)tobj->farthings * tobj->count);
 						obj_from_obj (&tobj, 0);
@@ -6527,7 +6400,7 @@ void
 	if ((obj = ch->left_hand))
 	{
 		if (GET_ITEM_TYPE (obj) == ITEM_MONEY)
-		{
+		{ /*
 			if ((currency_type == CURRENCY_FOOD
 				&& (obj->nVirtual >= 50090 && obj->nVirtual <= 50093)))
 			{
@@ -6537,6 +6410,8 @@ void
 			}
 			else if ((currency_type == CURRENCY_PHOENIX
 				&& (obj->nVirtual >= 14011 && obj->nVirtual <= 14017)))
+				*/
+			if ( obj->nVirtual == 14011 || obj->nVirtual == 14013 || obj->nVirtual == 14016 )
 			{
 				money += ((int)ch->left_hand->farthings * ch->left_hand->count);
 				extract_obj (ch->left_hand);
@@ -6549,7 +6424,7 @@ void
 			{
 				next_obj = tobj->next_content;
 				if (GET_ITEM_TYPE (tobj) == ITEM_MONEY)
-				{
+				{ /*
 					if ((currency_type == CURRENCY_FOOD
 						&& (tobj->nVirtual >= 50090
 						&& tobj->nVirtual <= 50093)))
@@ -6563,6 +6438,8 @@ void
 					else if ((currency_type == CURRENCY_PHOENIX
 						&& (tobj->nVirtual >= 14011
 						&& tobj->nVirtual <= 14017)))
+					*/
+					if ( tobj->nVirtual == 14011 || tobj->nVirtual == 14013 || tobj->nVirtual == 14016 )
 					{
 						money += ((int) tobj->farthings * tobj->count);
 						obj_from_obj (&tobj, 0);
@@ -6585,7 +6462,7 @@ void
 	obj = ch->delay_obj;
 	ch->delay_obj = NULL;
 
-
+/*
 	if (currency_type == CURRENCY_FOOD)
 	{
 
@@ -6641,7 +6518,8 @@ void
 		}
 	}
 	else if (currency_type == CURRENCY_PHOENIX)
-	{
+	{ */
+	/*
 		if (money / 1000)
 		{
 			tobj = load_object (14017);
@@ -6653,7 +6531,7 @@ void
 			money %= 1000;
 			change = true;
 		}
-
+*/
 		if (money / 100)
 		{
 			tobj = load_object (14016);
@@ -6665,7 +6543,7 @@ void
 			money %= 100;
 			change = true;
 		}
-
+/*
 		if (money / 50)
 		{
 			tobj = load_object (14015);
@@ -6689,7 +6567,7 @@ void
 			change = true;
 			money %= 20;
 		}
-
+*/
 		if (money / 10)
 		{
 			tobj = load_object (14013);
@@ -6701,7 +6579,7 @@ void
 			change = true;
 			money %= 10;
 		}
-
+/*
 		if (money / 5)
 		{
 			tobj = load_object (14012);
@@ -6713,7 +6591,7 @@ void
 			change = true;
 			money %= 5;
 		}
-
+*/
 		if (money)
 		{
 			tobj = load_object (14011);
@@ -6724,13 +6602,13 @@ void
 				obj_to_char (tobj, ch);
 			change = true;
 		}
-	}
+//	}
 
 	if (!SupressOutput)
 	{
 		if (container)
 			send_to_char
-			("\nRifling through your belongings, you retrieve your chips.\n", ch);
+			("\nRifling through your belongings, you retrieve your coins.\n", ch);
 		else
 			send_to_char ("\nYou offer up the specified amount.\n", ch);
 
@@ -6988,7 +6866,12 @@ float
 	count = (obj->count) ? obj->count : 1;
 	cost = (obj->farthings + obj->silver * 4) * count;
 	sprintf(weights, ", %d.%02d lb", obj->obj_flags.weight / 100, obj->obj_flags.weight % 100);
-	*weight += obj->obj_flags.weight * count;
+	
+	if (weight != NULL)
+	{
+	  *weight += obj->obj_flags.weight * count;
+	}
+	
 	sprintf (format, "%% 10.02f cp%%s - %%%dc#2%%s#0", 2 * depth);
 	sprintf (buffer + strlen (buffer), format, cost, weights, ' ',
 		obj->short_description);
@@ -7401,7 +7284,7 @@ void
 
 		payrollAmt += strtol (row[3], NULL, 10);
 
-		sprintf (buf + strlen (buf), " #5%s#0 was paid %ld credits.\n", row[2], strtol (row[3], NULL, 10));
+		sprintf (buf + strlen (buf), " #5%s#0 was paid %ld coins.\n", row[2], strtol (row[3], NULL, 10));
 
 		if (strlen (buf) > MAX_STRING_LENGTH - 512)
 		{
@@ -7419,7 +7302,7 @@ void
 		{
 			sprintf (buf + strlen (buf),
 				"\n    Total for #6%s %d#0: Payroll #2%d cp#0.\n\n"
-				"    Current credits on hand: #2%d cp#0.\n",
+				"    Current coins on hand: #2%d cp#0.\n",
 				month_short_name[(int) last_month],
 				(int) last_year,
 				payrollAmt,
@@ -7430,7 +7313,7 @@ void
 			sprintf (buf + strlen (buf),
 				"\n    Total for #6%s %d#0: Payroll #2%d cp#0.\n\n"
 				"    Total for period:      Payroll #2%d cp#0.\n"
-				"    Current credits on hand:  #2%d cp#0.\n",
+				"    Current coins on hand:  #2%d cp#0.\n",
 				month_short_name[(int) last_month],
 				(int) last_year,
 				payrollAmt,
@@ -8309,7 +8192,7 @@ void
 #define SHORT_ON_RENT		"You haven't got enough for your rent. Don't bother talking to me again until you do."
 #define RENT_PROBLEM		"We're not open for business just now - come back later."
 #define RENT_COMMENCED		"A pleasure doing business with you. To see how much rent you have left, type #6rent balance#0. Here's your key. To visit your room, type #6rent access#0 - you'll need your key handy to do so."
-#define RENT_TOPPEDUP		"Ah, thank you very much. That's one more full Lunar day added to your rent balance."
+#define RENT_TOPPEDUP		"Ah, thank you very much. That's one more full month added to your rent balance."
 #define ALREADY_RENTING		"But you're already renting from us - one lease per tennant."
 #define NOT_RENTING			"But we don't have you on our records as renting here - just because you have the key doesn't prove anything."
 #define MISSING_KEY			"You'll need to show me some kind of key if you want to do that."
@@ -8611,14 +8494,14 @@ void
 
 		if (office_obj->o.od.value[4] > 0)
 		{
-			sprintf (buf,	"You can have the room for a full Lunar day #6[OOC: 7 Real-Life Days]#0 for #2%d credits#0."
-				"At any time, you can pay the same amount for another Lunar day. You fall behind, you'll need to pay your "
+			sprintf (buf,	"You can have the room for a full month #6[OOC: 7 Real-Life Days]#0 for #2%d coins#0."
+				"At any time, you can pay the same amount for another month. You fall behind, you'll need to pay your "
 				"back rent before I let you back in to your place. I'll allow you to take multiple people in to the room, but you will only get one key.", rent);
 		}
 		else
 		{
-			sprintf (buf,	"You can have the room for a full Lunar day #6[OOC: 7 Real-Life Days]#0 for #2%d credits#0."
-				"At any time, you can pay the same amount for another Lunar day. You fall behind, you'll need to pay your "
+			sprintf (buf,	"You can have the room for a full month #6[OOC: 7 Real-Life Days]#0 for #2%d coins#0."
+				"At any time, you can pay the same amount for another full month. You fall behind, you'll need to pay your "
 				"back rent before I let you back in to your place. This room has space enough for only one person at any time.", rent);
 		}
 
@@ -8677,7 +8560,7 @@ void
 		if ( result )
 			mysql_free_result (result);
 
-		sprintf (buf,	"You can have the room for another full Lunar day #6[OOC: 7 Real-Life Days]#0 for #2%d credits#0. "
+		sprintf (buf,	"You can have the room for another full month #6[OOC: 7 Real-Life Days]#0 for #2%d coins#0. "
 			"You fall behind, you'll need to pay your back rent before I let you back in to your place.", rent);
 
 		name_to_ident (ch, buf2);
@@ -8735,7 +8618,7 @@ void
 		if ( result )
 			mysql_free_result (result);
 
-		sprintf (buf,	"You can have a duplicate key produced for #2%d credits#0. Both keys will work, but only the original owner will be able to topup, replicate, and replace.", (rent / 2));
+		sprintf (buf,	"You can have a duplicate key produced for #2%d coins#0. Both keys will work, but only the original owner will be able to topup, replicate, and replace.", (rent / 2));
 
 		name_to_ident (ch, buf2);
 		sprintf (buf3, "%s %s", buf2, buf);
@@ -8775,7 +8658,7 @@ void
 		if ( result )
 			mysql_free_result (result);
 
-		sprintf (buf,	"You can have a replacement key for a half Lunar day's worth of rent, or, #2%d credits#0. "
+		sprintf (buf,	"You can have a replacement key for a half month's worth of rent, or, #2%d coins#0. "
 			"This doesn't increase your rent balance, and your old key will become invalid.", rent/2);
 
 		name_to_ident (ch, buf2);
@@ -8968,8 +8851,8 @@ void
 	else
 	{
 		sprintf(buf,               "rent usage: rent <commence|topup|balance|access>\n");
-		sprintf(buf + strlen(buf), "rent commence  - take out a Lunar day-to-day lease on a room\n");
-		sprintf(buf + strlen(buf), "rent topup     - add another Lunar day's worth of rent to your balance\n");
+		sprintf(buf + strlen(buf), "rent commence  - take out a month lease on a room\n");
+		sprintf(buf + strlen(buf), "rent topup     - add another month's worth of rent to your balance\n");
 		sprintf(buf + strlen(buf), "rent balance   - check how much balance you have owing\n");
 		sprintf(buf + strlen(buf), "rent access    - access your room\n");
 		sprintf(buf + strlen(buf), "rent replace   - replaces your key (your old key will no longer function)\n");

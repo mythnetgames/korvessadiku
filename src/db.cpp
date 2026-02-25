@@ -316,9 +316,9 @@ void boot_db( void ) {
 		PERM_MEMORY_SIZE = 12000000;
 		MAX_OVERHEAD = 16000000;
 	} else {
-		MAX_MEMORY = 5000000;
-		PERM_MEMORY_SIZE = 3250000;
-		MAX_OVERHEAD = 4512000;
+		MAX_MEMORY = 20000000;
+		PERM_MEMORY_SIZE = 12000000;
+		MAX_OVERHEAD = 16000000;
 	}
 
 	system_log( "Initializing read-only memory.", false );
@@ -464,9 +464,6 @@ void boot_db( void ) {
 
 	mm( "post boot variable lists" );
 
-	system_log( "Loading turf.", false );
-	load_turf_systems();
-	load_turf_hoods();
 
 	system_log( "Loading craft information.", false );
 	boot_crafts();
@@ -706,7 +703,106 @@ void stock_new_deliveries( void ) {
 
 	system_log( "New shopkeeper deliveries stocked.", false );
 }
+void
+reset_time (void)
+{
+	char buf[MAX_STRING_LENGTH];
 
+	long beginning_of_time = GAME_SECONDS_BEGINNING;
+
+	int qz[] = { 6, 6, 6, 6, 5, 5, 4, 4, 5, 6, 6, 7 };
+	int moonrise, sunrise, moonset, t1, t2, t3;
+
+	int i = 0;
+
+	struct time_info_data mud_time_passed (time_t t2, time_t t1);
+
+	next_hour_update = time (0) + ((time (0) - beginning_of_time) % 900);
+	next_minute_update = time (0);
+
+	time_info = mud_time_passed (time (0), beginning_of_time);
+
+	sunrise = qz[(int) time_info.month];	/* sunrise is easy */
+	if (time_info.day <= 15)
+		t1 = 15 - time_info.day;
+	else
+		t1 = time_info.day - 15;
+	/* t1 is 0 at new moon when moon is up for day length and 15 at
+	full moon when moon is up for night length */
+	t3 = sunrise << 1;		/* because it doesn't work otherwise! :( */
+	t2 = ((t3 + 1) * (15 - t1)) + ((23 - t3) * t1);
+	/* t2 = time between moonrise and moonset * 15 */
+	moonrise = (345 + time_info.day * 24 - t2) / 30;
+	moonset = (345 + time_info.day * 24 + t2) / 30;
+	if (moonrise >= 24)
+	{
+		moonrise -= 24;
+		moonset -= 24;
+	}				/* moonset is allowed to be >= 24 if the moon is out at midnight */
+
+	for (i = 0; i <= 99; i++)
+	{
+		if (time_info.hour == sunrise)
+			weather_info[i].sunlight = SUN_RISE;
+		else if (time_info.hour == (23 - t3))
+			weather_info[i].sunlight = SUN_SET;
+		else if (time_info.hour > sunrise && time_info.hour < (23 - t3))
+			weather_info[i].sunlight = SUN_LIGHT;
+		else if (time_info.hour >= moonrise && time_info.hour < moonset)
+			weather_info[i].sunlight = MOON_RISE;
+		else if (time_info.hour < (moonset % 24) && moonset >= 24)
+			weather_info[i].sunlight = MOON_RISE;
+		else
+			weather_info[i].sunlight = SUN_DARK;
+	}
+
+	sprintf (buf, "   Current Gametime: %dH %dD %dM %dY.",
+		time_info.hour, time_info.day, time_info.month, time_info.year);
+	system_log (buf, false);
+
+	if (time_info.month == 0 || time_info.month == 1 || time_info.month == 11)
+		time_info.season = WINTER;
+	else if (time_info.month < 11 && time_info.month > 7)
+		time_info.season = AUTUMN;
+	else if (time_info.month < 8 && time_info.month > 4)
+		time_info.season = SUMMER;
+	else
+		time_info.season = SPRING;
+
+	for (i = 0; i <= 99; i++)
+	{
+		if (Weather::weather_unification (i))
+			continue;
+		// weather_info[].clouds must be added to members. - Nimrod 12 Sept 13
+		weather_info[i].trend = number (0, 15);
+		// weather_info[i].clouds = number (0, 3);
+		if (time_info.season == SUMMER)
+		//	weather_info[i].clouds = number (0, 1);
+		if (zone_table[i].weather_type == WEATHER_DESERT)
+		//	weather_info[i].clouds = 0;
+		weather_info[i].fog = 0;
+		// if (weather_info[i].clouds > 0 && zone_table[i].weather_type != WEATHER_DESERT)
+		//	weather_info[i].state = number (0, 1);
+		// else if (zone_table[i].weather_type == WEATHER_DESERT)
+		//	weather_info[i].state = NO_RAIN;
+		// weather_info[i].temperature =
+		//	seasonal_temp[zone_table[i].weather_type][time_info.month];
+		weather_info[i].wind_speed = number (0, 2);
+		if (time_info.hour >= sunrise
+			&& time_info.hour < sunset[time_info.month])
+		{
+			sun_light = 1;
+			weather_info[i].temperature += 15;
+		}
+		else
+			weather_info[i].temperature -= 15;
+	}
+
+	time_info.holiday = 0;
+}
+
+// Commenting out Reset_time to insert old version above -Nimrod 12 Sept 13
+/*
 void reset_time( void ) {
 	char buf[ MAX_STRING_LENGTH ];
 
@@ -721,8 +817,9 @@ void reset_time( void ) {
 
 	time_info = moon_time_passed( time( 0 ), beginning_of_time );
 
-	if ( time_info.day >= 8 || time_info.day < 0 )
-		time_info.day = 0;
+// Nimrod commented following out	
+//	if ( time_info.day >= 8 || time_info.day < 0 ) 
+//		time_info.day = 0;
 
 	weather_info[ i ].sunlight = SUN_LIGHT;
 
@@ -731,7 +828,7 @@ void reset_time( void ) {
 	system_log( buf, false );
 
 	if ( time_info.month >= 0 && time_info.month <= 5 )
-		time_info.season = SEASON_NEAR;
+		time_info.season = SEASON_NEAR; // Need to set the seasons here, Nimrod bookmark
 	else
 		time_info.season = SEASON_FAR;
 
@@ -751,6 +848,8 @@ void reset_time( void ) {
 		weather_info[ i ].temperature = calcTemp( i );
 		weather_info[ i ].wind_speed = number( 0, 2 );
 	}
+
+/* Commented out by Nimrod for Time update - 11 Sept 13
 
 	int sunCount = ( time_info.day * 84 ) + time_info.hour;
 	int sunPhase = PHASE_SET;
@@ -798,9 +897,12 @@ void reset_time( void ) {
 	else
 		time_info.phaseEarth = PHASE_GIBBOUS_WAXING;
 
+
+
 	time_info.holiday = 0;
 }
 
+*/
 void create_room_zero( void ) {
 	ROOM_DATA *room;
 
@@ -830,7 +932,7 @@ void load_rooms( void ) {
 	FILE * fl;
 	int zon, flag = 0, tmp, sdir;
 	int virtual_nr;
-	char *temp, chk[ 50 ], errbuf[ 80 ], wfile[ 80 ];
+	char *temp, *temp1, chk[ 50 ], errbuf[ 80 ], wfile[ 80 ];
 	struct extra_descr_data *new_descr;
 	struct written_descr_data *w_desc;
 	struct room_prog *r_prog;
@@ -839,6 +941,10 @@ void load_rooms( void ) {
 	SCENT_DATA *scent;
 	ROOM_DATA *room;
 	int i;
+	int room_desc_val;
+	int weather_desc_val;
+	int season_desc_val;
+	int time_desc_val;
 
 	for ( i = 0; i < ZONE_SIZE; i++ ) {
 		wld_tab[ i ] = NULL;
@@ -1016,14 +1122,102 @@ void load_rooms( void ) {
 							tmp_prg->next = r_prog;
 						}
 					}
-
+					
+					// New addition by Nimrod - 19 Sept 13
+					else if ( *chk == 'R') 
+					{
+					sprintf( errbuf, "Entering Load Loop for new Weather Descriptions.\n" );
+					system_log( errbuf, true );
+					
+					CREATE( room->extra, ROOM_EXTRA_DATA, 1 );
+					
+					// New weather descriptions 
+						for ( i = 0; i <=  256; i++ ) {
+							
+								
+							// Read a line and check what weather desc it is with a index_lookup
+							temp1 = fread_string ( fl );
+							// Debugging information
+							// system_log( temp1, true );
+							if (!strncmp (temp1,  "END_WEATHER_DESCS", 10))
+								break;
+							
+							if ((weather_desc_val = index_lookup (weather_room, temp1)) == -1)
+								weather_desc_val = 9999;
+							
+							// Debugging information
+							// sprintf( errbuf, "weather_desc_val = %d.\n", weather_desc_val );
+							// system_log( errbuf, true );
+							
+							// Read a line and check what season it is
+							temp1 = fread_string ( fl );
+							
+							// Debugging information
+							// system_log( temp1, true );
+							
+							if (!strncmp (temp1,  "END_WEATHER_DESCS", 10))
+								break;
+							
+							 if ((season_desc_val = index_lookup (season_string, temp1)) == -1)
+								season_desc_val = 9999;
+								
+								// Debugging information
+								// sprintf( errbuf, "season_desc_val = %d.\n", season_desc_val );
+								// system_log( errbuf, true );
+								
+								
+							// Read a line and check what time of day it is
+							temp1 = fread_string ( fl );
+							
+							// Debugging information
+							// system_log( temp1, true );
+							
+							if (!strncmp (temp1,  "END_WEATHER_DESCS", 10))
+								break;
+							if ((time_desc_val = index_lookup (that_time_of_day, temp1)) == -1)
+								time_desc_val = 9999;
+							
+							// Debugging information
+							// sprintf( errbuf, "time_desc_val = %d.\n", time_desc_val );
+							// system_log( errbuf, true );
+														
+							room_desc_val = time_desc_val * WR_DESCRIPTIONS * NUM_SEASONS + season_desc_val * WR_DESCRIPTIONS + weather_desc_val;
+							
+							// Debugging information
+							// sprintf( errbuf, "room_desc_val = %d.\n", room_desc_val );
+							//	system_log( errbuf, true );
+						
+						// Read the weather description
+						 temp1 = fread_string ( fl );
+						//	system_log( temp1, true );
+							if (!strncmp (temp1,  "END_WEATHER_DESCS", 10))
+								break;
+												
+							if (room_desc_val <= 9998 && room_desc_val >= 0){
+								//	 We have a good weather description, let's set it
+								if ( strlen(temp1) )
+									room->extra->weather_desc[ room_desc_val ] = temp1;
+							}
+							
+						}	
+						// Reading Alas Descriptions
+						for ( i = 0; i <= 5; i++ ) {
+							room->extra->alas[ i ] = fread_string( fl );
+							if ( !strlen( room->extra->alas[ i ] ) )
+								room->extra->alas[ i ] = NULL;
+						}
+					}
+					
 					else if ( *chk == 'A' ) {
-						/* Additional descriptions */
+						/* Legacy Additional descriptions - depracated  */
+						sprintf( errbuf, "Entering Legacy Loop for OLD Weather Descriptions.\n" );
+						system_log( errbuf, true );
 
 						CREATE( room->extra, ROOM_EXTRA_DATA, 1 );
 
-						for ( i = 0; i < WR_DESCRIPTIONS; i++ ) {
-							room->extra->weather_desc[ i ] = fread_string( fl );
+						for ( i = 0; i < 12; i++ ) { // WR_DESCRIPTIONS was replaced with 12 in this line to account for legacy files -Nim
+						
+							 room->extra->weather_desc[ i ] = fread_string( fl );
 							if ( !strlen( room->extra->weather_desc[ i ] ) )
 								room->extra->weather_desc[ i ] = NULL;
 						}
@@ -1034,7 +1228,7 @@ void load_rooms( void ) {
 								room->extra->alas[ i ] = NULL;
 						}
 					} //else if (*chk == 'A')
-
+					
 					else if ( *chk == 'C' ) {
 						/* Which room it is currently copying. */
 						fscanf( fl, "%d\n", &tmp );
@@ -1412,6 +1606,7 @@ void autosave( void ) {
 			save_count++;
 		}
 	}
+
 }
 
 void autosave_stayputs( void ) {
@@ -1731,6 +1926,11 @@ void clear_char( CHAR_DATA * ch ) {
 	ch->mob = mob;
 
 	ch->damage = 0;
+
+	ch->nat_attack_type = 0;
+	ch->damnodice = 0;
+	ch->damsizedice = 0;
+	ch->damroll = 0;
 
 	ch->room = NULL;
 	ch->in_room = NOWHERE;

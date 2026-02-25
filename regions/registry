@@ -42,7 +42,6 @@ Handle         "(wil + agi) / 2"   "(int + agi) / 2"  "(agi*3) + dex + wil + 10"
 Hunting        "(dex + int) / 2"   "(wil + int) / 2"  "(wil*2) + (int*2) + 15"
 First-Aid      "(int + dex) / 2"   "(int + dex)"      "(int*2) + (dex*3) + 5"
 Medicine       "(int + dex) / 2"   "(int + dex)"      "int + wil + (dex*3) + 5"
-Scavenge       "(int + wil) / 2"   "(int + wil) / 2"  "(int*3) + dex + wil + 10"  
 Eavesdrop      "(int + wil) / 2"   "(int + wil) / 4"  "(int*5) + 5"
 Butchery       "(dex + wil) / 2"   "(int + wil) / 2"  "int + (dex*3) + 15"
 
@@ -57,7 +56,6 @@ Armorcraft     "(int + wil) / 2"   "(int + wil) / 2"  "(dex*5) + 5"
 Handicraft     "(int + wil) / 2"   "(int + wil) / 2"  "(dex*5) + 5"  
 Artistry       "(int + wil) / 2"   "(int + wil) / 2"  "(dex*5) + 5"  
 
-Voodoo         "aur"               "aur / 4"          "(aur*4) + 15"
 Education      "(int + wil) / 2"   "int / 3"          "60"
 Common         "(int + wil) / 2"   "int / 3"          "50"
 

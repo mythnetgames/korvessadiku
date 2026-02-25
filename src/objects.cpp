@@ -14,9 +14,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <ctype.h>
-#include <fstream>  
 #include <vector>
-#include <iterator>
+#include <sstream>
+#include <string>
 
 #include "server.h"
 #include "structs.h"
@@ -1220,7 +1220,7 @@ void
 
 		if (obj->o.od.value[0] != 1)
 		{
-			if (ch->str > 18 && (obj->o.od.value[0] == 3))
+			if (ch->str >= 25 && (obj->o.od.value[0] == 3))
 				;
 			else
 			{
@@ -1459,18 +1459,18 @@ int
 	{
 		if (GET_ITEM_TYPE (obj) != ITEM_FIREARM)
 		{
-			sprintf (message, "Holsters are only for storing firearms.\n");
+			sprintf (message, "Holsters are only for storing ranged weapons.\n");
 			return 0;
 		}
 		if (container->contains)
 		{
-			sprintf (message, "This holster already contains a firearms.\n");
+			sprintf (message, "This holster already contains a ranged weapon.\n");
 			return 0;
 		}
 
 		if (obj->obj_flags.weight > container->o.od.value[0])
 		{
-			sprintf (message, "That firearm is too large for the holster.\n");
+			sprintf (message, "That ranged weapon is too large for the holster.\n");
 			return 0;
 		}
 		return 1;
@@ -1586,7 +1586,7 @@ int
 		if (GET_ITEM_TYPE(obj) != ITEM_ROUND)
 		{
 			sprintf (message,
-				"Bandoliers are only for storing rounds.\n");
+				"Quivers are only for storing arrows and bolts.\n");
 			return 0;
 		}
 
@@ -1594,7 +1594,7 @@ int
 			i += tobj->count;
 		if (i + count > container->o.od.value[0])
 		{
-			sprintf (message, "The bandolier can't hold that many rounds.\n");
+			sprintf (message, "The quiver can't hold that many missiles.\n");
 			return 0;
 		}
 		return 1;
@@ -2673,7 +2673,7 @@ void
 	char buffer[MAX_STRING_LENGTH];
 	OBJ_DATA *tobj, *obj;
 
-	if (!cmd && !spare_capacity(ch, obj, true))
+	if (!cmd && !spare_capacity(ch, false, true))
 	{
 		send_to_char("This area is too small and already too full to contain the items you are holding.\n", ch);
 		return;
@@ -2889,7 +2889,22 @@ void
 			extract_obj (obj->attached);
 			obj->attached = NULL;
 			obj_to_room (tobj, ch->in_room);
-			obj->attached = NULL;
+			obj->attached = NULL; // Not sure why we're setting this twice.
+		}
+		
+		if (obj->contains && GET_ITEM_TYPE (obj) == ITEM_FIREARM && obj->o.weapon.use_skill != SKILL_CROSSBOW)
+		{
+			sprintf (buffer, "%s#0 clatters to the ground!",
+				obj_short_desc (obj->contains));
+			*buffer = toupper (*buffer);
+			sprintf (buf, "#2%s", buffer);
+			act (buf, true, ch, 0, 0, TO_CHAR | _ACT_FORMAT);
+			act (buf, true, ch, 0, 0, TO_ROOM | _ACT_FORMAT);
+			tobj = load_object (obj->contains->nVirtual);
+			extract_obj (obj->contains);
+			obj->contains = NULL;
+			obj_to_room (tobj, ch->in_room);
+			obj->contains = NULL;
 		}
 
 		/*
@@ -3420,7 +3435,11 @@ void
 		send_to_char ("Give it to yourself? How generous...\n", ch);
 		return;
 	}
-
+    if (obj->location == WEAR_BOTH || obj->location == WEAR_PRIM || obj->location == WEAR_SEC)
+	{
+	  send_to_char("You must stop wielding that before you can give it to someone.\n", ch);
+	  return;
+	}
 
 	if (GET_ITEM_TYPE(obj) == ITEM_GRENADE && obj->o.grenade.status == 1)
 	{
@@ -3667,6 +3686,7 @@ void
 	const char *verbose_liquid_amount [] = {"", "some of the ", "a lot of the ", "most of the ", "all of the "};
 	//POISON_DATA *poison;
 	int poisoned = 0;
+	int WEIGHT = get_weight (ch) / 100;
 
 	argument = one_argument (argument, buf);
 
@@ -3770,7 +3790,7 @@ void
 
 	if (evaluate_emote_string(ch, &first_person, third_person, argument))
 	{
-	    sips *= 10;
+	   // sips *= 10; // Why is this here? -Nimrod
 		if (!tasted)
 		{
 			if (drink->ink_color && str_cmp(drink->ink_color, "(null)"))
@@ -3794,51 +3814,51 @@ void
 		// again. It should ony take one day's worth of food, or two 2-course meals, to
 		// get you back to merely malnourished.
 
-		if (ch->hunger >= 0)
+		if (ch->hunger >= 0)  // Updated to use global variables  0211141740 -Nimrod
 		{
-			ch->hunger += (drink->o.fluid.food * sips);
+			ch->hunger += (drink->o.fluid.food * sips * AVG_WEIGHT / WEIGHT);
 		}
-		else if (ch->hunger <= -25 && ch->hunger >= -48)
+		else if (ch->hunger <= 0 && ch->hunger >= MIN_CALORIES * .18)
 		{
-			ch->hunger += 2 * (drink->o.fluid.food * sips);
+			ch->hunger += 2 * (drink->o.fluid.food * sips * AVG_WEIGHT / WEIGHT);
 
-			if (ch->hunger > 2)
-				ch->hunger = 2;
+			if (ch->hunger > 0)
+				ch->hunger = 0;
 		}
-		else if (ch->hunger <= -49 && ch->hunger >= -72)
+		else if (ch->hunger <= MIN_CALORIES * .18 && ch->hunger >= MIN_CALORIES * .36)
 		{
-			ch->hunger += 3 * (drink->o.fluid.food * sips);
+			ch->hunger += 3 * (drink->o.fluid.food * sips * AVG_WEIGHT / WEIGHT);
 
-			if (ch->hunger > 2)
-				ch->hunger = 2;
+			if (ch->hunger > MIN_CALORIES * .18)
+				ch->hunger = MIN_CALORIES * .18;
 		}
-		else if (ch->hunger <= -73 && ch->hunger >= -96)
+		else if (ch->hunger <= MIN_CALORIES * .36 && ch->hunger >= MIN_CALORIES * .54)
 		{
-			ch->hunger += 4 * (drink->o.fluid.food * sips);
+			ch->hunger += 4 * (drink->o.fluid.food * sips * AVG_WEIGHT / WEIGHT);
 
-			if (ch->hunger > 2)
-				ch->hunger = 2;
+			if (ch->hunger > MIN_CALORIES * .36)
+				ch->hunger = MIN_CALORIES * .36;
 		}
-		else if (ch->hunger <= -97 && ch->hunger >= -120)
+		else if (ch->hunger <= MIN_CALORIES * .54 && ch->hunger >= MIN_CALORIES * .72)
 		{
-			ch->hunger += 5 * (drink->o.fluid.food * sips);
+			ch->hunger += 5 * (drink->o.fluid.food * sips * AVG_WEIGHT / WEIGHT);
 
-			if (ch->hunger > 2)
-				ch->hunger = 2;
+			if (ch->hunger > MIN_CALORIES * .54)
+				ch->hunger = MIN_CALORIES * .54;
 		}
-		else if (ch->hunger <= -121 && ch->hunger >= -144)
+		else if (ch->hunger <= MIN_CALORIES * .72 && ch->hunger >= MIN_CALORIES * .90)
 		{
-			ch->hunger += 6 * (drink->o.fluid.food * sips);
+			ch->hunger += 6 * (drink->o.fluid.food * sips * AVG_WEIGHT / WEIGHT);
 
-			if (ch->hunger > 2)
-				ch->hunger = 6;
+			if (ch->hunger > MIN_CALORIES * .72)
+				ch->hunger = MIN_CALORIES * .72;
 		}
-		else if (ch->hunger <= -145)
+		else if (ch->hunger <= MIN_CALORIES * .90)
 		{
-			ch->hunger += 7 * (drink->o.fluid.food * sips);
+			ch->hunger += 7 * (drink->o.fluid.food * sips * AVG_WEIGHT / WEIGHT);
 
-			if (ch->hunger > 2)
-				ch->hunger = 2;
+			if (ch->hunger > MIN_CALORIES * .90)
+				ch->hunger = MIN_CALORIES * .90;
 		}
 		else
 		{
@@ -3846,11 +3866,11 @@ void
 		}
 
 
-		if (ch->hunger > 48)
-			ch->hunger = 48;
+		if (ch->hunger > MAX_CALORIES)
+			ch->hunger = MAX_CALORIES;
 
-		if (ch->thirst > 300)
-			ch->thirst = 300;
+		if (ch->thirst > MAX_THIRST)
+			ch->thirst = MAX_THIRST;
 
 		if (GET_ITEM_TYPE(container) != ITEM_FOUNTAIN)
 		{
@@ -3874,6 +3894,9 @@ void
 	int poisoned = 0;
 	OBJ_DATA *tobj = NULL;
 	bool tasted = false;
+	int WEIGHT = get_weight(ch) > 100 ? get_weight(ch)/100 : AVG_WEIGHT; 
+	
+   
 
 	argument = one_argument (argument, buf);
 
@@ -3927,7 +3950,7 @@ void
 		else if (!strcmp (buf, "all"))
 		{
 			bites = MAX (1, obj->o.food.bites);
-			if ((obj->o.food.food_value + ch->hunger) > 48)
+			if ((obj->o.food.food_value + ch->hunger) > MAX_CALORIES) // Changed from 48 to 2000 0211141701 -Nimrod
 			{
 				send_to_char ("You are much too full to eat that much!\n", ch);
 				return;
@@ -4031,60 +4054,63 @@ void
 
 			if (ch->hunger >= 0)
 			{
-				ch->hunger += get_bite_value (obj);
+				ch->hunger += get_bite_value (obj) * AVG_WEIGHT / WEIGHT;
 			}
-			else if (ch->hunger <= -25 && ch->hunger >= -48)
+			else if (ch->hunger <= 0 && ch->hunger >= MIN_CALORIES * .18)
 			{
-				ch->hunger += 2 * get_bite_value (obj);
+				ch->hunger += 2 * get_bite_value (obj) * AVG_WEIGHT / WEIGHT;
 
-				if (ch->hunger > 2)
-					ch->hunger = 2;
+				if (ch->hunger > 0)
+					ch->hunger = 0;
 			}
-			else if (ch->hunger <= -49 && ch->hunger >= -72)
+			else if (ch->hunger <= MIN_CALORIES * .18 && ch->hunger >= MIN_CALORIES * .36)
 			{
-				ch->hunger += 3 * get_bite_value (obj);
+				ch->hunger += 3 * get_bite_value (obj) * AVG_WEIGHT / WEIGHT;
 
-				if (ch->hunger > 2)
-					ch->hunger = 2;
+				if (ch->hunger > MIN_CALORIES * .18)
+					ch->hunger = MIN_CALORIES * .18;
 			}
-			else if (ch->hunger <= -73 && ch->hunger >= -96)
+			else if (ch->hunger <= MIN_CALORIES * .36 && ch->hunger >= MIN_CALORIES * .54)
 			{
-				ch->hunger += 4 * get_bite_value (obj);
+				ch->hunger += 4 * get_bite_value (obj) * AVG_WEIGHT / WEIGHT;
 
-				if (ch->hunger > 2)
-					ch->hunger = 2;
+				if (ch->hunger > MIN_CALORIES * .36)
+					ch->hunger = MIN_CALORIES * .36;
 			}
-			else if (ch->hunger <= -97 && ch->hunger >= -120)
+			else if (ch->hunger <= MIN_CALORIES * .54 && ch->hunger >= MIN_CALORIES * .72)
 			{
-				ch->hunger += 5 * get_bite_value (obj);
+				ch->hunger += 5 * get_bite_value (obj) * AVG_WEIGHT / WEIGHT;
 
-				if (ch->hunger > 2)
-					ch->hunger = 2;
+				if (ch->hunger > MIN_CALORIES * .54)
+					ch->hunger = MIN_CALORIES * .54;
 			}
-			else if (ch->hunger <= -121 && ch->hunger >= -144)
+			else if (ch->hunger <= MIN_CALORIES * .72 && ch->hunger >= MIN_CALORIES * .90)
 			{
-				ch->hunger += 6 * get_bite_value (obj);
+				ch->hunger += 6 * get_bite_value (obj) * AVG_WEIGHT / WEIGHT;
 
-				if (ch->hunger > 2)
-					ch->hunger = 6;
+				if (ch->hunger > MIN_CALORIES * .72)
+					ch->hunger = MIN_CALORIES * .72;
 			}
-			else if (ch->hunger <= -145)
+			else if (ch->hunger <= MIN_CALORIES * .9) // 90%
 			{
-				ch->hunger += 7 * get_bite_value (obj);
+				ch->hunger += 7 * get_bite_value (obj) * AVG_WEIGHT / WEIGHT;
 
-				if (ch->hunger > 2)
-					ch->hunger = 2;
+				if (ch->hunger > MIN_CALORIES * .9)
+					ch->hunger = MIN_CALORIES * .9;
 			}
 			else
 			{
-				ch->hunger += get_bite_value (obj);
+				ch->hunger += get_bite_value (obj) * AVG_WEIGHT / WEIGHT;
 			}
 
-			if (ch->hunger > 48)
-				ch->hunger = 48;
+			if (ch->hunger > MAX_CALORIES)
+				ch->hunger = MAX_CALORIES;
+				
+			if (ch->hunger < MIN_CALORIES)
+				ch->hunger = MIN_CALORIES;
 
-			if (ch->thirst > 300)
-				ch->thirst = 300;
+			if (ch->thirst > MAX_THIRST)
+				ch->thirst = MAX_THIRST;
 
 			obj->o.food.bites--;
 
@@ -4112,9 +4138,9 @@ void
 			}
 		}
 
-		if (ch->hunger > 48)
-			ch->hunger = 48;
-		if (ch->hunger > 36)
+		if (ch->hunger > MAX_CALORIES)
+			ch->hunger = MAX_CALORIES;
+		if (ch->hunger > MAX_CALORIES * .9)
 			act ("You are full.", false, ch, 0, 0, TO_CHAR);
 
 		if (poisoned > 0)
@@ -4521,11 +4547,11 @@ void
 		act ("You wear $p over your eyes.", true, ch, obj, 0, TO_CHAR | _ACT_FORMAT);
 		break;
 	case 29:
-		act ("$n slips $p up around $s hips!", true, ch, obj, 0, TO_ROOM | _ACT_FORMAT);
+		act ("$n slips $p up around $s hips.", true, ch, obj, 0, TO_ROOM | _ACT_FORMAT);
 		act ("You slip $p up around your hips.", true, ch, obj, 0, TO_CHAR | _ACT_FORMAT);
 		break;
 	case 13:
-		act ("$n wears $p around $s chest!", true, ch, obj, 0, TO_ROOM | _ACT_FORMAT);
+		act ("$n wears $p around $s chest.", true, ch, obj, 0, TO_ROOM | _ACT_FORMAT);
 		act ("You wear $p around your chest.", true, ch, obj, 0, TO_CHAR | _ACT_FORMAT);
 		break;
 	}
@@ -4594,6 +4620,12 @@ void
 		"ten", "eleven", "twelve", "quite a few"
 	};
 	int hours;
+	
+	if (obj_object->contains && GET_ITEM_TYPE (obj_object) == ITEM_FIREARM && obj_object->o.weapon.use_skill != SKILL_CROSSBOW)
+	{
+	  send_to_char ("You must unload your weapon first.\n", ch);
+	  return;
+	}
 
 	if (IS_SET (obj_object->obj_flags.extra_flags, ITEM_MOUNT) &&
 		!IS_SET (ch->act, ACT_MOUNT))
@@ -5005,7 +5037,7 @@ void
 			{
 			case 1:	// primary weapons
 
-				if (ch->str < 18)
+				if (ch->str < 25)
 				{
 					if (get_equip (ch, WEAR_PRIM))
 					{
@@ -5027,7 +5059,7 @@ void
 						equip_char (ch, obj_object, WEAR_PRIM);
 					}
 					break;
-				}		// > 17 str or troll wields ME in either hand.
+				}		// >= 25 str wields ME in either hand.
 
 			case 2:	// Light weapons, and should include brawling weapons.
 				//case SKILL_SLING:
@@ -5067,7 +5099,7 @@ void
 				break;
 
 			case 3:	// Heavy weapons.
-				if (ch->str >= 20)
+				if (ch->str >= 25)
 				{
 					// Extremely strong chars can wield two-handed weapons with one hand.
 					if (get_equip (ch, WEAR_PRIM))
@@ -5869,7 +5901,8 @@ void
 			ch);
 		return;
 	}
-
+	
+   
 
 	if (!obj && *arg1)
 	{
@@ -6099,6 +6132,12 @@ void
 			}
 		} //if (target_obj)
 	} //if (!obj && *arg1)
+	
+	 if (obj->contains && GET_ITEM_TYPE (obj) == ITEM_FIREARM && obj->o.weapon.use_skill != SKILL_CROSSBOW)
+	{
+	  send_to_char ("You must unload your weapon first.\n", ch);
+	  return;
+	}
 
 	if (!obj)
 	{
@@ -6308,7 +6347,7 @@ void
 
 	if (!IS_SHEATHABLE (obj))
 	{
-		send_to_char ("You can only sheath a melee weapon, missile or firearm.\n", ch);
+		send_to_char ("You can only sheath a melee weapon, missile or a ranged weapon.\n", ch);
 		return;
 	}
 
@@ -6390,7 +6429,7 @@ void
 	else if (GET_ITEM_TYPE(sheath) == ITEM_AMMO_BELT || GET_ITEM_TYPE(sheath) == ITEM_BANDOLIER)
 		first_person.assign("You pocket #2");
 	else
-		first_person.assign("You sheath #2");
+		first_person.assign("You sheathe #2");
 	first_person.append(obj_short_desc(obj));
 	first_person.append("#0 in #2");
 	first_person.append(obj_short_desc(sheath));
@@ -6477,8 +6516,8 @@ void
 
 	switch (obj->o.od.value[0])
 	{
-	case 1:	// Medium weapons.
-		if (ch->str < 18)
+	case 1:	// Medium weapons. //Increased minimum to 25, as we don't think just because you are strong you can dwield. 
+		if (ch->str < 25)
 		{
 			if (get_equip (ch, WEAR_PRIM))
 			{
@@ -6497,7 +6536,7 @@ void
 				obj_destination = WEAR_PRIM;
 			}
 			break;
-		}			// > 17 str wields ME in either hand.
+		}			
 	case 2:	// Light weapons.
 
 		if (get_equip (ch, WEAR_PRIM) && get_equip (ch, WEAR_SEC))
@@ -6530,7 +6569,7 @@ void
 		obj_destination = WEAR_BOTH;
 		break;
 	case 3: // HEAVY WEAPONS
-		if (ch->str >= 20)
+		if (ch->str >= 25)
 		{
 			// Extremely strong chars can wield two-handed weapons with one hand.
 			if (get_equip (ch, WEAR_PRIM))
@@ -6735,9 +6774,9 @@ void
 
 	watched_action(ch, "butcher a carcass", 0, 1);
 
-	ch->delay_type = DEL_BUTC_1;
-	ch->delay = 12;
-
+	ch->delay_type = GET_TRUST(ch) ? DEL_BUTC_3 : DEL_BUTC_1;
+	ch->delay = GET_TRUST(ch) ? 1 : 12;
+	
 	// Add time to the object timer so it doesn't decay while we're skinning it.  -Methuselah
 	if ((obj->obj_timer - time(0)) < 1000)
 		obj->obj_timer = time(0) + 1000;
@@ -6859,8 +6898,13 @@ void
 	OBJ_DATA *carcass;
 	OBJ_DATA *remains;
 	int i = 1;
+	int j = 0;
+	int k = 0;
 	bool failed = false;
 	char buf[MAX_STRING_LENGTH];
+	int slot[10];
+	char var_list[10][100];
+	char *vari_list[10];
 
 
 	carcass = (OBJ_DATA *) ch->delay_info1;
@@ -6906,28 +6950,30 @@ void
 	}
 
 	// First two ranks, easy to butcher.
+	
+	
 
 	if (skill_level (ch, SKILL_BUTCHERY, -40))
 	{
 		if (carcass->o.od.value[0])
 		{
-			if (!(obj1 = load_object(carcass->o.od.value[0])))
-			{
+		if (!(obj1 = clone_colored_object(carcass, carcass->o.od.value[0], 0)))
+		{
 				send_to_char ("Problem...please contact an immortal.\n", ch);
 				return;
 			}
 			else
-			{
-
-				// Give them a piece of meat for free, otherwise,
+			{	// Give them a piece of meat for free, otherwise,
 				// they roll their skill for each piece of meat.
-
+				
 				obj_to_room (obj1, ch->in_room);
 
 				for (i = 1; i < carcass->o.od.value[1]; i++)
 				{
 					if (skill_use(ch, SKILL_BUTCHERY, -40))
-						obj_to_room (load_object(carcass->o.od.value[0]), ch->in_room);
+					{
+					  obj1->count++;
+                    }
 				}
 
 				sprintf(buf, "You succeed in cutting #2%s#0 from the carcass.\n", obj_short_desc (obj1));
@@ -6948,7 +6994,8 @@ void
 	{
 		if (carcass->o.od.value[2])
 		{
-			if (!(obj2 = load_object(carcass->o.od.value[2])))
+			// if (!(obj2 = load_object(carcass->o.od.value[2])))
+			if (!(obj2 = clone_colored_object(carcass, carcass->o.od.value[2], 0)))
 			{
 				send_to_char ("Problem...please contact an immortal.\n", ch);
 				return;
@@ -6964,7 +7011,8 @@ void
 				for (i = 1; i < carcass->o.od.value[3]; i++)
 				{
 					if (skill_use(ch, SKILL_BUTCHERY, -20))
-						obj_to_room (load_object(carcass->o.od.value[2]), ch->in_room);
+					   obj2->count++;
+						//obj_to_room (load_object(carcass->o.od.value[2]), ch->in_room);
 				}
 
 				sprintf(buf, "You prevail in recovering #2%s#0 from the bones.\n", obj_short_desc (obj2));
@@ -6985,7 +7033,8 @@ void
 	{
 		if (carcass->o.od.value[4])
 		{
-			if (!(obj3 = load_object(carcass->o.od.value[4])))
+			// if (!(obj3 = load_object(carcass->o.od.value[4])))
+			if (!(obj3 = clone_colored_object(carcass, carcass->o.od.value[4], 0)))
 			{
 				send_to_char ("Problem...please contact an immortal.\n", ch);
 				return;
@@ -7001,7 +7050,8 @@ void
 				for (i = 1; i < carcass->o.od.value[5]; i++)
 				{
 					if (skill_use(ch, SKILL_BUTCHERY, 0))
-						obj_to_room (load_object(carcass->o.od.value[4]), ch->in_room);
+					  obj3->count++;
+					//	obj_to_room (load_object(carcass->o.od.value[4]), ch->in_room);
 				}
 
 				sprintf(buf, "With #2%s#0, you have stripped the carcass for all it has.\n", obj_short_desc (obj3));
@@ -7116,8 +7166,8 @@ void
 
 	act (buf, false, ch, 0, 0, TO_ROOM | _ACT_FORMAT);
 
-	ch->delay_type = DEL_SKIN_1;
-	ch->delay = 3;
+	ch->delay_type = GET_TRUST(ch) ? DEL_SKIN_3 : DEL_SKIN_1;
+	ch->delay = GET_TRUST(ch) ? 1 : 3;
 
 	// Add time to the object timer so it doesn't decay while we're skinning it.  -Methuselah
 	if ((obj_corpse->obj_timer - time(0)) < 1000)
@@ -7168,7 +7218,7 @@ void
 		watched_action(ch, "skin a corpse.", 0, 0);
 
 		ch->delay_type = DEL_SKIN_2;
-		ch->delay = 7;
+		ch->delay = GET_TRUST(ch) ? 1 : 7;
 	}
 	else
 	{
@@ -7220,7 +7270,7 @@ void
 			ch, 0, 0, TO_ROOM | _ACT_FORMAT);
 
 		ch->delay_type = DEL_SKIN_3;
-		ch->delay = 10;
+		ch->delay = GET_TRUST(ch) ? 1 : 10;
 	}
 	else
 	{
@@ -7242,7 +7292,12 @@ void
 	OBJ_DATA *carcass = NULL;
 	char buf[MAX_INPUT_LENGTH];
 	char *p;
-
+	int slot[10];
+	int j;
+	int k;
+	char var_list[10][100];
+	char *vari_list[10];
+	 
 	corpse = (OBJ_DATA *) ch->delay_info1;
 
 	// is it really a corpse?
@@ -7292,15 +7347,12 @@ void
 
 	if (skill_use (ch, SKILL_BUTCHERY, -50))
 	{
-		//A corpse that is WILL_SKIN has a negative o.od.value[2], See make-corpse() for details . We must adjust to get a vnum we can load?
-		if (!(skin = LOAD_COLOR(corpse, corpse->o.od.value[2])))
-		{
-			if (!(skin = LOAD_COLOR(corpse, -corpse->o.od.value[2])))
-			{
-				send_to_char ("Problem...please contact an immortal.\n", ch);
-				return;
-			}
-		}
+    
+	if (!(skin = clone_colored_object(corpse, corpse->o.od.value[2], 0)))
+	  {
+	  	  send_to_char ("Problem...please contact an immortal.\n", ch);
+		  return;
+	}
 
 		obj_to_room (skin, ch->in_room);
 
@@ -7360,14 +7412,13 @@ void
 	ch->delay = 0;
 	ch->delay_info1 = 0;
 	ch->delay_info2 = 0;
+	
+// Start loading the carcass now
 
-	if (!(carcass = load_object (corpse->o.od.value[3])))
-	{
-		if (!(carcass = load_object (-corpse->o.od.value[3])))
-		{
-			extract_obj (corpse);
-			return;
-		}
+		if (!(carcass = clone_colored_object(corpse, corpse->o.od.value[3], 0)))
+		  {
+	  	  send_to_char ("Problem...please contact an immortal.\n", ch);
+		  return;
 	}
 
 	// Lose 10% of the weight for the head.
@@ -7378,6 +7429,8 @@ void
 
 	// Carcass becomes 85% of the weight
 	carcass->obj_flags.weight = corpse->obj_flags.weight * 0.85;
+	// Carcass oval 1 becomes 5% of carcass weight (Remember weight is stored as a multiple of 100.  10000 = 100 lbs.)
+	carcass->o.od.value[1] = carcass->obj_flags.weight * .005; 
 	// Skin becomes 15% of the weight
 	if (skin)
 		skin->obj_flags.weight = corpse->obj_flags.weight * 0.15;
@@ -7439,7 +7492,7 @@ const int herbArray[HERB_NUMSECTORS * HERB_RARITIES][5] =
 
 
 
-
+// forage vcommon 3 (
 int
 	GetHerbPlant (int sector_type, int pos, int rarity)
 {
@@ -7706,144 +7759,105 @@ void
 10012, 10003, 10010
 };
 */
-#define VNUM_SHROOM 2036
+
 void
-    delayed_rummage (CHAR_DATA * ch)
+	delayed_rummage (CHAR_DATA * ch)
 {
-    OBJ_DATA *obj = NULL;
-    int objnum;
-    AFFECTED_TYPE *herbed;
-    AFFECTED_TYPE *af = NULL;
-    char arg[MAX_STRING_LENGTH];
-    int error;
+	OBJ_DATA *obj = NULL;
+	int objnum;
+	AFFECTED_TYPE *herbed;
+	AFFECTED_TYPE *af = NULL;
+	char arg[MAX_STRING_LENGTH];
 
 
-    for (herbed = ch->hour_affects; herbed; herbed = herbed->next)
-    {
-        if (herbed->type == AFFECT_FORAGED && herbed->a.spell.sn == ch->in_room)
-        {
-            send_to_char ("You've searched here too recently to have any chance of uncovering anything more.\n\r", ch);
-            return;
-        }
-    }
+	for (herbed = ch->hour_affects; herbed; herbed = herbed->next)
+	{
+		if (herbed->type == AFFECT_FORAGED && herbed->a.spell.sn == ch->in_room)
+		{
+			send_to_char ("You've searched here too recently to have any chance of uncovering anything more.\n\r", ch);
+			return;
+		}
+	}
 
-    /*
-    herbed = is_room_affected (ch->room->affects, HERBED_COUNT);
+	/*
+	herbed = is_room_affected (ch->room->affects, HERBED_COUNT);
 
-    if (herbed && (herbed->a.herbed.timesHerbed >= MAX_HERBS_PER_ROOM))
-    {
-    send_to_char ("This area has been stripped of anything useful for the time being.\n\r",
-    ch);
-    return;
-    }
-    */
+	if (herbed && (herbed->a.herbed.timesHerbed >= MAX_HERBS_PER_ROOM))
+	{
+	send_to_char ("This area has been stripped of anything useful for the time being.\n\r",
+	ch);
+	return;
+	}
+	*/
 
-    if (skill_use (ch, SKILL_FORAGE, -40 + (ch->delay_info2 * 20)))
-    {
-        objnum = GetHerbPlant (ch->room->sector_type, ch->delay_info1, ch->delay_info2);
-        obj = load_object (objnum);
+	if (skill_use (ch, SKILL_FORAGE, -40 + (ch->delay_info2 * 20)))
+	{
+		objnum = GetHerbPlant (ch->room->sector_type, ch->delay_info1, ch->delay_info2);
+		obj = load_object (objnum);
+
+		if (obj)
+		{
+			obj_to_room (obj, ch->in_room);
+			act ("Your rummaging has revealed $p.", false, ch, obj, 0, TO_CHAR);
+			act ("$n's rummaging uncovers $p.", false, ch, obj, 0, TO_ROOM);
+
+			add_affect (ch, AFFECT_FORAGED, 60, 0, 0, 0, 0, ch->in_room);
+
+			/*
+			if (!herbed)
+			{
+			herbed = (AFFECTED_TYPE *) alloc (sizeof (AFFECTED_TYPE), 13);
+			herbed->type = HERBED_COUNT;
+			herbed->a.herbed.timesHerbed = 1;
+			herbed->a.herbed.duration = HERB_RESET_DURATION;
+			herbed->next = ch->room->affects;
+			ch->room->affects = herbed;
+			}
+			else
+			{
+			herbed->a.herbed.timesHerbed++;
+			herbed->a.herbed.duration = HERB_RESET_DURATION;
+			}
+			*/
+		}
+		else
+		{
+			send_to_char("You successfully rummaged but there is naught to be found\n\r", ch);
+			sprintf(arg, "Herbalism Object %d missing.", objnum);
+			send_to_gods(arg);
+		}
+	}
+	else
+	{
+		// If you fail, you have a +5% diff chance of getting something random.
+		if (skill_use (ch, SKILL_FORAGE, 5))
+		{
+
+			objnum = GetHerbPlant (ch->room->sector_type, 0, 0);
+			obj = load_object (objnum);
+			if (obj)
+			{
+				obj_to_room (obj, ch->in_room);
+				act ("Your rummaging does not reveal what you want, but you do find $p.", false, ch, obj, 0, TO_CHAR);
+				act ("$n's rummaging uncovers $p.", false, ch, obj, 0, TO_ROOM);
+			}
+			else
+			{
+				send_to_char ("Your rummaging efforts are to no avail.\n\r", ch);
+				act ("$n stops rummaging about.", true, ch, 0, 0, TO_ROOM);
+			}
+		}
+		else
+		{
+			send_to_char ("Your rummaging efforts are to no avail.\n\r", ch);
+			act ("$n stops rummaging about.", true, ch, 0, 0, TO_ROOM);
+		}
+
+		add_affect (ch, AFFECT_FORAGED, 60, 0, 0, 0, 0, ch->in_room);
+		//}
+	}
 
 
-
-        if (obj)
-        {
-              if (GET_ITEM_TYPE(obj) == ITEM_CLUSTER)
-	    {		
-		  act ("Your rummaging has revealed $p.", false, ch, obj, 0, TO_CHAR);
-                   obj_to_room (obj, ch->in_room);
-             } 
-           else if (obj->nVirtual == VNUM_SHROOM)
-{
-act ("Your rummaging has revealed $p.", false, ch, obj, 0, TO_CHAR);
-                   obj_to_room (obj, ch->in_room);
-}
-else if (IS_NPC (ch))
-	
-	    {	
-		obj_to_room (obj, ch->in_room);	
-		  act ("$n's rummaging unconvers $p.", false, ch, obj, 0, TO_ROOM);
-                    add_affect (ch, AFFECT_FORAGED, 30, 0, 0, 0, 0, ch->in_room);
-             } 
-	
-else 
-{
-             obj_to_char (obj, ch);
-            act ("Your rummaging has revealed $p.", false, ch, obj, 0, TO_CHAR);
-        //    act ("$n's rummaging unconvers $p.", false, ch, obj, 0, TO_ROOM);
-}
-            add_affect (ch, AFFECT_FORAGED, 30, 0, 0, 0, 0, ch->in_room);
-
-            /*
-            if (!herbed)
-            {
-            herbed = (AFFECTED_TYPE *) alloc (sizeof (AFFECTED_TYPE), 13);
-            herbed->type = HERBED_COUNT;
-            herbed->a.herbed.timesHerbed = 1;
-            herbed->a.herbed.duration = HERB_RESET_DURATION;
-            herbed->next = ch->room->affects;
-            ch->room->affects = herbed;
-            }
-            else
-            {
-            herbed->a.herbed.timesHerbed++;
-            herbed->a.herbed.duration = HERB_RESET_DURATION;
-            }
-            */
-        }
-        else
-        {
-            send_to_char("You successfully rummaged but there is naught to be found\n\r", ch);
-            sprintf(arg, "Herbalism Object %d missing.", objnum);
-            send_to_gods(arg);
-        }
-    }
-    else
-    {
-        // If you fail, you have a +20% diff chance of getting something random.
-        if (skill_use (ch, SKILL_FORAGE, 20))
-        {
-
-            objnum = GetHerbPlant (ch->room->sector_type, 0, 0);
-            obj = load_object (objnum);
-            if (obj)
-            {
-                obj_to_char (obj, ch);
-                act ("Your rummaging does not reveal what you want, but you do find $p.", false, ch, obj, 0, TO_CHAR);
-            //    act ("$n's rummaging unconvers $p.", false, ch, obj, 0, TO_ROOM);
-            }
-	if (IS_NPC (ch))
-	
-	    {		
-		  act ("$n stops rummaging about.", true, ch, 0, 0, TO_ROOM);
-             } 
-            else
-            {
-                send_to_char ("Your rummaging efforts are to no avail.\n\r", ch);
-            //    act ("$n stops rummaging about.", true, ch, 0, 0, TO_ROOM);
-            }
-        }
-        else
-        {
-            send_to_char ("Your rummaging efforts are to no avail.\n\r", ch);
-        //    act ("$n stops rummaging about.", true, ch, 0, 0, TO_ROOM);
-        }
-
-        add_affect (ch, AFFECT_FORAGED, 30, 0, 0, 0, 0, ch->in_room);
-        //}
-    }
-     
-
-   if (error == NO_HANDS_FULL)
-        {
-            act ("Your hands are full!", true, ch, 0, 0, TO_CHAR);
-            return;
-        }
-        if (error == NO_TOO_HEAVY)
-            {            
-            act ("You can't carry so much weight.", true, ch, 0, 0, TO_CHAR);
-            return;
-            }
-   
 	// If this is a cluster object with the right setting, then we'll make it appear invsibile.
 	if (obj)
 	{
@@ -8512,7 +8526,7 @@ void
 			true, ch, plant, 0, TO_CHAR | _ACT_FORMAT);
 	}
 }
-#define VNUM_CRATE 8137
+
 void do_empty (CHAR_DATA * ch, char *argument, int cmd)
 {
 	OBJ_DATA *obj;
@@ -8524,6 +8538,8 @@ void do_empty (CHAR_DATA * ch, char *argument, int cmd)
 	//POISON_DATA *poison;
 
 	argument = one_argument (argument, buf);
+	
+   
 
 	if (IS_SET (ch->room->room_flags, OOC) && IS_MORTAL (ch)
 		&& str_cmp (ch->room->name, PREGAME_ROOM_NAME))
@@ -8541,6 +8557,12 @@ void do_empty (CHAR_DATA * ch, char *argument, int cmd)
 
 	if ( GET_ITEM_TYPE( container ) == ITEM_CONTAINER )
 	{
+	  if (IS_SET (container->o.container.flags, CONT_LOCKED))
+	  {
+		send_to_char ("You'll need to open it first.\n", ch);
+		return;
+	  }
+	
 	    char container_name[ MAX_STRING_LENGTH ];
 	    argument = one_argument( argument, container_name );
 
@@ -8552,7 +8574,7 @@ void do_empty (CHAR_DATA * ch, char *argument, int cmd)
                 return;
             }
 
-            if ( GET_ITEM_TYPE( target_container ) != ITEM_CONTAINER && container->nVirtual==VNUM_CRATE)
+            if ( GET_ITEM_TYPE( target_container ) != ITEM_CONTAINER )
             {
                 send_to_char( "How do you expect to empty anything into that?\n", ch );
                 return;
@@ -8605,7 +8627,7 @@ void do_empty (CHAR_DATA * ch, char *argument, int cmd)
             act("You finish emptying $p.", false, ch, container, 0, TO_CHAR);
             act("$n finishes emptying $p.", true, ch, container, 0, TO_ROOM);
         } else {
-            if (!spare_capacity(ch, obj, false))
+            if (!spare_capacity(ch, container, false))
             {
                 send_to_char("This area is too small and already too full to contain that item.\n", ch);
                 return;
@@ -8912,6 +8934,7 @@ void
 	light (CHAR_DATA * ch, OBJ_DATA * obj, int on, int on_off_msg)
 {
 	/* Automatically correct any problems with on/off status */
+	// light()
 
 	if (obj->o.light.hours <= 0)
 		obj->o.light.on = 0;
@@ -9080,7 +9103,7 @@ void
 			return;
 		}
 
-		light (ch, obj, on, true);
+		light (ch, obj, on, true); // line 8922 search for light()
 	}
 }
 
@@ -9890,6 +9913,7 @@ void
 	char buf3[MAX_STRING_LENGTH] = { '\0' };
 	char buf4[MAX_STRING_LENGTH] = { '\0' };
 	char buf5[MAX_STRING_LENGTH] = { '\0' };
+	AFFECTED_TYPE *c_aff;
 	OBJ_DATA *obj = NULL;
 	OBJ_DATA *tool = NULL;
 	OBJ_DATA *tool_leftover = NULL;
@@ -10123,11 +10147,25 @@ void
 
 	if (argument[strlen(argument) - 1] == '!' || refresh)
 	{
+		/*
 		if (get_affect (ch, MAGIC_CRAFT_DELAY) && IS_MORTAL (ch))
 		{
 			act	("Sorry, but your OOC delay timer is still in place. You'll receive a notification when it expires and you're free to decorate once more.", false, ch, 0, 0, TO_CHAR | _ACT_FORMAT);
 			return;
 		}
+		*/
+
+		if ((c_aff = get_affect (ch, MAGIC_CRAFT_DELAY))
+		&& (IS_MORTAL(ch))
+		&& ((c_aff->a.spell.modifier - time (0)) > ACTIVITY_TIMER_MAX ))
+		{
+			act
+				("Sorry, but your OOC activity timer is full. You'll receive a notification when it expires.",
+				false, ch, 0, 0, TO_CHAR | _ACT_FORMAT);
+			return;
+		}
+
+
 
 		// Cull the last two degrees of our argument for the "!" part.
 		if (refresh)
@@ -10162,7 +10200,7 @@ void
 			obj->dec_short = 0;
 		}
 
-		for (size_t y = 0; y < strlen (obj->full_description) - 1; y++)
+		for (size_t y = 0; y < strlen (obj->full_description); y++)
 		{
 			sprintf (buf4 + strlen (buf4), "%c", obj->full_description[y]);
 		}
@@ -10250,14 +10288,19 @@ void
 				}
 			}
 		}
-
 		skill_use(ch, SKILL_ARTISTRY, 0);
-		// Add a RL hour delay
-		magic_add_affect (ch, MAGIC_CRAFT_DELAY, -1, (time (0) + 60 * 60), 0, 0, 0);
+
+		int delay_time = (((c_aff = get_affect (ch, MAGIC_CRAFT_DELAY)) ? c_aff->a.spell.modifier + (60 * 60): (time(0) + 60 * 60)));
+		remove_affect_type (ch, MAGIC_CRAFT_DELAY);
+		magic_add_affect (ch, MAGIC_CRAFT_DELAY, -1, delay_time, 0, 0, 0);
+
+		// Add a RL hour delay - Defunct now that crafting timers stack.
+		// magic_add_affect (ch, MAGIC_CRAFT_DELAY, -1, (time (0) + 60 * 60), 0, 0, 0);
 	}
 	else
 	{
-		for (size_t y = 0; y < strlen (obj->full_description) - 1; y++)
+	  
+		for (size_t y = 0; y < strlen (obj->full_description); y++)
 		{
 			sprintf (buf4 + strlen (buf4), "%c", obj->full_description[y]);
 		}
@@ -10309,7 +10352,7 @@ void
 
 
 
-#define MAX_CLOTHING_ITEMS 24
+#define MAX_CLOTHING_ITEMS 19
 
 const int clothes_to_qualitify[MAX_CLOTHING_ITEMS] =
 {
@@ -10331,11 +10374,6 @@ const int clothes_to_qualitify[MAX_CLOTHING_ITEMS] =
 	3042,
 	3047,
 	3050,
-	3057,
-	3058,
-	3071,
-	3072,
-	65002,
 	1
 };
 
@@ -10754,4 +10792,59 @@ void obj_data::partial_deep_copy (OBJ_DATA *proto)
 
 
 
+}
+// clone_colored_object() - added 0317140202 -Nimrod (Happy Birthday Grandpa Virgil!  Born 3-17-1900 R.I.P.  I miss you.)
+// Function will copy variables from from_obj and place them on returned object based solely on variable category.
+// Does not account for objects that may use the same variable multiple times.
+OBJ_DATA *
+	clone_colored_object (OBJ_DATA *from_obj, int to_obj_vnum, int cmd)
+{
+  int j = 0;
+  int k = 0;
+  int slot[10];
+  char var_list[10][100];
+  char *vari_list[10];	
+  char buf[200];
+
+  // Initalize pointer array and slots used to hold variable categories on produced obj (to_obj_vnum)
+  for (j = 0; j<10;j++)
+  {
+    vari_list[j] = var_list[j]; // initialize pointer
+    slot[j] = -1; 	// initialize slot
+    *var_list[j] = '\0'; // Set these to null while we're at it.
+  }
+  // Get variables categories from prototype of object we're going to load
+  fetch_variable_categories ( vari_list, to_obj_vnum, 0);
+	
+  // Figure out what variables from the from_obj will be transfered to new_obj
+  // This nested loop will make sure that if the variables aren't in the same order on both objects
+  // they will still be transferred correctly.  The only thing this does not account for is 
+  // objects that use the same variable more than once.
+	
+  for ( j = 0; j < 10; j++) // variables on from_obj
+  {
+    for ( k = 0; k < 10; k++) // variables of obj we're going to load (to_obj_vnum)
+    {
+      if (!(strcmp(var_list[k], from_obj->var_cat[j])) && strlen(var_list[k]) >= 2 )  // Make sure variable category is at least two chars long and they match
+      {
+        if (slot[k] < 0)  // Only assign if slot[k] still has not been assigned already - Should allow for duplicate variables to pass through.
+		  slot[k] = j;
+		//sprintf(buf, "from slot: >>>%d<<< to slot: >>>%d<<<", j, k);
+		//send_to_gods(buf);
+	  }
+    }
+  }
+  	
+  return(load_colored_object( 
+        to_obj_vnum, 
+	    slot[0] >= 0 ? from_obj->var_color[slot[0]] : 0, 
+		slot[1] >= 0 ? from_obj->var_color[slot[1]] : 0, 
+		slot[2] >= 0 ? from_obj->var_color[slot[2]] : 0, 
+		slot[3] >= 0 ? from_obj->var_color[slot[3]] : 0, 
+		slot[4] >= 0 ? from_obj->var_color[slot[4]] : 0, 
+		slot[5] >= 0 ? from_obj->var_color[slot[5]] : 0, 
+		slot[6] >= 0 ? from_obj->var_color[slot[6]] : 0, 
+		slot[7] >= 0 ? from_obj->var_color[slot[7]] : 0, 
+		slot[8] >= 0 ? from_obj->var_color[slot[8]] : 0, 
+		slot[9] >= 0 ? from_obj->var_color[slot[9]] : 0 )); 
 }

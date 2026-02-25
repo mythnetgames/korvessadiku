@@ -2457,8 +2457,7 @@ void
 void
 	do_disband (CHAR_DATA * ch, char *argument, int cmd)
 {
-	CHAR_DATA *tch;
-        CHAR_DATA *victim;
+	CHAR_DATA *pal;
 	char buf[MAX_STRING_LENGTH];
 
 	argument = one_argument (argument, buf);
@@ -2466,24 +2465,24 @@ void
 	if (!*buf || !str_cmp (buf, "all"))
 	{
 
-		act ("$n motions to $s group.", false, ch, 0, 0,
+		act ("$n motions to $s clanmates.", false, ch, 0, 0,
 			TO_ROOM | _ACT_FORMAT);
-		act ("You motion to your group.", false, ch, 0, 0,
+		act ("You motion to your clanmates.", false, ch, 0, 0,
 			TO_CHAR | _ACT_FORMAT);
 
-		for (victim = ch->room->people; victim; victim = victim->next_in_room)
+		for (pal = ch->room->people; pal; pal = pal->next_in_room)
 		{
 
-			if (victim->following != ch)
+			if (pal->following != ch || !IS_NPC (pal))
 				continue;
 
-			if (victim->following == ch)
+			if (is_leader (ch, pal) && AWAKE (pal))
 			{
 				act ("$N motions to you to stop following.",
-					false, victim, 0, ch, TO_CHAR | _ACT_FORMAT);
-				act ("$n falls out of step.", false, victim, 0, ch,
+					false, pal, 0, ch, TO_CHAR | _ACT_FORMAT);
+				act ("$n falls out of step.", false, pal, 0, ch,
 					TO_ROOM | _ACT_FORMAT);
-				victim->following = 0;
+				pal->following = 0;
 				// ch->group->erase (pal);
 			}
 		}
@@ -2491,38 +2490,39 @@ void
 		return;
 	}
 
-	if (!(victim = get_char_room_vis (ch, buf)))
+	if (!(pal = get_char_room_vis (ch, buf)))
 	{
 		send_to_char ("Nobody is here by that name.\n\r", ch);
 		return;
 	}
 
-	if (victim->following != ch)
+	if (pal->following != ch)
 	{
-		act ("$N is not following you.", false, ch, 0, ch, TO_CHAR);
+		act ("$N is not following you.", false, ch, 0, pal, TO_CHAR);
 		return;
 	}
 
-//	if (!is_leader (ch, victim))
-	//{
-//		act ("You can't give $N orders.", false, ch, 0, victim, TO_CHAR);
-//		return;
-//	}
+	if (!is_leader (ch, pal))
+	{
+		act ("You can't give $N orders.", false, ch, 0, pal, TO_CHAR);
+		return;
+	}
 
-//	if (!IS_NPC (ch))
-//	{
-//		send_to_char ("This command does not work on PCs.\n", ch);
-//		return;
-//	}
+	if (!IS_NPC (pal))
+	{
+		send_to_char ("This command does not work on PCs.\n", ch);
+		return;
+	}
 
-	victim->following = 0;
+	pal->following = 0;
 	// ch->group->erase (pal);
 
-	act ("You motion to $N.", false, ch, 0, victim, TO_CHAR | _ACT_FORMAT);
-	act ("$N motions to $n.", false, victim, 0, ch, TO_NOTVICT | _ACT_FORMAT);
-	act ("$N motions to you to stop following.", false, victim, 0, ch, TO_CHAR);
-	act ("$n falls out of step.", false, victim, 0, ch, TO_ROOM | _ACT_FORMAT);
+	act ("You motion to $N.", false, ch, 0, pal, TO_CHAR | _ACT_FORMAT);
+	act ("$N motions to $n.", false, pal, 0, ch, TO_NOTVICT | _ACT_FORMAT);
+	act ("$N motions to you to stop following.", false, pal, 0, ch, TO_CHAR);
+	act ("$n falls out of step.", false, pal, 0, ch, TO_ROOM | _ACT_FORMAT);
 }
+
 void
 	do_castout (CHAR_DATA * ch, char *argument, int cmd)
 {
@@ -2984,7 +2984,8 @@ void
 	{
 		// row[2] is sdesc
 		// row[4] is rank
-		sprintf (buf2, "%4d. %-13s %s\n", index, row[4], row[2]);
+		// row 1 is name
+		sprintf (buf2, "%4d. %-13s %-12s %s\n", index, row[4], row[1], row[2]);
 
 		if (strlen (buf) + strlen (buf2) >= MAX_STRING_LENGTH)
 			break;
@@ -2999,7 +3000,7 @@ void
 	return;
 }
 
-
+/*
 // Some code to get rid of all of these conflict clans.
 void
 	conflicting_clan_check(CHAR_DATA *ch)
@@ -3052,3 +3053,4 @@ void
 		send_to_char( "Your have shedded your conflicting loyalties - only the strongest remain.", ch );
 	}
 }
+*/

@@ -66,7 +66,7 @@ shock_to_char (CHAR_DATA * ch, CHAR_DATA * tch, int loc, int type, int impact, i
         return 0;
     }
 
-    // What's our current ratio?
+/*  unused  // What's our current ratio?
     int old_tier = 3;
     float old_ratio = static_cast<float>(ch->shock) / ch->max_shock;
     if (old_ratio >= 0.6667)
@@ -76,7 +76,7 @@ shock_to_char (CHAR_DATA * ch, CHAR_DATA * tch, int loc, int type, int impact, i
     else if (old_ratio >= 0.0001)
         old_tier = 1;
     else
-        old_tier = 0;
+        old_tier = 0;*/
 
     // Standard damage: equal to what we actually sustained.
     // If it's a punch from brawling (attack type 9), we do double shock,
@@ -142,7 +142,7 @@ shock_to_char (CHAR_DATA * ch, CHAR_DATA * tch, int loc, int type, int impact, i
     // knocked down to your knees and can't stand.
     if (new_tier <= 1)
     {
-        if (number(0,25) >= GET_WIL(ch))
+        if (number(0,25) > GET_WIL(ch))
         {
             if (GET_POS(ch) > SIT)
             {
@@ -332,7 +332,7 @@ wound_to_char (CHAR_DATA * ch, char *location, int impact, int type,
 	if (!str_cmp(lookup_race_variable(ch->race, RACE_NAME), "robot"))
 		type = 13;
 
-    if (type == 2 || type == 4)
+    if (type == 2 || type == 4) // chop or slash
         switch (number (1, 6))
         {
         case 1:
@@ -354,7 +354,7 @@ wound_to_char (CHAR_DATA * ch, char *location, int impact, int type,
             sprintf (name, "laceration");
             break;
         }
-    else if (type == 0 || type == 1)
+    else if (type == 0 || type == 1)  // stab or pierce
         switch (number (1, 5))
         {
         case 1:
@@ -373,7 +373,7 @@ wound_to_char (CHAR_DATA * ch, char *location, int impact, int type,
             sprintf (name, "perforation");
             break;
         }
-    else if (type == 3)
+    else if (type == 3) // crush
         switch (number (1, 5))
         {
         case 1:
@@ -392,7 +392,7 @@ wound_to_char (CHAR_DATA * ch, char *location, int impact, int type,
             sprintf (name, "crush");
             break;
         }
-    else if (type == 5)
+    else if (type == 5) // chill
         switch (number (1, 7))
         {
         case 1:
@@ -418,7 +418,7 @@ wound_to_char (CHAR_DATA * ch, char *location, int impact, int type,
             break;
         }
 
-    else if (type == 6)
+    else if (type == 6) // burn
         switch (number (1, 7))
         {
         case 1:
@@ -444,7 +444,7 @@ wound_to_char (CHAR_DATA * ch, char *location, int impact, int type,
             break;
         }
 
-    else if (type == 7)		// Natural attacks -- teeth.
+    else if (type == 7)		// Natural attacks -- teeth. BITE
         switch (number (1, 5))
         {
         case 1:
@@ -505,7 +505,7 @@ wound_to_char (CHAR_DATA * ch, char *location, int impact, int type,
             sprintf (name, "hole");
             break;
         case 2:
-            sprintf (name, "bullet-wound");
+            sprintf (name, "hole");
             break;
         case 3:
             sprintf (name, "puncture");
@@ -517,7 +517,7 @@ wound_to_char (CHAR_DATA * ch, char *location, int impact, int type,
             sprintf (name, "rupture");
             break;
         case 6:
-            sprintf (name, "gunshot");
+            sprintf (name, "puncture");
             break;
         }
     }
@@ -526,7 +526,7 @@ wound_to_char (CHAR_DATA * ch, char *location, int impact, int type,
         switch (number (1, 1))
         {
         case 1:
-            sprintf (name, "exit-wound");
+            sprintf (name, "wound");
             break;
         }
     }
@@ -631,7 +631,7 @@ wound_to_char (CHAR_DATA * ch, char *location, int impact, int type,
         else if (type == 9)
             wound->type = str_dup ("fist");
         else if (type >= 10)
-            wound->type = str_dup ("bullet");
+            wound->type = str_dup ("pierce");
 
         wound->name = str_dup (name);
         wound->severity = str_dup (severity);
@@ -670,7 +670,7 @@ wound_to_char (CHAR_DATA * ch, char *location, int impact, int type,
                         send_to_char ("\n", ch);
                         send_to_char (p, ch);
                         mem_free (p);
-                        sprintf(buf, "$n's gasps for air as $s %s is struck.", expand_wound_loc (wound->location));
+                        sprintf(buf, "$n gasps for air as $s %s is struck.", expand_wound_loc (wound->location));
                         act(buf, false, ch, 0, 0, TO_ROOM | _ACT_FORMAT | _ACT_BLEED);
                         break;
                     case HITLOC_HILEGS:
@@ -783,7 +783,7 @@ wound_to_char (CHAR_DATA * ch, char *location, int impact, int type,
                         send_to_char (p, ch);
                         mem_free (p);
                         soma_add_affect(ch, SOMA_BLUNT_SEVBODY, 666, 0, 0, 250, 250, 250, 666, 666, 666, 666);
-                        sprintf(buf, "$n's gasps for air as $s %s is struck.", expand_wound_loc (wound->location));
+                        sprintf(buf, "$n gasps for air as $s %s is struck.", expand_wound_loc (wound->location));
                         act(buf, false, ch, 0, 0, TO_ROOM | _ACT_FORMAT | _ACT_BLEED);
                         fracture = SOMA_BLUNT_SEVBODY;
                         break;
@@ -1273,9 +1273,7 @@ wound_to_char (CHAR_DATA * ch, char *location, int impact, int type,
             send_to_char ("\n", ch);
             send_to_char (p, ch);
             mem_free (p);
-	//	act ("$n #1starts to bleed!#0", false, ch, 0, 0, TO_ROOM | _ACT_FORMAT);     
-   }
-		
+        }
     } // if bloodloss
     else
         ch->damage += impact;
@@ -1875,7 +1873,7 @@ delayed_treatment (CHAR_DATA * ch)
 
 	if (ch->skills[SKILL_MEDICINE] >= 10)
 	{
-		roll = MAX(number(1, skill_level(ch, SKILL_FIRSTAID, 0)), number(((ch->skills[SKILL_EDUCATION] - 10 / 5) + 1), skill_level(ch, SKILL_MEDICINE, 0)));
+	  roll = MAX(number(1, skill_level(ch, SKILL_FIRSTAID, 0)), number((((ch->skills[SKILL_EDUCATION] - 10) / 5) + 1), skill_level(ch, SKILL_MEDICINE, 0)));
 	}
 	else
 	{
@@ -2257,7 +2255,7 @@ npc_treatment (CHAR_DATA * ch, CHAR_DATA * mob, char *argument)
         }
 
         sprintf (buf,
-                 "whisper %s I'll get you taken care of for a total of %d credits.",
+                 "whisper %s I'll get you taken care of for a total of %d coppers.",
                  buf2, (int) cost);
         command_interpreter (mob, buf);
         return;
@@ -2331,7 +2329,7 @@ npc_treatment (CHAR_DATA * ch, CHAR_DATA * mob, char *argument)
 
         if (!can_subtract_money (ch, (int) cost, mob->mob->currency_type))
         {
-            sprintf (buf, "%s You seem to be a little short on credits.", buf2);
+            sprintf (buf, "%s You seem to be a little short on coppers.", buf2);
             do_whisper (mob, buf, 83);
             return;
         }
@@ -2940,15 +2938,15 @@ show_wounds (CHAR_DATA * ch, int mode)
                 {
                     if (wound->bindskill >= 70)
                     {
-                        strcat (buf4, "neatly bound bullet ");
+                        strcat (buf4, "neatly bound puncture ");
                     }
                     else if (wound->bindskill >= 30)
                     {
-                        strcat (buf4, "bound bullet ");
+                        strcat (buf4, "bound puncture ");
                     }
                     else
                     {
-                        strcat (buf4, "poorly bound bullet ");
+                        strcat (buf4, "poorly bound puncture ");
                     }
                 }
                 else
@@ -4869,7 +4867,7 @@ delayed_long_bind(CHAR_DATA *thisPtr)
 void
 delayed_bind (CHAR_DATA * thisPtr)
 {
-    bool bIsTargetActorBound = 0;
+    //unused bool bIsTargetActorBound = 0;
     char buf[MAX_STRING_LENGTH] = {'\0'};
     CHAR_DATA *pTargetActor = NULL;
     WOUND_DATA *pWound = NULL;
@@ -4923,7 +4921,7 @@ delayed_bind (CHAR_DATA * thisPtr)
                             break;
                         default:
                             pWound->gunshot = 1;
-                            bIsTargetActorBound = 1;
+                            //unused bIsTargetActorBound = 1;
                             pWound->bleeding = 0;
                             pWound->lastbound = time (0);
 
@@ -4941,7 +4939,7 @@ delayed_bind (CHAR_DATA * thisPtr)
                     {
                         if (pWound->gunshot)
                             continue;
-                        bIsTargetActorBound = 1;
+                        //unused bIsTargetActorBound = 1;
                         pWound->bleeding = 0;
                         pWound->lastbound = time (0);
 
@@ -4977,7 +4975,7 @@ delayed_bind (CHAR_DATA * thisPtr)
                         break;
                     default:
                         pWound->gunshot = 1;
-                        bIsTargetActorBound = 1;
+                        //unused bIsTargetActorBound = 1;
                         pWound->bleeding = 0;
                         pWound->lastbound = time (0);
 
@@ -4995,7 +4993,7 @@ delayed_bind (CHAR_DATA * thisPtr)
                 {
                     if (pWound->gunshot)
                         continue;
-                    bIsTargetActorBound = 1;
+                    //unused bIsTargetActorBound = 1;
                     pWound->bleeding = 0;
                     pWound->lastbound = time (0);
 

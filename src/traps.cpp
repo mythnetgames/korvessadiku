@@ -470,7 +470,8 @@ void
 		act ("Usage: trap assemble <object, 'room' or exit> <trigger> <components>", false, ch, 0, 0, TO_CHAR);
 		return;
 	}
-
+/*
+		
 	if (!strn_cmp ("north", arg, strlen (arg)))
 		dir = 0;
 	else if (!strn_cmp ("east", arg, strlen (arg)))
@@ -483,8 +484,8 @@ void
 		dir = 4;
 	else if (!strn_cmp ("down", arg, strlen (arg)))
 		dir = 5;
-
-	if (dir >= 0)
+*/
+	if (dir = lookup_dir(arg) >= 0) 
 	{
 		if (!EXIT (ch, dir))
 		{
@@ -1313,6 +1314,7 @@ void delayed_trap_assemble2 (CHAR_DATA * ch)
 					{
 						trap_enact (ch, trap_obj, 4, NULL);
 					}
+					else
 					{
 						af = (AFFECTED_TYPE *) alloc (sizeof (AFFECTED_TYPE), 13);
 
@@ -1365,6 +1367,12 @@ void
 	}
 	else
 	{
+	
+	dir = lookup_dir(buf);
+		
+	/*  Replacing with lookup_dir - Nimrod 7 Sept 13
+	
+	
 		switch (*buf)
 		{
 		case 'n':
@@ -1389,6 +1397,7 @@ void
 			dir = -1;
 			break;
 		}
+		*/
 	}
 
 	af = get_affect (ch, AFFECT_SHADOW);

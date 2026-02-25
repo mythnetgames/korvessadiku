@@ -51,15 +51,15 @@ const int restricted_skills[] =
     0,				/* Sole Use */
     0,				/* Dual-Wield */
    -1,				/* Aim */
-    0,				/* Handgun */
-    0,				/* Rifle */
+   -2,				/* Handgun */
+   -2,				/* Rifle */
    -2,				/* SMG */
    -2,				/* Gunnery */
    -2,				/* Explosives */
 
     0,				/* Sneak */
     0,				/* Hide */
-    0,				/* Steal */
+   -6,				/* Steal */
    -2,				/* Picklock */
    -2,				/* Haggle */
    -2,				/* Handle */
@@ -70,20 +70,46 @@ const int restricted_skills[] =
    -1,				/* Eavesdrop */
     0,				/* Butchery */
 
-    0,				/* Chemistry */
-    0,				/* Mechanics */
-    0,				/* Gunsmithery */
+   -2,				/* Chemistry */
+   -2,				/* Mechanics */
+   -2,				/* Gunsmithery */
    -2,				/* Computerology */
-    0,				/* Electronics */
-    0,				/* Biology */
+   -2,				/* Electronics */
+   -2,				/* Biology */
     0,				/* Weaponcraft */
     0,				/* Armorcraft */
-    0,				/* Handicraft */
+   -2,				/* Handicraft */
     0,				/* Artistry */
 
-    0,             /* Education */
+   -6,             /* Education */
    -2,				/* Voodoo */
    -1,             // Common
+    0,             //Metalcraft
+    0,             //Leathercraft
+    0,             //Textilecraft
+    0,                //Woodcraft
+    0,                //Cooking
+    0,                //Baking
+    0,                //Brewing
+    0,                //Fishing
+    0,                //Stonecraft
+    0,                //Earthencraft
+    0,                //Gardening
+    0,                //Farming
+    0,                //Shortbow
+    0,                //Longbow
+    0,                //Crossbow
+    0,                //Music
+   -2,                //Astronomy
+   -3,                //Orkish
+   -3,                //Wargish
+   -3,                //Dalish
+   -3,                //Sindarin
+   -3,                //Khuzdul
+   -3,                //Tengwar
+   -3,                //Cirth
+   -3,                //Warcraft
+   
 
 };
 
@@ -298,13 +324,21 @@ is_involved (CHAR_DATA *ch, CHAR_DATA *tch, int cmd)
 
 void fluid_object(OBJ_DATA *obj)
 {
-		if ((GET_ITEM_TYPE(obj) == ITEM_DRINKCON || GET_ITEM_TYPE(obj) == ITEM_FOUNTAIN)
+  if (obj)
+  {
+    if ((GET_ITEM_TYPE(obj) == ITEM_DRINKCON || GET_ITEM_TYPE(obj) == ITEM_FOUNTAIN)
 			&& vtoo(obj->o.drinks.liquid) && obj->o.drinks.volume && !obj->contains)
-		{
+	{
 			OBJ_DATA *fluid = load_object(obj->o.drinks.liquid);
 			fluid->count = obj->o.drinks.volume;
 			obj_to_obj(fluid, obj);
-		}
+	}
+
+  }
+  else
+  {
+    send_to_gods("An illegal call to fluid_object has been made.  Let Nimrod know.");
+  }
 }
 
 // Corrects a/an in a string, strips our double blanks.
@@ -382,7 +416,6 @@ one_argument (char *argument, char *arg_first)
             *arg_first = tolower (*argument);
         else
             *arg_first = *argument;
-
         arg_first++;
         argument++;
     }
@@ -661,7 +694,7 @@ is_restricted_skill (CHAR_DATA * ch, int skill, int prof)
 			ch->skills[SKILL_RIFLE] ||
 			ch->skills[SKILL_SMG] ||
 			ch->skills[SKILL_GUNNERY] ||
-			ch->skills[SKILL_ARCHERY] ||
+			ch->skills[SKILL_EXPLOSIVES] ||
             ch->skills[SKILL_POLEARM])
             return 0;
         else
@@ -738,20 +771,19 @@ send_email (account * to_acct, const char *cc, char *from, char *subject,
     fprintf (fp, "To: %s\n", to_acct->email.c_str ());
     if (cc != NULL && *cc)
         fprintf (fp, "Cc: %s\n", cc);
-    fprintf (fp, "X-Sender: %s\n", MUD_EMAIL);
-    fprintf (fp, "Mime-Version: 1.0\n");
-    fprintf (fp, "Content-type: text/plain;charset=\"us-ascii\"\n");
-    fprintf (fp, "Organization: %s\n", MUD_NAME);
+    // fprintf (fp, "X-Sender: %s\n", MUD_EMAIL);
+    // fprintf (fp, "Mime-Version: 1.0\n");
+   // fprintf (fp, "Content-type: text/plain;charset=\"us-ascii\"\n");
+   // fprintf (fp, "Organization: %s\n", MUD_NAME);
     fprintf (fp, "Subject: %s\n", subject);
     fprintf (fp, "\n");
-    fprintf (fp, "%s", message);
-
+    //fprintf (fp, "%s", message);
+    fwrite(message, 1, strlen(message), fp);
     // Remove this line to remove MUD-specific email footer
 
 
-    fprintf (fp,
-             "\n\n\n\n\n--\nParallel RPI: http://www.forum.parallelrpi.com\n");
-
+   // fprintf (fp, "\n--\nSoI-Laketown RPI: http://www.laketownrpi.us/forums\n");
+    fwrite (".\n", 1, 2, fp);
     // Remove this line to remove reference to SoI's weekly automated newsletter
     /*
       if (strstr (subject, "Palantir Weekly"))
@@ -1004,6 +1036,8 @@ struct time_info_data
     };
 
     secs = (t2 - t1) * PULSES_PER_SEC;
+	
+	now.dayofweek = int((secs/GAME_SECONDS_PER_DAY )  % 7);
 
     now.year += secs / GAME_SECONDS_PER_YEAR;
     secs = secs % GAME_SECONDS_PER_YEAR;
@@ -1015,12 +1049,15 @@ struct time_info_data
     secs = secs % GAME_SECONDS_PER_DAY;
 
     now.hour += secs / GAME_SECONDS_PER_HOUR;
+	
+	
 
     return now;
 }
 
 
 /* Calculate the MUD time passed over the last t2-t1 centuries (secs) */
+/*
 struct time_info_data
             moon_time_passed (time_t t2, time_t t1)
 {
@@ -1031,27 +1068,32 @@ struct time_info_data
     };
 
     secs = (t2 - t1) * PULSES_PER_SEC;
+	
+	
 
     now.year += secs / MOON_SECONDS_PER_YEAR;
     secs = secs % MOON_SECONDS_PER_YEAR;
 
     now.month += secs / MOON_SECONDS_PER_MONTH;
     secs = secs % MOON_SECONDS_PER_MONTH;
-
-    now.day += secs / MOON_SECONDS_PER_DAY;
+	
+	now.day += secs / MOON_SECONDS_PER_DAY;
     secs = secs % MOON_SECONDS_PER_DAY;
-
+	
     now.hour += secs / MOON_SECONDS_PER_HOUR;
+	secs = secs % MOON_SECONDS_PER_HOUR;
+	
+	now.minute += secs / 60;
 
     return now;
 }
-
+*/
 struct time_info_data
             age (CHAR_DATA * ch)
 {
     struct time_info_data player_age;
 
-    player_age = moon_time_passed (time (0), ch->time.birth);
+    player_age = mud_time_passed (time (0), ch->time.birth);
 
     player_age.year += ch->age - GAME_BASE_YEAR;	/* All players start at 17 */
 
@@ -2729,85 +2771,28 @@ obj_short_desc (OBJ_DATA * obj)
         else			/* 5 - 20 coins */
             sprintf (coins, "a handful of");
 
-        if (obj->nVirtual == 50093)
-        {
-            if (obj->count == 1)
-                strcat (coins, " 'two-hundred-forty'-marked piece of scrip");
-            else
-                strcat (coins, " 'two-hundred-forty'-marked pieces of scrip");
-        }
-        else if (obj->nVirtual == 50092)
-        {
-            if (obj->count == 1)
-                strcat (coins, " 'twenty-five'-marked piece of scrip");
-            else
-                strcat (coins, " 'twenty-five'-marked pieces of scrip");
-        }
-
-        else if (obj->nVirtual == 50091)
-        {
-            if (obj->count == 1)
-                strcat (coins, " 'five'-marked piece of scrip");
-            else
-                strcat (coins, " 'five'-marked pieces of scrip");
-        }
-
-        else if (obj->nVirtual == 50090)
-        {
-            if (obj->count == 1)
-                strcat (coins, " 'one'-marked piece of scrip");
-            else
-                strcat (coins, " 'one'-marked pieces of scrip");
-        }
-        else if (obj->nVirtual == 14011)
+        if (obj->nVirtual == 14011)
         {
             if (obj->count > 1)
-                strcat (coins, " white, circular chips");
+                strcat (coins, " copper coins");
             else
-                strcat (coins, " white, circular chip");
-        }
-        else if (obj->nVirtual == 14012)
-        {
-            if (obj->count > 1)
-                strcat (coins, " red, circular chips");
-            else
-                strcat (coins, " red, circular chip");
+                strcat (coins, " copper coin");
         }
         else if (obj->nVirtual == 14013)
         {
             if (obj->count > 1)
-                strcat (coins, " blue, circular chips");
+                strcat (coins, " silver coins");
             else
-                strcat (coins, " blue, circular chip");
-        }
-        else if (obj->nVirtual == 14014)
-        {
-            if (obj->count > 1)
-                strcat (coins, " yellow, circular chips");
-            else
-                strcat (coins, " yellow, circular chip");
-        }
-        else if (obj->nVirtual == 14015)
-        {
-            if (obj->count > 1)
-                strcat (coins, " green, circular chips");
-            else
-                strcat (coins, " green, circular chip");
+                strcat (coins, " silver coin");
         }
         else if (obj->nVirtual == 14016)
         {
             if (obj->count > 1)
-                strcat (coins, " black, circular chips");
+                strcat (coins, " gold coins");
             else
-                strcat (coins, " black, circular chip");
+                strcat (coins, " gold coin");
         }
-        else if (obj->nVirtual == 14017)
-        {
-            if (obj->count > 1)
-                strcat (coins, " gold-flecked, circular chips");
-            else
-                strcat (coins, " gold-flecked, circular chip");
-        }
+       
         return coins;
     }
     else if (GET_ITEM_TYPE (obj) == ITEM_CARD)
@@ -3345,20 +3330,14 @@ mm (char *msg)
 #endif
 }
 
-int
-is_human (CHAR_DATA * ch)
+
+// A more accurate title would be is_humanoid. This is used for determing natural attack
+// So as long as orcs are punchers and not biters, we do want them and all humanoids included
+// here as users of Brawling rather than biters etc.
+
+int is_human (CHAR_DATA * ch)
 {
-    // Survivor, Human, Denizen, Mutation, Cybernetic, and Phoenixer.
-
-    if (ch->race == 1 ||
-        ch->race == 5 ||
-        ch->race == 6 ||
-        ch->race == 67 ||
-        ch->race == 68 ||
-        ch->race == 69)
-        return 1;
-
-    return 0;
+  return (lookup_race_int (ch->race, RACE_BODY_PROTO)==PROTO_HUMANOID);
 }
 
 int
@@ -3780,8 +3759,15 @@ get_bite_value (OBJ_DATA * obj)
        bite.  The initial bites may yield more food than later bites.
        This depends on how even the ratio of bites to food value is.
      */
+	 
+	 // Modifying to return full value of food object as we are now setting up caloric values
+	 // on a per-bite basis rather than the whole object.  This allows us to more easily passed
+	 // values from variables. -Nimrod 2153011315
+	 
+    return obj->o.food.food_value;
+    // remove above line if you want to go back to old system. -Nim
 
-    bite_num = obj->o.food.bites;
+	bite_num = obj->o.food.bites;
     total_bites = vtoo (obj->nVirtual)->o.food.bites;
 
     if (total_bites <= 1)

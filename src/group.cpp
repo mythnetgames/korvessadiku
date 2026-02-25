@@ -10,7 +10,7 @@
 #include "protos.h"
 
 const char *race_describer[] =
-    {"humans", "humanoids", "insects", "automatons", "bots", "vehicles",
+    {"humans", "humanoids", "insects", "orcs", "goblins", "elves",
      "dogs", "lizards", "spiders", "rodents", "bats", "animals"
     };
 
@@ -1002,8 +1002,8 @@ do_group (CHAR_DATA * ch, char *argument, int cmd)
 
     *buf = *one_argument(buf, arg1);
     
-    sprintf (buf, "#5%s#0 [%s] [%s] %s, leading:\n\n", char_short (top_leader),
-             wound_total (top_leader, false), fatigue_bar (top_leader, false), tactical_status (top_leader));
+    sprintf (buf, "#5%s#0 [%s]%s, leading:\n\n", char_short (top_leader),
+             wound_total (top_leader, false), tactical_status (top_leader));
     buf[2] = toupper (buf[2]);
 
     for (tch = top_leader->room->people; tch; tch = tch->next_in_room)
@@ -1024,8 +1024,8 @@ do_group (CHAR_DATA * ch, char *argument, int cmd)
             //(str_cmp(arg1, "guarding") && str_cmp(arg2, "(guarding)")) ||
             //        (str_cmp(arg1, "engaged") && str_cmp(arg2, "(engaged)")))
             {
-                sprintf (buf + strlen (buf), "   #5%s#0 [%s] [%s]%s", char_short (tch),
-                    wound_total (tch, false), fatigue_bar (tch, false),  tactical_status(tch));
+                sprintf (buf + strlen (buf), "   #5%s#0 [%s]%s", char_short (tch),
+                    wound_total (tch, false), tactical_status(tch));
                 shown = true;
                 found = true;
             }
@@ -1034,8 +1034,8 @@ do_group (CHAR_DATA * ch, char *argument, int cmd)
         
         if (!shown && !(*arg1))
         {
-            sprintf (buf + strlen (buf), "   #5%s#0 [%s] [%s]%s", char_short (tch),
-                wound_total (tch, false), fatigue_bar (tch, false), tactical_status(tch));
+            sprintf (buf + strlen (buf), "   #5%s#0 [%s]%s", char_short (tch),
+                wound_total (tch, false), tactical_status(tch));
             found = true;
         }
         shown = false;

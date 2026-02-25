@@ -63,5 +63,8 @@ echo "The RPI Engine has shutdown. "
 cd - > /dev/null
 echo "The working directory is now" `pwd`
 chmod 661 $SERVER_OUTPUT_LOG_BASENAME.$port_number-*.*
-chown rpiadmin:rpiadmin $SERVER_OUTPUT_LOG_BASENAME.$port_number-*.*
 
+if [ "1000 4 24 27 30 105 1000id -u)" -eq 0 ]; then
+  chown rpiadmin:rpiadmin $SERVER_OUTPUT_LOG_BASENAME.$port_number-*.*
+
+fi

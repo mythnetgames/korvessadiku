@@ -553,6 +553,7 @@ void
 			ch->position = STAND;
 			ch->fight_mode = 2;
 			ch->effort = 100;
+			ch->dameffort = 100;
 
 			if (is_clan_member(tch, "arena_blue"))
 			{
@@ -603,6 +604,7 @@ void
 			ch->position = STAND;
 			ch->fight_mode = 2;
 			ch->effort = 100;
+			ch->dameffort = 100;
 			command_interpreter(ch, "look");
 			return;
 		}
@@ -634,6 +636,7 @@ void
 			ch->position = STAND;
 			ch->fight_mode = 2;
 			ch->effort = 100;
+			ch->dameffort = 100;
 			command_interpreter(ch, "look");
 			return;
 		}
@@ -1957,6 +1960,7 @@ void
 void
 	grunge_arena__update_delays (void)
 {
+return; // Disabling this for now as it's crashing the mud.  0205141926 -Nim
 	if (grunge_arena_last_echo > 1)
 	{
 		grunge_arena_last_echo--;

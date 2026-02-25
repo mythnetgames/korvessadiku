@@ -1785,15 +1785,16 @@ do_variables (CHAR_DATA *ch, char *argument, int cmd)
 
                 output.append("#2|#0");
 
-                output.append(skills[it->second.skill_name], MIN((int) strlen(item_types[it->second.skill_name]), 6));
+                output.append(skills[it->second.skill_name], MIN((int) strlen(skills[it->second.skill_name]), 6));
 
-                for (i = 0, j = (6 - MIN((int) strlen(item_types[it->second.skill_name]), 5)); i < j; i++)
+                for (i = 0, j = (7 - MIN((int) strlen(skills[it->second.skill_name]), 6)); i < j; i++)
                     output.append(" ");
 
                 output.append("#2|#0");
 
                 std::ostringstream conversion4;
                 conversion4 << it->second.skill_mod;
+
 
                 for (i = 0, j = (3 - conversion4.str().length()); i < j; i++)
                     output.append(" ");
@@ -2170,9 +2171,10 @@ do_variables (CHAR_DATA *ch, char *argument, int cmd)
                                     output += "\nNo such oval: enter a value between 0 and 5.\n";
                                     break;
                                 }
-                                else if (!IS_IMPLEMENTOR(ch))
+                                
+                                else if (GET_TRUST (ch) < 4)
                                 {
-                                    output += "\nOnly Kithrater is allowed to do this at the moment.\n";
+                                    output += "\nThis command is reserved for level 4 and higher.\n";
                                     break;
                                 }
 

@@ -28,15 +28,7 @@
 
 #include <string>
 #include <stdio.h>
-#include <fcntl.h>  
-#include <signal.h>
-#include <time.h>
-#include <errno.h> 
-#include <ctime>
-#include <cstdlib>
-
-
-
+#include <vector>
 
 #ifndef MACOSX
 #include <malloc.h>
@@ -44,6 +36,7 @@
 
 #include <sys/time.h>
 #include <mysql/mysql.h>
+
 
 #include "clan.h"
 
@@ -65,7 +58,8 @@ extern const char *direction[];
 extern const int movement_loss[];
 extern struct timeval time_now;
 extern SITE_INFO *banned_site;
-
+extern const int sunrise[];	// weather.c
+extern const int sunset[];	// weather.c
 extern const char *earth_phase[];
 extern const char *sun_phase[];
 extern const char *temp_phrase[];
@@ -202,24 +196,30 @@ extern ROLE_DATA *role_list;
 extern OBJ_DATA *object_list;
 extern struct zone_data *zone_table;
 extern struct use_table_data use_table[];	// handler.c
-extern const int weapon_armor_table[10][6];
+extern const int weapon_armor_table[10][6]; // fight.cpp
+extern const int weapon_standards[5][4][7]; //olc.cpp
+extern const int armor_standards[5][6][5]; //olc.cpp
 extern const char *item_types[];
 extern const char *trap_bits[];
 
 
 extern const char *drinks[];	// olc.c
 extern const char *holiday_short_names[];
-extern const char *armor_types[];
+extern const char *armor_types[]; //fight.cpp
+extern const char *damage_types[]; //fight.cpp
 extern const char *month_short_name[];
 extern const char *month_lkup[];
 extern const char *verbal_time[];
 extern const char *fullness[];
 extern const char *color_liquid[];
 extern const char *weather_room[];
+extern const char *season_string[];
+extern const char *that_time_of_day[];
 extern struct msg_data *msg_list;
 extern struct spell_table_data spell_list[];
 extern const struct body_info body_tab[NUM_TABLES][MAX_HITLOC];
 extern const char* const dirs[];
+extern const char* const short_dirs[];
 extern const char* const relative_dirs[];
 extern const int rev_dir[];
 extern int season_time;
@@ -236,12 +236,13 @@ extern const char *dec_conditions[5];
 extern const char *dec_skills[9];
 extern const char *dec_short_skills[9];
 extern const char *dec_size[4];
-extern const char *dec_short[11];
+extern const char *dec_short[12];
 
 extern const char *day_name[];
 extern const char *season_name[];
 
 extern const char *month_name[];
+extern const char *short_month_name[];
 
 extern struct room_direction_data *dir_options[];
 extern MYSQL *database;
@@ -286,10 +287,24 @@ void do_combine (CHAR_DATA *ch, char *argument, int cmd);
 extern const char *gun_bits[];
 extern const char *calibers[];
 extern const char *shell_name[];
+extern const char *shell_name_plural[];
 extern const char *ammo_bits[];
 extern const char *ammo_sizes[];
 extern const char *gun_set[];
 extern const char *grenade_bits[];
+extern const char *trigger_text_first[];
+extern const char *trigger_text_third[];
+extern const char *echo_one[];
+extern const char *echo_two[];
+extern const char *echo_three[];
+extern const char *echo_four[];
+extern const char *echo_five[];
+extern const int echo_one_qty;
+extern const int echo_two_qty;
+extern const int echo_three_qty;
+extern const int echo_four_qty;
+extern const int echo_five_qty;
+
 
 void do_load_clip (CHAR_DATA * ch, char *argument, int cmd);
 void delayed_load_clip (CHAR_DATA * ch);
@@ -426,7 +441,6 @@ void do_broadcast (CHAR_DATA * ch, char *argument, int cmd);
 void do_buck (CHAR_DATA * ch, char *argument, int cmd);
 void do_bug (CHAR_DATA * ch, char *argument, int cmd);
 void do_camp (CHAR_DATA * ch, char *argument, int cmd);
-void camp_home (CHAR_DATA * ch, char *argument, int cmd);
 void do_cast (CHAR_DATA * ch, char *argument, int cmd);
 void do_castout (CHAR_DATA * ch, char *argument, int cmd);
 void do_check (CHAR_DATA * ch, char *argument, int cmd);
@@ -685,7 +699,7 @@ void load_mob_ais (void);
 void load_foraged_goods (void);
 void save_foraged_goods (void);
 
-//void update_family_clanning (DESCRIPTOR_DATA * d);
+void update_family_clanning (DESCRIPTOR_DATA * d);
 void conflicting_clan_check(CHAR_DATA *ch);
 
 void load_foraged_zones (void);
@@ -700,6 +714,7 @@ int foraged_all(int sector);
 
 void load_obj_variables (void);
 void save_obj_variables (void);
+void test_db_init(void);
 
 void load_mob_variables (void);
 void save_mob_variables (void);
@@ -830,7 +845,6 @@ void do_shutdown (CHAR_DATA * ch, char *argument, int cmd);
 void do_sing (CHAR_DATA * ch, char *argument, int cmd);
 void do_sit (CHAR_DATA * ch, char *argument, int cmd);
 void do_skills (CHAR_DATA * ch, char *argument, int cmd);
-void do_progress (CHAR_DATA * ch, char *argument, int cmd);
 void do_talents (CHAR_DATA * ch, char *argument, int cmd);
 void do_sleep (CHAR_DATA * ch, char *argument, int cmd);
 void do_sneak (CHAR_DATA * ch, char *argument, int cmd);
@@ -838,6 +852,25 @@ void do_snoop (CHAR_DATA * ch, char *argument, int cmd);
 void do_south (CHAR_DATA * ch, char *argument, int cmd);
 void do_southeast (CHAR_DATA * ch, char *argument, int cmd);
 void do_southwest (CHAR_DATA * ch, char *argument, int cmd);
+
+void do_upnorth (CHAR_DATA * ch, char *argument, int cmd);
+void do_upeast (CHAR_DATA * ch, char *argument, int cmd);
+void do_upwest (CHAR_DATA * ch, char *argument, int cmd);
+void do_upsouth (CHAR_DATA * ch, char *argument, int cmd);
+void do_upnortheast (CHAR_DATA * ch, char *argument, int cmd);
+void do_upnorthwest (CHAR_DATA * ch, char *argument, int cmd);
+void do_upsoutheast (CHAR_DATA * ch, char *argument, int cmd);
+void do_upsouthwest (CHAR_DATA * ch, char *argument, int cmd);
+
+void do_downnorth (CHAR_DATA * ch, char *argument, int cmd);
+void do_downeast (CHAR_DATA * ch, char *argument, int cmd);
+void do_downsouth (CHAR_DATA * ch, char *argument, int cmd);
+void do_downwest (CHAR_DATA * ch, char *argument, int cmd);
+void do_downnortheast (CHAR_DATA * ch, char *argument, int cmd);
+void do_downnorthwest (CHAR_DATA * ch, char *argument, int cmd);
+void do_downsoutheast (CHAR_DATA * ch, char *argument, int cmd);
+void do_downsouthwest (CHAR_DATA * ch, char *argument, int cmd);
+
 void do_speak (CHAR_DATA * ch, char *argument, int cmd);
 void do_spells (CHAR_DATA * ch, char *argument, int cmd);
 void do_stable (CHAR_DATA * ch, char *argument, int cmd);
@@ -919,7 +952,6 @@ void do_where (CHAR_DATA * ch, char *argument, int cmd);
 void do_whirl (CHAR_DATA * ch, char *argument, int cmd);
 void do_whisper (CHAR_DATA * ch, char *argument, int cmd);
 void do_who (CHAR_DATA * ch, char *argument, int cmd);
-void do_wipe (CHAR_DATA * ch, char *argument, int cmd);
 void do_wizlist (CHAR_DATA * ch, char *argument, int cmd);
 void do_wizlock (CHAR_DATA * ch, char *argument, int cmd);
 void do_wlog (CHAR_DATA * ch, char *argument, int cmd);
@@ -938,6 +970,8 @@ void do_zsave (CHAR_DATA * ch, char *argument, int cmd);
 void do_zset (CHAR_DATA * ch, char *argument, int cmd);
 void do_flist (CHAR_DATA * ch, char *argument, int cmd);
 void do_scents (CHAR_DATA * ch, char *argument, int cmd);
+void fetch_variable_categories ( char **var_list, int target, int target_type);
+OBJ_DATA *clone_colored_object (OBJ_DATA *from_obj, int to_obj_vnum, int cmd);
 
 
 /*
@@ -1172,6 +1206,7 @@ void morph_mob (CHAR_DATA * ch);
 int can_learn (CHAR_DATA * ch);
 int mob_weather_reaction (CHAR_DATA * ch);
 int would_attack (CHAR_DATA * ch, CHAR_DATA * tch);
+int wildlife_check (CHAR_DATA * ch, CHAR_DATA * target);
 void ready_melee_weapons (CHAR_DATA * ch);
 int get_stat_range (int score);
 void reformat_say_string (char *source, char **target, CHAR_DATA * to);
@@ -1308,6 +1343,7 @@ int generic_find (char *arg, int bitvector, CHAR_DATA * ch,
 		  CHAR_DATA ** tar_ch, OBJ_DATA ** tar_obj);
 char *swap_xmote_target (CHAR_DATA * ch, char *argument, int cmd);
 void clear_pmote (CHAR_DATA * ch);
+void clear_status( CHAR_DATA * ch );
 void clear_voice (CHAR_DATA * ch);
 int suffocated (CHAR_DATA * ch);
 int drowned (CHAR_DATA * ch);
@@ -1424,7 +1460,6 @@ load_exact_colored_object (int vnum, char *color0, char *color1, char *color2, c
 OBJ_DATA *fread_object (int vnum, int nZone, FILE * fp);
 OBJ_DATA *fread_obj (FILE * fp);
 void death_email (CHAR_DATA * ch);
-int index_lookup (const char* const* index, const char* lookup);
 int check_climb (CHAR_DATA * ch);
 int _filbuf ();
 int ungetc ();
@@ -1459,6 +1494,10 @@ int soma_add_affect (CHAR_DATA * ch, int type, int duration, int latency,
 
 int swimming_check (CHAR_DATA * ch);
 char *lookup_string (int value, int reg_index);
+int index_lookup (const char* const* index, const char* lookup);
+int lookup_dir(const char *value); // Nimrod added 7 Sept 13
+
+//char* vc_rand(char *category);
 
 void set_hobbitmail_flags (int id, int flags);
 void setup_registry (void);
@@ -1686,9 +1725,6 @@ void delayed_camp1 (CHAR_DATA * ch);
 void delayed_camp2 (CHAR_DATA * ch);
 void delayed_camp3 (CHAR_DATA * ch);
 void delayed_camp4 (CHAR_DATA * ch);
-void delayed_home_camp1 (CHAR_DATA * ch);
-void delayed_home_camp2 (CHAR_DATA * ch);
-void delayed_home_camp3 (CHAR_DATA * ch);
 void delayed_cast (CHAR_DATA * ch);
 void delayed_count_coin (CHAR_DATA * ch);
 void delayed_cover (CHAR_DATA * ch);
@@ -1848,6 +1884,7 @@ int is_mounted (CHAR_DATA * ch);
 void rl_minute_affect_update (void);
 void clear_watch (CHAR_DATA * ch);
 void show_unread_messages (CHAR_DATA * ch);
+void show_unread_news_messages (CHAR_DATA * ch);
 char *file_to_string (char *name);
 void check_memory ();
 int is_incantation (char *argument);
@@ -1914,6 +1951,7 @@ char *obj_short_desc (OBJ_DATA * obj);
 char *obj_desc (OBJ_DATA * obj);
 OBJ_DATA *split_obj (OBJ_DATA * obj, int count);
 void ten_second_update (void);
+void add_a_minute (void);
 char *get_line (char **buf, char *ret_buf);
 ALIAS_DATA *is_alias (CHAR_DATA * ch, char *argument);
 void alias_free (ALIAS_DATA * alias);
@@ -1948,6 +1986,7 @@ void refresh_db_connection (void);
 void reload_sitebans (void);
 void reload_mob_resets (void);
 void target_sighted (CHAR_DATA * ch, CHAR_DATA * target);
+void target_sighted_reaction (CHAR_DATA * ch, CHAR_DATA * target);
 void system_log (const char *str, bool error);
 void player_log (CHAR_DATA * ch, char *command, char *str);
 void weather_and_time (int mode);

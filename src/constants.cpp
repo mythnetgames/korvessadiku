@@ -6,6 +6,8 @@
 
 #include "structs.h"
 
+
+
 const char *verbal_number[] = {
   "zero",
   "one",
@@ -125,15 +127,38 @@ const char *verbose_dirs[] = {
   "the northwest",
   "the southeast",
   "the southwest",
+  "the upper north",
+  "the upper east",
+  "the upper south",
+  "the upper west",
+  "the upper northeast",
+  "the upper northwest",
+  "the upper southeast",
+  "the upper southwest",
+  "the lower north",
+  "the lower east",
+  "the lower south",
+  "the lower west",
+  "the lower northeast",
+  "the lower northwest",
+  "the lower southeast",
+  "the lower southwest"
   "\n"
 };
 
-const char *season_string[4] = {
+const char *season_string[] = {
   "spring",
   "summer",
   "autumn",
-  "winter"
+  "winter",
+  "\n"
 };
+
+const char *that_time_of_day[] = {
+  "day",
+  "night",
+  "\n"
+  };
 
 const char *month_short_name[12] = {
   "First",
@@ -192,7 +217,7 @@ const char *somatics[] = {
 
 
 const char *skills[] = {
-  "Unused",
+  "Unused", // 0
   "Brawling",
   "Small-Blade",
   "Long-Blade",
@@ -202,7 +227,7 @@ const char *skills[] = {
   "Deflect",
   "Sole-Wield",
   "Dual-Wield",
-  "Aim",
+  "Aim", //10
   "Handgun",
   "Rifle",
   "Machinegun",
@@ -218,7 +243,7 @@ const char *skills[] = {
   "Hunting",
   "First-Aid",
   "Medicine",
-  "Scavenge",
+  "Forage",
   "Eavesdrop",
   "Butchery",
 
@@ -234,9 +259,33 @@ const char *skills[] = {
   "Artistry",
 
   "Education",
-  "Voodoo",
+  "Empathy",
   "Common",
-
+  "Metalcraft", 
+  "Leathercraft", 
+  "Textilecraft", 
+  "Woodcraft", 
+  "Cooking", 
+  "Baking", 
+  "Brewing", 
+  "Fishing", 
+  "Stonecraft", 
+  "Earthencraft", 
+  "Gardening",
+  "Farming", 
+  "Shortbow", 
+  "Longbow", 
+  "Crossbow", 
+  "Music", 
+  "Astronomy",
+  "Orkish",
+  "Wargish",
+  "Dalish",
+  "Sindarin",
+  "Khuzdul",
+  "Tengwar",
+  "Cirth",
+  "Warcraft",
   "\n"
 };
 
@@ -641,18 +690,12 @@ const char *sex_noun[] = {
 };
 
 const char *weather_room[] = {
+  "default",
   "foggy",
   "cloudy",
   "rainy",
   "stormy",
   "snowy",
   "blizzard",
-  "night",
-  "nfoggy",
-  "nrainy",
-  "nstormy",
-  "nsnowy",
-  "nblizzard",
-  "day",
-  "\n"
+   "\n"
 };

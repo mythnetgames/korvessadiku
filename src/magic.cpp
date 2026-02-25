@@ -293,6 +293,7 @@ do_prepare (CHAR_DATA * ch, char *argument, int cmd)
 
   sprintf (name, "%s", lookup_spell_variable (id, VAR_NAME));
 
+  
   if (caster_type (ch) == CASTER_WHITE)
     {
       sprintf (buf,
@@ -322,6 +323,7 @@ do_prepare (CHAR_DATA * ch, char *argument, int cmd)
 	       char_short (ch), HSHR (ch));
       buf2[2] = toupper (buf2[2]);
     }
+  
   else
     {
       send_to_char ("You aren't a spellcaster!\n", ch);
@@ -2160,7 +2162,7 @@ email_acceptance (DESCRIPTOR_DATA * d)
 		   "   Thank you for your interest in %s! This is an automated\n"
 		   "system notification sent to inform you that your application for a character\n"
 		   "named %s has been ACCEPTED by a Guide, and that you may enter\n"
-		   "Parallel at your earliest convenience. We'll see you there!\n"
+		   "SoI-Laketown at your earliest convenience. We'll see you there!\n"
 		   "\n"
 		   "%s left the following comments regarding your application:\n"
 		   "\n%s", MUD_NAME, tch->tname, d->character->pc->account_name,
@@ -2178,7 +2180,7 @@ email_acceptance (DESCRIPTOR_DATA * d)
 		   "   Thank you for your interest in %s! This is an automated\n"
 		   "system notification sent to inform you that your application for a character\n"
 		   "named %s has been ACCEPTED by the reviewer, and that you may enter\n"
-		   "Parallel at your earliest convenience. We'll see you there!\n"
+		   "SoI-Laketown at your earliest convenience. We'll see you there!\n"
 		   "\n"
 		   "%s left the following comments regarding your application:\n"
 		   "\n%s", MUD_NAME, tch->tname, d->character->tname,

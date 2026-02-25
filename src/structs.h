@@ -35,18 +35,7 @@
 #include <sys/types.h>
 #include <sys/time.h>
 #include "constants.h"
-#include <string>  
-#include <list>  
-#include <map>  
-#include <set>  
-#include <vector>  
-#include <stdexcept>  
-#include <fstream>  
-#include <iostream>  
-#include <sstream>  
-#include <ios>  
-#include <iterator>
-#include <algorithm>
+#include <vector>
 
 #include "object_damage.h"
 
@@ -130,7 +119,7 @@ typedef struct targeted_bys	TARGETED_BY;
 #ifndef __cplusplus
 typedef char bool;
 #endif
-typedef char rpi_byte;
+typedef char byte;
 typedef unsigned long bitflag;
 typedef signed char shortint;
 
@@ -255,10 +244,23 @@ typedef signed char shortint;
 //#define HOLIDAY_ENDERI2		4
 //#define HOLIDAY_ENDERI3		5
 
-//#define SPRING	        0
-//#define SUMMER  	        1
-//#define AUTUMN		    2
-//#define WINTER	        3
+#define HOLIDAY_METTARE		1
+#define HOLIDAY_YESTARE		2
+#define HOLIDAY_TUILERE		3
+#define HOLIDAY_LOENDE		4
+#define HOLIDAY_ENDERI		5
+#define HOLIDAY_YAVIERE		6
+
+#define NUM_SEASONS	4
+#define NUM_THAT_TIME_OF_DAY 2
+
+
+#define SPRING	        0
+#define SUMMER  	        1
+#define AUTUMN		    2
+#define WINTER	        3
+
+
 
 // We have two moon seasons: near and far on our axial tilt. Modifies temperature a little.
 #define SEASON_NEAR     0
@@ -340,21 +342,23 @@ typedef signed char shortint;
 
 /* Weather-room descrition constants - see weather_room in constants.c */
 
-#define		WR_DESCRIPTIONS		12	/* Doesn't include WR_NORMAL */
+#define		WR_DESCRIPTIONS		7 // Used to be 12	 Update 21 Sept 13 -Nimrod Doesn't include WR_NORMAL 
 
-#define		WR_FOGGY		0
-#define		WR_CLOUDY		1
-#define		WR_RAINY		2
-#define		WR_STORMY		3
-#define		WR_SNOWY		4
-#define		WR_BLIZARD		5
-#define		WR_NIGHT		6
-#define		WR_NIGHT_FOGGY		7
-#define		WR_NIGHT_RAINY		8
-#define		WR_NIGHT_STORMY		9
-#define		WR_NIGHT_SNOWY		10
-#define		WR_NIGHT_BLIZARD	11
-#define		WR_NORMAL		12
+#define		WR_NORMAL		0
+#define		WR_FOGGY		1
+#define		WR_CLOUDY		2
+#define		WR_RAINY		3
+#define		WR_STORMY		4
+#define		WR_SNOWY		5
+#define		WR_BLIZARD		6
+
+#define		WR_NIGHT		7
+#define		WR_NIGHT_FOGGY		8
+#define		WR_NIGHT_RAINY		9
+#define		WR_NIGHT_STORMY		10
+#define		WR_NIGHT_SNOWY		11
+#define		WR_NIGHT_BLIZARD	12
+
 
 /* For 'type_flag' */
 
@@ -458,6 +462,10 @@ typedef signed char shortint;
 // ITEM_E_BOOK uses 91
 
 #define ITEM_E_BREATHER     92
+#define ITEM_SHORTBOW	93
+#define ITEM_LONGBOW	94
+#define ITEM_CROSSBOW	95
+
 
 /* Bitvector For 'wear_flags' */
 
@@ -621,8 +629,27 @@ typedef signed char shortint;
 #define SOUTHEAST       10
 #define SOUTHWEST       11
 
+#define UPNORTH		12
+#define UPEAST		13
+#define UPSOUTH		14
+#define UPWEST		15
+#define UPNORTHEAST       16
+#define UPNORTHWEST       17
+#define UPSOUTHEAST       18
+#define UPSOUTHWEST       19
 
-#define LAST_DIR	SOUTHWEST
+#define DOWNNORTH		20
+#define DOWNEAST		21
+#define DOWNSOUTH		22
+#define DOWNWEST		23
+#define DOWNNORTHEAST       24
+#define DOWNNORTHWEST       25
+#define DOWNSOUTHEAST       26
+#define DOWNSOUTHWEST       27
+
+
+
+#define LAST_DIR	DOWNSOUTHWEST
 
 /* exit_info */
 
@@ -638,7 +665,7 @@ typedef signed char shortint;
 #define EX_ISGATE       ( 1 << 9 )
 
 /* For 'Sector types' */
-
+/* Old Sector Types from Atonement
 #define SECT_INSIDE	    0
 #define SECT_MOONPLAIN		1
 #define SECT_MOONHILL		2
@@ -676,7 +703,75 @@ typedef signed char shortint;
 #define SECT_RUINKITCHEN	34
 #define SECT_RUINDOMICILE	35
 #define SECT_FREEFALL 		36
-
+ - End of old Sectors
+ 
+ Begin new Sectors for SoI-Laketown -Nimrod */
+ 
+ #define SECT_INSIDE		0
+ #define SECT_BOARDWALK		1
+ #define SECT_CITY			2  // Called SETTLEMENT - Nimrod
+ #define SECT_ROAD			3
+ #define SECT_TRAIL			4
+ #define SECT_FIELDS		5
+ #define SECT_WOODS			6
+ #define SECT_FOREST		7
+ #define SECT_HILLS			8
+ #define SECT_MOUNTAIN		9
+ #define SECT_SWAMP			10
+ #define SECT_DOCK			11	
+ #define SECT_CAVE			12
+ #define SECT_PASTURE		13
+ #define SECT_HEATH			14
+ #define SECT_PIT			15
+ #define SECT_LEANTO		16
+ #define SECT_SHALLOW_LAKE	17
+ #define SECT_LAKE			18
+ #define SECT_DEEP_LAKE		19
+ #define SECT_RIVER			20
+ #define SECT_REEF			21
+ #define SECT_UNDERWATER	22
+ #define SECT_MIRKWOOD		23
+ #define SECT_MIRKWOOD_DEEP	24
+ #define SECT_MIRKWOOD_SPIDER	25
+ #define SECT_MIRKWOOD_ELVEN	26
+ #define SECT_MIRKWOOD_VALLEY	27
+ #define SECT_MIRKWOOD_ORC		28
+ #define SECT_DESOLATION		29
+ #define SECT_DOL_GULDUR		30
+ #define SECT_ELVEN_HALLS		31
+ 
+ // Not needed right now but defining to not disturb code.  -Nimrod
+ #define SECT_OCEAN 	99
+ #define SECT_FREEFALL	98
+ #define SECT_RUINSTREET	97
+ #define SECT_RUINHIGHWAY	96
+ #define SECT_OUTSIDE 95
+ /*
+ #define SECT_RUINSHOP
+ #define SECT_RUINGENERATOR
+ #define SECT_RUINCHEMLAB
+ #define SECT_RUINWORKSHOP
+ #define SECT_RUINKITCHEN
+ #define SECT_RUINDOMICILE
+ #define SECT_RUINUTIL
+ #define SECT_RUINSTREET
+ #define SECT_RUINRELIG
+ #define SECT_RUINOUTSIDE
+ #define SECT_RUINOFFICE
+ #define SECT_RUINLAB
+ #define SECT_RUININSIDE
+ #define SECT_RUINHIGHWAY
+ #define SECT_RUINGYM
+ #define SECT_RUINAPARTMENT
+ #define SECT_MONSAND
+ #define SECT_MOONPLAIN
+ #define SECT_MOONMOUNTAIN
+ #define SECT_MOONLIGHT
+ #define SECT_MOONHILL
+ #define SECT_MOONDARK
+ */
+ 
+ 
 /* ---- For new herb stuff ---- */
 
 /* Herb sectors */
@@ -1259,7 +1354,7 @@ typedef signed char shortint;
 #define SKILL_RIFLE		        12
 #define SKILL_SMG       	    13
 #define SKILL_GUNNERY		    14
-#define SKILL_ARCHERY	    15      // One day this will be awesome.
+#define SKILL_EXPLOSIVES	    15      // One day this will be awesome.
 
 #define LAST_WEAPON_SKILL       14      // The last real weaponskill we have.
 
@@ -1289,15 +1384,100 @@ typedef signed char shortint;
 #define SKILL_HANDICRAFT		36
 #define SKILL_ARTISTRY			37
 
+
 // odds and ends
 #define SKILL_EDUCATION         38
 #define SKILL_VOODOO  	        39
 #define SKILL_COMMON            40
+#define SKILL_METALCRAFT        41
+#define SKILL_LEATHERCRAFT      42
+#define SKILL_TEXTILECRAFT      43
+#define SKILL_WOODCRAFT         44
+#define SKILL_COOKING           45
+#define SKILL_BAKING            46
+#define SKILL_BREWING           47
+#define SKILL_FISHING           48
+#define SKILL_STONECRAFT        49
+#define SKILL_EARTHENCRAFT      50
+#define SKILL_GARDENING         51
+#define SKILL_FARMING           52
+#define SKILL_SHORTBOW          53
+#define SKILL_LONGBOW           54
+#define SKILL_CROSSBOW          55
+#define SKILL_MUSIC             56
+#define SKILL_ASTRONOMY			57
+#define SKILL_ORKISH			58
+#define SKILL_WARGISH			59
+#define SKILL_DALISH			60
+#define SKILL_SINDARIN			61
+#define SKILL_KHUZDUL			62
+#define SKILL_TENGWAR			63
+#define SKILL_CIRITH			64
+#define SKILL_WARCRAFT			65
 
-
-#define LAST_SKILL		SKILL_COMMON
+#define LAST_SKILL		SKILL_WARCRAFT
 
 #define PSIONIC_TALENTS		1
+
+#define WEAPON_PISTOL     0
+#define WEAPON_SMG        1
+#define WEAPON_RIFLE      2
+#define WEAPON_SLING      3
+#define WEAPON_HEAVYGUN   4
+#define WEAPON_BLOWGUN    5
+#define WEAPON_RAYGUN     6
+#define WEAPON_CROSSBOW   7 
+#define WEAPON_SHORTBOW   8
+#define WEAPON_LONGBOW    9
+#define WEAPON_ELVENBOW   10
+#define WEAPON_BALISTA    11
+#define WEAPON_SLINGSHOT  12
+#define WEAPON_CATAPULT   13
+#define WEAPON_TREBUCHET  14
+
+#define AMMO_SIZE_20CAL             0
+#define AMMO_SIZE_25CAL             1
+#define AMMO_SIZE_30CAL             2
+#define AMMO_SIZE_35CAL             3
+#define AMMO_SIZE_40CAL             4
+#define AMMO_SIZE_45CAL             5
+#define AMMO_SIZE_50CAL             6
+#define AMMO_SIZE_55CAL             7
+#define AMMO_SIZE_60CAL             8
+#define AMMO_SIZE_BB                9
+#define AMMO_SIZE_DART              10
+#define AMMO_SIZE_BOLT              11
+#define AMMO_SIZE_SHORT_ARROW       12
+#define AMMO_SIZE_LONG_ARROW        13
+#define AMMO_SIZE_ELVEN_ARROW       14
+#define AMMO_SIZE_BALISTA_BOLT      15
+#define AMMO_SIZE_SLINGSHOT_STONE   16
+#define AMMO_SIZE_CATAPULT_STONE    17
+#define AMMO_SIZE_TREBUCHET_BOULDER 18
+
+#define AMMO_TYPE_JACKETED          0
+#define AMMO_TYPE_HOLLOW_TIPPED     1
+#define AMMO_TYPE_ARMOR_PIERCING    2
+#define AMMO_TYPE_INCENDIARY        3
+#define AMMO_TYPE_TRACER            4
+#define AMMO_TYPE_BLUNTED           5
+#define AMMO_TYPE_SHARPENED         6
+#define AMMO_TYPE_BONE              7
+#define AMMO_TYPE_FLINT             8
+#define AMMO_TYPE_METAL_TIPPED      9
+#define AMMO_TYPE_BROADHEAD         10
+#define AMMO_TYPE_BODKIN            11
+#define AMMO_TYPE_FLAMING           12
+
+
+#define NEWBIE_CALORIES             5000  /* Give newbies a break before coded hunger to get situated */
+#define MAX_CALORIES                2000
+#define AVG_WEIGHT		    150
+#define MIN_CALORIES		    -10000
+#define MIN_THIRST		    0
+#define MAX_THIRST		    300
+#define HOURLY_CALORIES		    30
+#define HOURLY_THIRST		    6
 
 /* How much light is in the land ? */
 
@@ -1423,9 +1603,7 @@ typedef signed char shortint;
 #define DEL_TURFACTION      95
 #define DEL_ORDER_PLACE     96
 #define DEL_ORDER_FULFILL   97
-#define DEL_HOME_CAMP1		98
-#define DEL_HOME_CAMP2		99
-#define DEL_HOME_CAMP3		100
+
 
 /* Zone flags */
 
@@ -1573,13 +1751,13 @@ struct writing_data
 
 struct written_descr_data	/* for descriptions written in languages */
 {
-    rpi_byte language;
+    byte language;
     char *description;
 };
 
 struct obj_flag_data
 {
-    rpi_byte type_flag;
+    byte type_flag;
     bitflag wear_flags;
     int extra_flags;
     int extra_flags2;
@@ -2179,6 +2357,8 @@ struct shop_data
 };
 
 // MATERIALS
+/*
+Original - 30 Aug 13 - Nimrod
 #define MAT_NONE	0
 #define MAT_ORGANIC	1
 #define MAT_TEXTILE	2
@@ -2190,11 +2370,44 @@ struct shop_data
 #define MAT_PAPER	8
 #define MAT_LIQUID	9
 #define MAT_OTHER	10
+*/
+// New Materials added 30 Aug 13 -Nimrod
+#define MAT_NONE	0
+#define MAT_BONE	1
+#define MAT_CERAMIC	2
+#define MAT_GLASS	3
+#define MAT_LEATHER	4
+#define MAT_LIQUID	5
+#define MAT_METAL	6
+#define MAT_MINERAL	7
+#define MAT_ORGANIC	8
+#define MAT_PAPER	9
+#define MAT_STONE	10
+#define MAT_TEXTILE	11
+#define MAT_WOOD	12
+#define MAT_GEMSTONE 13
+#define MAT_PRECIOUSMETAL 14
+#define MAT_BRICK 15
+#define MAT_OTHER	16
+#define MAT_PLASTIC	17
+#define MAT_ELECTRONIC	18
+
+
+
+
+
+
+
+
+
+
+
+
 
 struct room_extra_data
 {
     char *alas[6];
-    char *weather_desc[WR_DESCRIPTIONS];
+    char *weather_desc[WR_DESCRIPTIONS * NUM_SEASONS * NUM_THAT_TIME_OF_DAY + 1];
 };
 
 #define PC_TRACK	( 1 << 0 )
@@ -2236,7 +2449,8 @@ struct time_info_data
     int minute;
     int holiday;
     int phaseEarth;         // What phase is the earth in?
-    int phaseSun;           // What phase is the sun in?
+    int phaseSun; 	// What phase is the sun in?
+	int dayofweek;
 };
 
 struct time_data
@@ -3334,6 +3548,7 @@ struct char_data
     int hire_storeroom;
     int hire_storeobj;
     char *dmote_str;
+	char *status_str;
     int cover_from_dir;
     int morph_type;
     int clock;
@@ -3352,6 +3567,7 @@ struct char_data
     int combat_counter[MAX_SKILLS];
     int compete_dam;
     int effort;
+  int dameffort;
     int combat_block;
 
     // Japh's mem fixing stuff
@@ -3373,6 +3589,14 @@ struct char_data
     char *d_feat2;
     char *d_feat3;
     char *d_feat4;
+
+  // Grommit duplicate NPC only fields for natural attack damage to allow races to be customized for PC attack dmg too
+  int damnodice;
+  int damsizedice;
+  int damroll;
+
+  char *mob_color_name[10];
+    char *mob_color_cat[10];
 
     DESCRIPTOR_DATA *descriptor;
     DESCRIPTOR_DATA * descr ();
@@ -3480,6 +3704,12 @@ struct race_data
     int nomad;
     int alert;
     int movement;
+  int nat_attack_type;
+  int damnodice;
+  int damsizedice;
+  int damroll;
+  int natural_delay;
+
 
     RACE_TABLE_ENTRY *next;
 };
@@ -3555,8 +3785,13 @@ struct race_data
 #define RACE_NOMAD			34
 #define RACE_ALERT			35
 #define RACE_MOVEMENT		36
+#define RACE_NAT_ATTACK_TYPE    37
+#define RACE_DAMNODICE          38
+#define RACE_DAMSIZEDICE        39
+#define RACE_DAMROLL            40
+#define RACE_NATURAL_DELAY      41
 
-#define LAST_RACE			36
+#define LAST_RACE			41
 
 #define RACE_TRACKS_SMALL    1	 // Only leave tracks if bleeding
 #define RACE_TRACKS_NEVER    2	 // Never, ever leave tracks.
@@ -3856,6 +4091,9 @@ struct encumberance_info
 #define MORALE_HELD		( 1 << 3 )
 #define FLAG_PETRIFIED		( 1 << 4 )
 #define NEW_PLAYER_TAG		( 1 << 5 )	/* Displays (new player) in their ldescs */
+
+#define NEW_PLAYER_TAG_DURATION_HOURS   36      /* Amount of hours player on a character after which the game auto-strips your newbie flag */
+
 #define MENTOR			( 1 << 6 )	/* PC Mentor flag */
 #define NOPETITION		( 1 << 7 )	/* No Petition */
 #define PRIVATE			( 1 << 8 )	/* Non-Guide-reviewable app */
@@ -3874,7 +4112,9 @@ struct encumberance_info
 #define AUTOSCAN                ( 1 << 21 )     // Player will attempt to scan direction he is watching upon entering room.
 #define BRIEF_MODE              ( 1 << 22 )     // Players sees a lot less output, mostly for vision-impairment.
 #define FIREFIGHT_FILTER        ( 1 << 23 )     // Players sees a lot less firearm-related spam.
-#define AUTO_COVER				( 1 << 24 )     // Players toss themselves in to cover automatially
+#define AUTO_COVER		( 1 << 24 )     // Players toss themselves in to cover automatially
+#define DEBUG_PROMPT            ( 1 << 25 )     // Displays additional debug information on the prompt
+
 
 /* char_data.guardian_flags - controls notification of PC initiated attacks */
 #define GUARDIAN_PC		( 1 << 0 )	/* 01 */
@@ -3931,17 +4171,22 @@ struct encumberance_info
 #define TRIG_PRISONER	11
 #define TRIG_KNOCK		12
 
-#define GAME_BASE_YEAR		83   // Translates to BETA start of 147 years since founding of NP
+#define GAME_BASE_YEAR		2869   // Battle of 5 armies was 2941  189
 #define GAME_SECONDS_BEGINNING  100	/* Subtr 10800 to ++gametime 12hr */
-#define GAME_SECONDS_PER_YEAR	31104000
-#define GAME_SECONDS_PER_MONTH	2592000
-#define GAME_SECONDS_PER_DAY	86400
-#define GAME_SECONDS_PER_HOUR	3600
+#define GAME_SECONDS_PER_YEAR	31104000 // real life seconds in a year
+#define GAME_SECONDS_PER_MONTH	2592000 // real life seconds in a month
+#define GAME_SECONDS_PER_DAY	86400 //real life seconds in a day
+#define GAME_SECONDS_PER_HOUR	3600 // real life seconds in an hour
 
 #define MOON_SECONDS_PER_HOUR	3600
-#define MOON_SECONDS_PER_DAY	302400   // 84 hours per phase
-#define MOON_SECONDS_PER_MONTH	2419200  // 8 phases per Lunar day
-#define MOON_SECONDS_PER_YEAR	31449600 // 13 Days per Year
+#define MOON_SECONDS_PER_DAY	86400   // 84 hours per phase
+#define MOON_SECONDS_PER_MONTH	2592000  // 8 phases per Lunar day
+#define MOON_SECONDS_PER_YEAR	31104000 // 12 
+
+#define MOON_CYCLE 2881443 // 29 days, 12 hours, 44 minutes and 3 seconds)
+#define MOON_ORBIT 2388720 // 27.3days
+
+#define ACTIVITY_TIMER_MAX 86400
 
 
 #define MODE_COMMAND		(1 << 0)
@@ -4560,7 +4805,8 @@ struct craft_variable_data
     int from;                     // Which item will this go to?
     int to;                     // Which item will this go to?
     char *category;               // Which category to take
-    int pos;                      // Where to put it.
+    int pos; 	// Where to put it.
+	char *manual;  // Used when manually setting a variable in a craft. -Added 0213141746 -Nimrod
 };
 
 struct craft_oval_data
@@ -4645,12 +4891,12 @@ struct econ_data
     } obj_econ_info[ECON_ZONES];
 };
 
-#define QUALITY_TRASH		1 << 21
-#define QUALITY_POOR		1 << 7
-#define QUALITY_ORDINARY	1 << 17
-#define QUALITY_GOOD		1 << 18
-#define QUALITY_SUPERB		1 << 19
-#define QUALITY_EPIC		1 << 20
+#define QUALITY_TRASH		1 << 0
+#define QUALITY_POOR		1 << 1
+#define QUALITY_ORDINARY	1 << 2
+#define QUALITY_GOOD		1 << 3
+#define QUALITY_SUPERB		1 << 4
+#define QUALITY_EPIC		1 << 5
 
 
 #define AGE_BABY        0

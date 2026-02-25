@@ -300,7 +300,7 @@ mob_wander (CHAR_DATA * ch)
     ROOM_DATA *room;
     int room_exit_zone;
     int room_exit_virt;
-    int exit_tab[6];
+    int exit_tab[LAST_DIR + 1];
     int zone;
     int num_exits = 0;
     int to_exit;
@@ -420,7 +420,7 @@ mob_wander (CHAR_DATA * ch)
     ch->last_room = room_exit_virt;
 
     i = exit_tab[to_exit];
-    if (IS_SET (ch->room->dir_option[i]->exit_info, EX_CLOSED))
+    if (IS_SET (ch->room->dir_option[i]->exit_info, EX_CLOSED) && IS_SET(lookup_race_int(ch->race, RACE_DOOR_BITS), RACE_DOOR_OPEN))
     {
         one_argument (ch->room->dir_option[i]->keyword, buf2);
         sprintf (buf, "%s %s", buf2, dirs[i]);
@@ -989,6 +989,7 @@ shooter_routine (CHAR_DATA * ch)
     char buf[AVG_STRING_LENGTH] = {'\0'};
     int count = 0;
     int error_msg = 0;
+	int scan_dir = 0;
 
     // If we've got a firearm and it's ready to go, let's just check if we can't pocket
     // any other clips or rounds we're holding.
@@ -1028,7 +1029,20 @@ shooter_routine (CHAR_DATA * ch)
 		// Now we'll just do a scan to see if anyone we want to shoot is nearby.
 		if (ch->aiming_at)
 			return 0;
-
+        // for loop replacing manual scan commands 0317142159 -Nimrod
+        for (scan_dir = 0; scan_dir <= LAST_DIR; scan_dir++)
+        {
+          if (!ch->aiming_at)
+		  {
+		    sprintf(buf, "%s", dirs[scan_dir]);
+			do_scan(ch, buf, 0);
+		  }
+		  if (ch->aiming_at)
+			break;
+        }
+		if (ch->aiming_at)
+		  return 1;
+/*		  
 		if (!ch->aiming_at)
 			do_scan(ch, "north", 0);
 		if (ch->aiming_at)
@@ -1058,7 +1072,7 @@ shooter_routine (CHAR_DATA * ch)
 			do_scan(ch, "down", 0);
 		if (ch->aiming_at)
 			return 1;
-
+*/
 		if (!ch->aiming_at)
 		{
 			CHAR_DATA *tch = NULL;
@@ -1152,6 +1166,14 @@ shooter_routine (CHAR_DATA * ch)
 
         if (is_direct)
         {
+		  if (!(firearm->location == WEAR_BOTH || firearm->location == WEAR_PRIM || firearm->location == WEAR_SEC))
+           {
+            //  send_to_gods ("NPC is not wielding the weapon, trying to force wield.");
+			 do_wield(ch, fname(firearm->name), 0);
+             return 1;
+           }
+		
+		
             // If we've got the right type of round in our right hand, then load from that.
             // Otherwise, pocket or drop it.
             if ((obj = ch->right_hand) && GET_ITEM_TYPE(obj) == ITEM_ROUND)
@@ -1212,6 +1234,8 @@ shooter_routine (CHAR_DATA * ch)
                 ch->delay += 2;
                 return 0;
             }
+			// send_to_gods("NPC Trying to wield a weapon.");
+			// do_wield(ch, fname(firearm->name), 0);
         }
         else
         {
@@ -2003,18 +2027,23 @@ remove_attacker (CHAR_DATA * victim, CHAR_DATA * threat)
 {
     ATTACKER_DATA *tmp, *targ_att = NULL;
 
+    // send_to_gods("Starting remove_attacker");
     if (victim->attackers && victim->attackers->attacker == threat)
     {
+        
         targ_att = victim->attackers;
         victim->attackers = victim->attackers->next;
     }
     else if (victim->attackers)
     {
+        
         for (tmp = victim->attackers; tmp; tmp = tmp->next)
         {
+            
             if (tmp->next && tmp->next->attacker
                     && tmp->next->attacker == threat)
             {
+                send_to_gods("remove_attacker checkpoint 4 - Let Nimrod know if you see this.");
                 targ_att = tmp->next;
                 tmp->next = tmp->next->next;
             }
@@ -3053,6 +3082,25 @@ is_threat (CHAR_DATA * ch, CHAR_DATA * tch)
     return 0;
 }
 
+// Checks whether two mobs are both flagged wildlife. 
+// 0 if neither is wildlife
+// 1 if ch is wildlife
+// 2 if target is wildlife
+// 3 if both are wildlife
+int
+wildlife_check (CHAR_DATA * ch, CHAR_DATA * target) 
+{
+	int result = 0;
+	
+	if (IS_SET (ch->act, ACT_WILDLIFE)) 
+		result += 1;
+	
+	if (IS_SET (target->act, ACT_WILDLIFE))
+		result += 2;
+	
+	return result;
+}
+
 int
 would_attack (CHAR_DATA * ch, CHAR_DATA * tch)
 {
@@ -3201,15 +3249,15 @@ npc_ranged_retaliation (CHAR_DATA * target, CHAR_DATA * ch)
 			add_overwatch(target, ch, 2, false);
 
 			// Then, we check to make sure we're taking cover from that direction - if we're not, we get in to cover.
-			const char *direct[] =
-			{ "north", "east", "south", "west", "up", "down", "area", "\n" };
+		//	const char *direct[] =
+		//	{ "north", "east", "south", "west", "up", "down", "area", "\n" };
 			bool in_cover = false;
 			AFFECTED_TYPE *af = NULL;
 			char buf[AVG_STRING_LENGTH] = {'\0'};
 
 			int dir = 0;
 			if (target->in_room == ch->in_room)
-				dir = 6;
+				dir = -1;  // Used for taking cover from the area.
 			else
 				dir = track (target, ch->in_room);
 
@@ -3217,7 +3265,7 @@ npc_ranged_retaliation (CHAR_DATA * target, CHAR_DATA * ch)
 			{
 				if (af->type == AFFECT_COVER)
 				{
-					if (af->a.cover.direction == dir || dir == 6)
+					if (af->a.cover.direction == dir || dir == -1)
 					{
 						in_cover = true;
 					}
@@ -3228,7 +3276,7 @@ npc_ranged_retaliation (CHAR_DATA * target, CHAR_DATA * ch)
 			{
 				if (target->delay_type != DEL_COVER)
 				{
-					sprintf(buf, "cover %s", direct[dir]);
+					sprintf(buf, "cover %s", (dir >= 0 ? dirs[dir] : "area")); // direct[dir]); // Updated 0317141337 -Nimrod
 					command_interpreter(target, buf);
 				}
 			}

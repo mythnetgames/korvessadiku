@@ -917,7 +917,7 @@ void reval( CHAR_DATA * ch, char * arg, room_prog_var *& variable_list ) {
 				pass = ( iTest > ( time_info.season + 1 ));
 				break;
 			case '!':
-				pass = ( iTest != ( time_info.hour + 1 ));
+				pass = ( iTest != ( time_info.season + 1 ));
 				break;
 		}
 		if ( !pass ) {
@@ -1072,6 +1072,18 @@ void reval( CHAR_DATA * ch, char * arg, room_prog_var *& variable_list ) {
 
 	else if ( !strncmp( sarg, "door", 4 ) ) {
 		int direction;
+		
+	//	Start lookup_dir replacement for switch below.
+		if((dir = lookup_dir(rbuf)) < 0)
+	{
+		ifin[ nNest ] = 1;
+		return;
+    }
+	
+	//  Replacing with lookup_dir - Nimrod 7 Sept 13 
+		
+		
+		/*
 		switch ( rbuf[ 0 ] ) {
 			case 'n':
 				direction = 0;
@@ -1095,6 +1107,8 @@ void reval( CHAR_DATA * ch, char * arg, room_prog_var *& variable_list ) {
 				ifin[ nNest ] = 1;
 				return;
 		}
+		
+		*/
 
 		if ( !EXIT(ch, direction)
 		)
@@ -1748,6 +1762,19 @@ void reval( CHAR_DATA * ch, char * arg, room_prog_var *& variable_list ) {
 			virt = ch->room->vnum;
 		else
 			virt = atol( rbuf );
+			
+			//	Start lookup_dir replacement for switch below.
+			if((dir = lookup_dir(dbuf)) < 0)
+			{
+				system_log( "Unknown direction in reval::link", true );
+				ifin[ nNest ] = 1;
+				return;
+			}
+			//  Replacing with lookup_dir - Nimrod 7 Sept 13
+			
+			
+			
+		/*	
 		switch ( *dbuf ) {
 			case 'n':
 				dir = 0;
@@ -1772,7 +1799,7 @@ void reval( CHAR_DATA * ch, char * arg, room_prog_var *& variable_list ) {
 				ifin[ nNest ] = 1;
 				return;
 		}
-
+		*/
 		if ( !( troom = vnum_to_room( virt )) ) {
 			system_log( "ERROR: tar room not found in reval::link", true );
 			ifin[ nNest ] = 1;
@@ -3581,7 +3608,13 @@ void r_link( CHAR_DATA * ch, char *argument ) {
 		system_log( "ERROR: Missing args in r_link", true );
 		return;
 	}
-
+	
+	//	Start lookup_dir replacement for switch below.
+	dir = lookup_dir(buf2);
+	//  Replacing with lookup_dir - Nimrod 7 Sept 13
+	
+	
+	/*
 	switch ( *buf2 ) {
 		case 'n':
 			dir = 0;
@@ -3605,7 +3638,7 @@ void r_link( CHAR_DATA * ch, char *argument ) {
 			dir = -1;
 			break;
 	}
-
+	*/
 	if ( dir == -1 ) {
 		system_log( "ERROR: Invalid direction in r_link", true );
 		return;
@@ -3662,7 +3695,11 @@ void r_exit( CHAR_DATA * ch, char *argument ) {
 		system_log( "ERROR: Missing args in r_link", true );
 		return;
 	}
-
+	
+	//	Start lookup_dir replacement for switch below.
+	dir = lookup_dir(buf2);
+	//  Replacing with lookup_dir - Nimrod 7 Sept 13
+	/*
 	switch ( *buf2 ) {
 		case 'n':
 			dir = 0;
@@ -3686,7 +3723,7 @@ void r_exit( CHAR_DATA * ch, char *argument ) {
 			dir = -1;
 			break;
 	}
-
+	*/
 	if ( dir == -1 ) {
 		system_log( "ERROR: Invalid direction in r_link", true );
 		return;
@@ -4021,7 +4058,12 @@ void r_unlink( CHAR_DATA * ch, char *argument ) {
 		location = ch->room->vnum;
 	else
 		location = atoi( arg2 );
-
+		
+		//	Start lookup_dir replacement for switch below.
+		dir = lookup_dir(arg1);
+			
+			//  Replacing with lookup_dir - Nimrod 7 Sept 13
+	/*
 	switch ( *arg1 ) {
 		case 'n':
 			dir = 0;
@@ -4045,7 +4087,7 @@ void r_unlink( CHAR_DATA * ch, char *argument ) {
 			dir = -1;
 			break;
 	}
-
+	*/
 	if ( dir == -1 ) {
 		system_log( "ERROR: Invalid direction in r_unlink", true );
 		return;
@@ -4080,7 +4122,11 @@ void r_unexit( CHAR_DATA * ch, char *argument ) {
 		location = ch->room->vnum;
 	else
 		location = atoi( arg2 );
-
+		
+		//	Start lookup_dir replacement for switch below.
+		dir = lookup_dir(arg1);
+		//  Replacing with lookup_dir - Nimrod 7 Sept 13
+	/*
 	switch ( *arg1 ) {
 		case 'n':
 			dir = 0;
@@ -4104,7 +4150,7 @@ void r_unexit( CHAR_DATA * ch, char *argument ) {
 			dir = -1;
 			break;
 	}
-
+	*/
 	if ( dir == -1 ) {
 		system_log( "ERROR: Invalid direction in r_unexit", true );
 		return;
@@ -4354,7 +4400,12 @@ void r_lock( CHAR_DATA * ch, char *argument ) {
 	half_chop( argument, arg1, arg2 );
 
 	virt = atol( arg2 );
-
+	
+	//	Start lookup_dir replacement for switch below.
+	dir = lookup_dir(arg1);
+	//  Replacing with lookup_dir - Nimrod 7 Sept 13
+	
+	/*
 	switch ( *arg1 ) {
 		case 'n':
 			dir = 0;
@@ -4378,7 +4429,7 @@ void r_lock( CHAR_DATA * ch, char *argument ) {
 			dir = -1;
 			break;
 	}
-
+	*/
 	if ( dir == -1 ) {
 		system_log( "ERROR: Invalid direction in r_unexit", true );
 		return;
@@ -4968,7 +5019,7 @@ void r_pain( CHAR_DATA * ch, char *argument ) {
 	}
 	low = atoi( arg2 );
 	high = atoi( arg3 );
-	if ( ( type = index_lookup( damage_type, arg5 ) ) < 0 ) {
+	if ( ( type = index_lookup( damage_type, arg5 ) ) < 0 ) {  // This should probably use fight_damage as listed on line 30 in objects.cpp
 		type = 3;
 	}
 
@@ -5196,6 +5247,9 @@ void r_purge( CHAR_DATA * ch, char *argument ) {
 		for ( object = ptrRoom->contents; object; object = next_object ) {
 			next_object = object->next_content;
 			if ( GET_ITEM_TYPE (object) == ITEM_DWELLING && object->o.od.value[ 0 ] >= 100000 ) {
+				continue;
+			}
+			else if ( IS_SET (object->obj_flags.extra_flags, ITEM_NOPURGE) ) {
 				continue;
 			}
 			extract_obj( object );
@@ -5455,27 +5509,21 @@ void r_givecash( CHAR_DATA *ch, char *argument ) {
 		return;
 	}
 	if ( TargetVnum == -1 ) {
-		if ( Count / 240 ) { // Mithril/gold hundredpiece.
+		if ( Count / 100 ) { // Mithril/gold hundredpiece.
 			//if (currency_type == CURRENCY_ORKISH)
-			tobj = load_object( 50093 );
-			tobj->count = Count / 240;
+			tobj = load_object( 14016 );
+			tobj->count = Count / 100;
 			obj_to_char( tobj, ch );
-			Count %= 240;
+			Count %= 100;
 		}
-		if ( Count / 25 ) { // Silver royal.
-			tobj = load_object( 50092 );
+		if ( Count / 10 ) { // Silver royal.
+			tobj = load_object( 14013 );
 			obj_to_char( tobj, ch );
-			tobj->count = Count / 25;
-			Count %= 25;
-		}
-		if ( Count / 5 ) { // Bronze copper.
-			tobj = load_object( 50091 );
-			obj_to_char( tobj, ch );
-			tobj->count = Count / 5;
-			Count %= 5;
+			tobj->count = Count / 10;
+			Count %= 10;
 		}
 		if ( Count ) { // Copper bit.
-			tobj = load_object( 50090 );
+			tobj = load_object( 14011 );
 			obj_to_char( tobj, ch );
 			tobj->count = Count;
 		}
@@ -5561,16 +5609,40 @@ void r_door( CHAR_DATA *ch, char *argument ) {
 		room = atoi( ThisArgument.c_str() );
 
 	ArgumentList = one_argument( ArgumentList, ThisArgument );
+	
+	
+	
+	//  Added nested switch to account for ordinals - Nimrod 8 Sept 13
 	switch ( ThisArgument[ 0 ] ) {
 		case 'n':
-			direction = 0;
-			break;
+			switch ( ThisArgument[ 1 ] ) {
+				case 'e':
+					direction = 8;
+					break;
+				case 'w':
+					direction = 9;
+					break;
+				default:
+					direction = 0;
+				break;
+			}
+		break;
 		case 'e':
 			direction = 1;
 			break;
 		case 's':
-			direction = 2;
-			break;
+			switch ( ThisArgument[ 1 ] ) {
+				case 'e':
+					direction = 10;
+					break;
+				case 'w':
+					direction = 11;
+					break;
+				default:
+					direction = 2;
+					break;
+			}
+		break;
 		case 'w':
 			direction = 3;
 			break;
@@ -5583,7 +5655,7 @@ void r_door( CHAR_DATA *ch, char *argument ) {
 		default:
 			return;
 	}
-
+	
 	if ( !vnum_to_room( room ) || !vnum_to_room( room )->dir_option[ direction ] )
 		return;
 
@@ -5868,7 +5940,37 @@ void r_mftog( CHAR_DATA *ch, std::string argument ) {
 }
 
 char * room__get_description( ROOM_DATA * room );
-char *exits[] = { "north", "east", "south", "west", "up", "down", "outside", "inside" };
+    char *exits[] =
+    {
+        "North",
+        "East ",
+        "South",
+        "West ",
+        "Up   ",
+        "Down ",
+        "Outside",
+        "Inside",
+		"Northeast",
+		"Northwest",
+		"Southeast",
+		"Southwest",
+		"UpNorth",
+		"UpEast",
+		"UpSouth",
+		"UpWest",
+		"UpNortheast",
+		"UpNorthwest",
+		"UpSoutheast",
+		"UpSouthwest",
+		"DownNorth",
+		"DownEast",
+		"DownSouth",
+		"DownWest",
+		"DownNortheast",
+		"DownNorthwest",
+		"DownSoutheast",
+		"DownSouthwest"
+    };
 
 bool prog_object_properties( OBJ_DATA *obj, std::string argument, std::string& output ) {
 	std::string buf;
@@ -6305,7 +6407,15 @@ void r_info( CHAR_DATA *ch, std::string argument, room_prog_var *& variable_list
 		char arg[ MAX_STRING_LENGTH ] = { '\0' };
 
 		one_argument( obj->name, arg );
-		value = retrieve_mysql_board_message( arg, i );
+		char * result = retrieve_mysql_board_message( arg, i );
+		if (result == NULL)
+			{
+			value = "";
+			}
+		else
+			{ 
+			value = result;
+			} 
 	}
 
 	else if ( buf.find( "list" ) != std::string::npos ) {
@@ -7423,14 +7533,17 @@ void r_math( CHAR_DATA *ch, char *arg, room_prog_var *& variable_list ) {
 	argument = one_argument( argument, variable_name );
 	argument = one_argument( argument, operation );
 	argument = one_argument( argument, buffer );
+ 
 
-	if ( variable_name.empty() || operation.empty() )
+ if ( variable_name.empty() || operation.empty() )
 		return;
 
+		
 	if ( is_variable_in_list( variable_list, variable_name ) ) {
 		std::string variable = get_variable_data( variable_list, variable_name );
-		if ( variable.empty() || !is_number( variable.c_str() ) )
+		 if ( variable.empty()){ // || !is_number( variable.c_str() ) )
 			return;
+			}
 
 		double new_value = 0;
 		if ( !operation.compare( "invert" ) ) {
@@ -7439,6 +7552,18 @@ void r_math( CHAR_DATA *ch, char *arg, room_prog_var *& variable_list ) {
 			new_value = ( double ) abs( atoi( variable.c_str() ) );
 		} else if ( !operation.compare( "int" ) ) {
 			new_value = ( double ) ( atoi( variable.c_str() ));
+		} else if ( !operation.compare( "hournum" ) ) {
+		    new_value = ( double ) (  time_info.hour );
+		} else if ( !operation.compare( "daynum" ) ) {
+		    new_value = ( double ) (  time_info.day + 1 );
+		} else if ( !operation.compare( "monthnum" ) ) {
+		    new_value = ( double ) (  time_info.month + 1 );
+		} else if ( !operation.compare( "yearnum" ) ) {
+		    new_value = ( double ) (  time_info.year );
+		} else if ( !operation.compare( "seasonnum" ) ) {
+		    new_value = ( double ) (  time_info.season + 1 );
+		} else if ( !operation.compare( "timestamp" ) ) {
+		    new_value = ( double ) (((time_info.year - 2900) * 8640)+((time_info.month + 1) * 720) + ((time_info.day +1) * 24) + time_info.hour );
 		} else if ( !operation.compare( "round" ) ) {
 			if ( buffer.empty() || !is_number( buffer.c_str() ) ) {
 				new_value = ( double ) ( floor( atof( variable.c_str() ) + 0.5 ));
@@ -7447,9 +7572,9 @@ void r_math( CHAR_DATA *ch, char *arg, room_prog_var *& variable_list ) {
 			}
 		} else {
 
-			if ( buffer.empty() || !is_number( buffer.c_str() ) )
+			 if ( buffer.empty()) { //			 || !is_number( buffer.c_str() ) )
 				return;
-
+				}
 			if ( !operation.compare( "add" ) ) {
 				new_value = atof( variable.c_str() ) + atof( buffer.c_str() );
 			} else if ( !operation.compare( "sub" ) ) {

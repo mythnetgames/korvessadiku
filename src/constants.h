@@ -31,18 +31,18 @@
 
 #define ENCRYPT_PASS		"w01fm3a7"
 
-#define STAFF_EMAIL		"staff@parallelrpi.com"
+#define STAFF_EMAIL		"staff@laketownrpi.us"
 
-#define APP_EMAIL		"staff@parallelrpi.com"
-#define CODE_EMAIL		"staff@parallelrpi.com"
-#define PET_EMAIL		"staff@parallelrpi.com"
-#define REPORT_EMAIL		"staff@parallelrpi.com"
+#define APP_EMAIL		"staff@laketownrpi.us"
+#define CODE_EMAIL		"staff@laketownrpi.us"
+#define PET_EMAIL		"staff@laketownrpi.us"
+#define REPORT_EMAIL		"staff@laketownrpi.us"
 
 #define IMPLEMENTOR_ACCOUNT	"Holmes"
-#define SERVER_LOCATION		"http://parallelrpi.com"
+#define SERVER_LOCATION		"http://laketownrpi.us"
 
-#define MUD_NAME		"Parallel RPI"
-#define MUD_EMAIL		"staff@parallelrpi.com"
+#define MUD_NAME		"SoI-Laketown RPI"
+#define MUD_EMAIL		"staff@laketownrpi.us"
 
 /* Be sure to define without trailing slashes! */
 
@@ -58,23 +58,22 @@
 /* Misc defines */
 
 #define OOC_LOUNGE			121
-#define MUSEUM_FOYER		120
+#define MUSEUM_FOYER			120
 #define AMPITHEATRE			70
 
 #define JUNKYARD			75
-#define LINKDEATH_HOLDING_ROOM		122
+#define LINKDEATH_HOLDING_ROOM		123
 
-#define PREGAME_ROOM				200
-#define PREGAME_ROOM_PROTOTYPE		315
+#define PREGAME_ROOM				124
+#define PREGAME_ROOM_PROTOTYPE		125
 #define PREGAME_ROOM_NAME		"The Pre-Commencement Room"
 
 #define OOC_TERMINAL_OBJECT		9
 
-#define MINAS_TIRITH_START_LOC		200
-#define MINAS_MORGUL_START_LOC		6120
-#define OSGILIATH_START_LOC		371
-#define EDEN_START_LOC			6120
-#define BOOZER				75002
+#define MINAS_TIRITH_START_LOC		126
+#define MINAS_MORGUL_START_LOC		127
+#define OSGILIATH_START_LOC		128
+#define EDEN_START_LOC			129
 
 #define LEANTO_OBJ_VNUM			95
 #define POWER_GRID_FLUX			25
@@ -118,7 +117,11 @@
 
 #define AVG_STRING_LENGTH	256	/* more useful string len */
 #define ERR_STRING_LENGTH   512
+
+
+#ifndef MAX_NAME_LENGTH                 /* Conflicts with definition in server.h */
 #define MAX_NAME_LENGTH		15	/* player character name */
+#endif
 
 #define MAX_INPUT_LENGTH     8000
 #define MAX_MESSAGES          60

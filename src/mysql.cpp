@@ -11,8 +11,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <vector>  
-#include <iterator>
 #include <stdlib.h>
 #include <unistd.h>
 #include <ctype.h>
@@ -20,8 +18,8 @@
 #include <mysql/mysql.h>
 #include <dirent.h>
 #include <signal.h>
-
-
+#include <vector>
+#include <sstream>
 
 #include "server.h"
 
@@ -32,7 +30,6 @@
 #include "utils.h"
 #include "utility.h"
 #include "decl.h"
-
 
 extern RACE_TABLE_ENTRY *entry;
 
@@ -115,28 +112,28 @@ int
 	va_list argp;
 	int i = 0;
 	double j = 0;
-	char *s = 0, *out = 0, *p = 0;
+	char *s = 0, *out = 0, *p = 0; // Setting s, out and p to null
 	char safe[MAX_STRING_LENGTH];
 	char query[MAX_STRING_LENGTH];
 
-	*query = '\0';
+	*query = '\0'; // Strange that we use two ways to set null in the same function.
 	*safe = '\0';
 
-	va_start (argp, fmt);
+	va_start (argp, fmt);  // Initialize variable argument list
 
-	for (p = fmt, out = query; *p != '\0'; p++)
+	for (p = fmt, out = query; *p != '\0'; p++) // It seems we are performing a sprintf call manually here.  Why?
 	{
-		if (*p != '%')
+		if (*p != '%') // If character p is not '%', then concatenate to out and loop back to for loop. 
 		{
 			*out++ = *p;
 			continue;
 		}
 
-		switch (*++p)
+		switch (*++p)  // if p is '%' then increment p and start switch
 		{
 		case 'c':
 			i = va_arg (argp, int);
-			out += sprintf (out, "%c", i);;
+			out += sprintf (out, "%c", i);; // So we're actually calling sprintf in a manual function to replace sprintf.
 			break;
 		case 's':
 			s = va_arg (argp, char *);
@@ -169,11 +166,30 @@ int
 	int result = mysql_real_query (database, query, strlen (query));
 	  if (mysql_errno(database))
 	    {
-	      fprintf (stderr, "The library call 'mysql_real_query' failed to run "
+		/* Nimrod commenting out until we get linked to the forums with the game. 11 Sept 13
+		      fprintf (stderr, "The library call 'mysql_real_query' failed to run "
 		       "the query '%s' for the following reason: %s\n",
 		       query, mysql_error (database));
+		*/
 	    }
 	return (result);
+}
+
+void test_db_init(void)  // Delete test call from load_obj_variables() ff
+{
+	int j = 0;
+	int i = 1;
+	MYSQL_RES *result;
+	MYSQL_ROW row;
+	char *category = '\0';
+// This doesn't seem like the absolute best method right now.
+// Need to find out how to look up to see if the table exists without sending a create command.
+
+// This is much better: mysql_list_tables() uses a regular expresion.
+// You must free the result set with mysql_free_result().
+// MYSQL_RES *mysql_list_tables(MYSQL *mysql, const char *wild)
+
+ mysql_safe_query ("CREATE TABLE IF NOT EXISTS rpi_engine.testjunkthis (PersonID int, LastName varchar(255), FirstName varchar(255), Address varchar(255), City varchar(255))");
 }
 
 void load_foraged_goods (void)
@@ -743,6 +759,7 @@ void save_craft_progs (void)
 {
 	//if (!engine.in_build_mode())
 	//   return;
+	mysql_safe_query ("DELETE FROM craft_progs_backup");
 	mysql_safe_query ("INSERT INTO craft_progs_backup SELECT * FROM craft_progs");
 	mysql_safe_query ("DELETE FROM craft_progs");
 	for (std::multimap<std::string, room_prog>::iterator it = craft_prog_list.begin(); it != craft_prog_list.end(); it++)
@@ -751,7 +768,6 @@ void save_craft_progs (void)
 	}
 }
 
-/* This is useless right now.
 
 void update_family_clanning (DESCRIPTOR_DATA * d)
 {
@@ -857,7 +873,8 @@ void update_family_clanning (DESCRIPTOR_DATA * d)
 	}
 
 }
-*/
+
+
 
 // Loads the master race table containing all race defines at boot
 
@@ -880,11 +897,11 @@ void
 
 		CREATE (entry, RACE_TABLE_ENTRY, 1);
 		entry->id = atoi (row[RACE_ID]);
-		entry->name = str_dup (row[RACE_NAME]);
+		entry->name = str_dup(row[RACE_NAME] ? row[RACE_NAME] : "");
 		entry->pc_race = atoi (row[RACE_PC]);
 		entry->starting_locs = atoi (row[RACE_START_LOC]);
 		entry->rpp_cost = atoi (row[RACE_RPP_COST]);
-		entry->created_by = str_dup (row[RACE_CREATED_BY]);
+		entry->created_by = str_dup(row[RACE_CREATED_BY] ? row[RACE_CREATED_BY] : "");
 		entry->last_modified = atoi (row[RACE_LAST_MODIFIED]);
 		entry->race_size = atoi (row[RACE_SIZE]);
 		entry->body_proto = atoi (row[RACE_BODY_PROTO]);
@@ -912,6 +929,12 @@ void
 		entry->nomad = atoi(row[RACE_NOMAD]);
 		entry->alert = atoi(row[RACE_ALERT]);
 		entry->movement = atoi(row[RACE_MOVEMENT]);
+// entry->nat_attack_type not in DB schema
+// entry->damnodice not in DB schema
+// entry->damsizedice not in DB schema
+// entry->damroll not in DB schema
+// entry->natural_delay not in DB schema
+
 
 		if (!race_table)
 			race_table = entry;
@@ -1077,6 +1100,18 @@ int
 			looked_up = entry->alert;
 		else if (which_var == RACE_MOVEMENT)
 			looked_up = entry->movement;
+		else if (which_var == RACE_NAT_ATTACK_TYPE)
+		  looked_up = entry->nat_attack_type;
+		else if (which_var == RACE_DAMNODICE)
+		  looked_up = entry->damnodice;
+		else if (which_var == RACE_DAMSIZEDICE)
+		  looked_up = entry->damsizedice;
+		else if (which_var == RACE_DAMROLL)
+		  looked_up = entry->damroll;
+		else if (which_var == RACE_NATURAL_DELAY)
+		  looked_up = entry->natural_delay;
+
+		  
 		if (looked_up)
 		{
 			return looked_up;
@@ -1177,6 +1212,17 @@ char *
 			looked_up = entry->alert;
 		else if (which_var == RACE_MOVEMENT)
 			looked_up = entry->movement;
+		else if (which_var == RACE_NAT_ATTACK_TYPE)
+		  looked_up = entry->nat_attack_type;
+		else if (which_var == RACE_DAMNODICE)
+		  looked_up = entry->damnodice;
+		else if (which_var == RACE_DAMSIZEDICE)
+		  looked_up = entry->damsizedice;
+		else if (which_var == RACE_DAMROLL)
+		  looked_up = entry->damroll;
+		else if (which_var == RACE_NATURAL_DELAY)
+		  looked_up = entry->natural_delay;
+
 		if (looked_up)
 		{
 			sprintf (value, "%d", looked_up);
@@ -3569,7 +3615,7 @@ CHAR_DATA *
 	ch->offense = atoi (row[39]);
 	ch->hit = atoi (row[40]);
 	ch->max_hit = atoi (row[41]);
-	ch->nat_attack_type = atoi (row[42]);
+	ch->nat_attack_type = lookup_race_int(ch->race, RACE_NAT_ATTACK_TYPE); /* turns row[42] into vestige by resetting attack type by race on load */
 	ch->move = atoi (row[43]);
 	ch->max_move = atoi (row[44]);
 	ch->circle = atoi (row[45]);
@@ -4002,7 +4048,16 @@ CHAR_DATA *
 
 	ch->max_hit = 40 + GET_CON (ch) * CONSTITUTION_MULTIPLIER;
 	ch->max_shock = 40 + GET_WIL(ch) * CONSTITUTION_MULTIPLIER;
-	ch->armor = 0;
+
+	// Set armor by race
+	ch->armor = lookup_race_int(ch->race, RACE_ARMOR);
+
+	// Set natural attack information by race
+	ch->damnodice = lookup_race_int(ch->race, RACE_DAMNODICE);
+	ch->damsizedice = lookup_race_int(ch->race, RACE_DAMSIZEDICE);
+	ch->damroll = lookup_race_int(ch->race, RACE_DAMROLL);
+	ch->natural_delay = lookup_race_int(ch->race, RACE_NATURAL_DELAY);
+
 
 	/*
 	if (!ch->max_mana

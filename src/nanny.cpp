@@ -71,52 +71,77 @@ const int pregame_furnishings[] =
 
 const char *color_skill[] =
 {
-    "#0",				/* Unused */
-    "#3",				/* Brawling */
-    "#3",				/* Small-Blade */
-    "#3",				/* Long-Blade */
-    "#3",				/* Polearm */
-    "#3",				/* Bludgeon */
-    "#3",				/* Dodge */
-    "#3",				/* Deflect */
-    "#9#3",				/* Sole-Wield */
-    "#9#3",				/* Dual-Wield */
-    "#3",				/* Aim */
-    "#3",				/* Handgun */
-    "#3",				/* Rifle */
-    "#3",				/* SMG */
-    "#3",				/* Gunnery */
-    "#3",				/* Explosives */
-
-    "#9#6",			    /* Sneak */
-    "#6",				/* Hide */
-    "#9#6",			    /* Steal */
-    "#9#6",			    /* Picklock */
-    "#0",				/* Haggle */
-    "#0",				/* Handle */
-    "#0",				/* Hunting */
-    "#6",	    		/* First-Aid */
-    "#9#6",           // Medicine
-    "#0",				/* Scavenge */
-    "#0",				/* Eavesdrop */
+    "#0",                    /* Unused */
+    "#3",                    /* Brawling */
+    "#3",                    /* Small-Blade */
+    "#3",                    /* Long-Blade */
+    "#3",                    /* Polearm */
+    "#3",                    /* Bludgeon */
+    "#3",                    /* Dodge */
+    "#3",                    /* Deflect */
+    "#9#3",                    /* Sole-Wield */
+    "#9#3",                    /* Dual-Wield */
+    "#3",                    /* Aim */
+    "#3",                    /* Handgun */
+    "#3",                    /* Rifle */
+    "#3",                    /* SMG */
+    "#3",                    /* Gunnery */
+    "#3",                    /* Explosives */
+ 
+    "#9#0",                   /* Sneak */
+    "#0",                    /* Hide */
+    "#9#1",                   /* Steal */
+    "#9#0",                   /* Picklock */
+    "#0",                    /* Haggle */
+    "#0",                    /* Handle */
+    "#0",                    /* Hunting */
+    "#6",                   /* First-Aid */
+    "#9#1",           // Medicine
+    "#0",                    /* Scavenge */
+    "#0",                    /* Eavesdrop */
     "#0",             /* Butchery */
-
-    "#2",			    /* Chemistry */
-    "#2", 			    /* Mechanics */
-    "#2",				/* Gunsmithery */
-    "#2",	    		/* Computerology */
-    "#2",		    	/* Electronics */
-    "#2",			    /* Biology */
-    "#2",			    /* Weaponcraft */
-    "#2",			    /* Armorcraft */
-    "#2",			    /* Handicraft */
-    "#9#2",		        /* Artistry */
-
+ 
+    "#2",                   /* Chemistry */
+    "#2",                    /* Mechanics */
+    "#2",                    /* Gunsmithery */
+    "#2",                   /* Computerology */
+    "#2",                   /* Electronics */
+    "#2",                   /* Biology */
+    "#6",                   /* Weaponcraft */
+    "#6",                   /* Armorcraft */
+    "#6",                   /* Handicraft */
+    "#9#6",                  /* Artistry */
+ 
     "#5",             /* Education */
     "#0",             /* Voodoo */
     "#0",             /* Common */
+    "#6",             /* Metalcraft */
+    "#6",             /* Leathercraft */
+    "#6",             /* Textilecraft */
+    "#6",             /* Woodcraft */
+    "#6",             /* Cooking */
+    "#6",             /* Baking */
+    "#6",             /* Brewing */
+    "#6",             /* Fishing */
+    "#6",             /* Stonecraft */
+    "#6",             /* Earthencraft */
+    "#6",             /* Gardening */
+    "#6",             /* Farming */
+    "#3",             /* Shortbow */
+    "#3",             /* Longbow */
+    "#3",             /* Crossbow */
+    "#6",             /* Music */
+    "#0",             /* Astronomy */
+    "#2",             /* Orkish */
+    "#2",             /* Wargish */
+    "#2",             /* Dalish */
+    "#2",             /* Sindarin */
+    "#2",             /* Khuzdul */
+    "#2",             /* Tengwar */
+    "#2",             /* Cirth */
+    "#6",             /* Warcraft */
+   
 };
-
 
 
 
@@ -219,7 +244,7 @@ display_unread_messages (DESCRIPTOR_DATA * d)
         return;
 
     sprintf (buf,
-             "#6There %s %d unread MUD-Mail%s awaiting your attention!#0\n\n",
+             "#6There %s %d unread Hobbitmail%s awaiting your attention!#0\n\n",
              unread > 1 ? "are" : "is", unread, unread > 1 ? "s" : "");
     SEND_TO_Q (buf, d);
 }
@@ -352,27 +377,33 @@ nanny_login_choice (DESCRIPTOR_DATA * d, char *argument)
 
     else if (*buf == 'C')
     {
-        if (!strstr (d->strClientHostname, "localhost")
-                && reference_ip (NULL, d->strClientHostname))
-        {
-            SEND_TO_Q
+         
+         if (!strstr (d->strClientHostname, "localhost")
+                && reference_ip (NULL, d->strClientHostname)
+		&& 1) // Change the 0 to 1 to re-enable IP Restrictions -Nimrod
+         {
+           SEND_TO_Q
             ("#1\nWe apologize, but our records indicate that an account has already been\n"
              "registered from this IP. If you have legitimate reasons for obtaining another\n"
              "login account, such as sharing your internet connection with other individuals,\n"
              "or you are unaware of any other accounts used over your connection, please\n"
              "contact the administrative staff at " STAFF_EMAIL
              " for assistance.\n\n", d);
-            SEND_TO_Q ("Your Selection: ", d);
-            return;
-        }
+             SEND_TO_Q ("Your Selection: ", d);
+             return;
+         }
+        
 
-		SEND_TO_Q ("All new accounts must be created through the Parallel RPI Website.\n"
-				   "The following link will take you to the account creation page:\n"
-				   "http://www.forum.parallelrpi.com", d);
-		SEND_TO_Q ("Your Selection: ", d);
-        //SEND_TO_Q (get_text_buffer (NULL, text_list, "account_application"), d);
-        //SEND_TO_Q ("What would you like to name your login account? ", d);
-        //d->connected = CON_NEW_ACCT_NAME;
+	// remarking out message that sends folks to Parallel website for account creation - Nimrod
+//		SEND_TO_Q ("\n\nAll new accounts must be created through the Shadows of Isildur Web Portal.\n"
+//				   "The following link will take you to the account creation page:\n"
+//				   "http://www.middle-earth.us/generator/adduser.php\n\n", d);
+//		SEND_TO_Q ("Your Selection: ", d);
+	// Remarking out the account application portion, next three lines. 0206141709 -Nimrod
+
+        SEND_TO_Q (get_text_buffer (NULL, text_list, "account_application"), d);
+        SEND_TO_Q ("What would you like to name your login account? ", d);
+        d->connected = CON_NEW_ACCT_NAME;
         return;
     }
 
@@ -627,7 +658,7 @@ nanny_check_password (DESCRIPTOR_DATA * d, char *argument)
             }
         }
         SEND_TO_Q
-        ("\n\nIncorrect password - have you forgotten it? Visit here to obtain a new one:\n\nhttp://www.forum.parallelrpi.com",
+        ("\n\nIncorrect password - have you forgotten it? Visit here to obtain a new one:\n\nhttp://www.laketownrpi.us/forums",
          d);
         d->acct->password_attempt++;
         return;
@@ -638,7 +669,7 @@ nanny_check_password (DESCRIPTOR_DATA * d, char *argument)
     d->color = d->acct->color;
     d->sound = d->acct->sound;
 
-    if (!strstr (d->strClientHostname, "atonementrpi.com"))
+    if (!strstr (d->strClientHostname, "middle-earth.us"))
     {
         std::string escaped_ip;
         std::string escaped_name;
@@ -665,7 +696,7 @@ nanny_check_password (DESCRIPTOR_DATA * d, char *argument)
             if (!IS_SET (d->acct->flags, ACCOUNT_IPSHARER) && nSharedIP > 0
                     && str_cmp (d->acct->name.c_str (), "Guest") != 0
                     && str_cmp (d->acct->last_ip.c_str (), "(null)") != 0
-                    && d->acct->last_ip.find ("atonementrpi.com") == std::string::npos)
+                    && d->acct->last_ip.find ("middle-earth.us") == std::string::npos)
             {
                 strcpy (strAccountSharer,
                         "  #1Possible IP sharing detected with:");
@@ -1582,7 +1613,7 @@ display_hobbitmail_inbox (DESCRIPTOR_DATA * d, account  *acct)
     char imm_buf[MAX_STRING_LENGTH];
     int i, admin = 0;
 
-    sprintf (buf, "                              #6MUD-Mail: Main Menu#0\n"
+    sprintf (buf, "                              #6Hobbitmail: Main Menu#0\n"
              "                              #6----------------------#0\n\n");
 
     if (!acct || acct->name.empty ())
@@ -1706,7 +1737,7 @@ nanny_composing_message (DESCRIPTOR_DATA * d, char *argument)
     else
     {
         SEND_TO_Q
-        ("#2Thanks! Your MUD-Mail has been delivered to the specified account.#0\n\n",
+        ("#2Thanks! Your Hobbitmail has been delivered to the specified account.#0\n\n",
          d);
         for (td = descriptor_list; td; td = td->next)
         {
@@ -1715,7 +1746,7 @@ nanny_composing_message (DESCRIPTOR_DATA * d, char *argument)
                 continue;
             if (str_cmp (td->acct->name.c_str (), acct->name.c_str ()) == 0)
                 SEND_TO_Q
-                ("#6\nA new MUD-Mail has arrived for your account!#0\n", td);
+                ("#6\nA new Hobbitmail has arrived for your account!#0\n", td);
         }
     }
 
@@ -1754,7 +1785,7 @@ nanny_compose_message (DESCRIPTOR_DATA * d, char *argument)
     ("\n#2Enter message; terminate with an '@' when completed. Once finished,\n",
      d);
     SEND_TO_Q
-    ("hit ENTER again to send and return to the main MUD-Mail menu.#0\n\n",
+    ("hit ENTER again to send and return to the main Hobbitmail menu.#0\n\n",
      d);
 
     d->pending_message->message = NULL;
@@ -1894,7 +1925,7 @@ nanny_compose_mail_to (DESCRIPTOR_DATA * d, char *argument)
     if (str_cmp (acct->name.c_str (), "Guest") == 0)
     {
         SEND_TO_Q
-        ("#1\nSorry, but MUD-Mail cannot be sent to the guest account.#0\n",
+        ("#1\nSorry, but Hobbitmail cannot be sent to the guest account.#0\n",
          d);
         SEND_TO_Q ("\nTo which PC's player do you wish to send a message? ", d);
         unload_pc (tch);
@@ -2116,7 +2147,7 @@ nanny_read_message (DESCRIPTOR_DATA * d, char *argument)
         ("DELETE FROM hobbitmail WHERE account = '%s' AND id = %d",
          d->acct->name.c_str (), (long int) d->stored);
         sprintf (buf,
-                 "\n#1The specified MUD-Mail has been deleted from your account.#0\n\n");
+                 "\n#1The specified Hobbitmail has been deleted from your account.#0\n\n");
         SEND_TO_Q (buf, d);
 
         display_hobbitmail_inbox (d, d->acct);
@@ -2137,7 +2168,7 @@ nanny_read_message (DESCRIPTOR_DATA * d, char *argument)
     }
 }
 
-#define PFILE_QUERY	"SELECT name,create_state FROM %s.pfiles WHERE account = '%s' AND create_state != 4 ORDER BY birth ASC"
+#define PFILE_QUERY	"SELECT name,create_state FROM %s.pfiles WHERE account = '%s' AND create_state < 4 ORDER BY birth ASC"
 
 void
 nanny_connect_select (DESCRIPTOR_DATA * d, char *argument)
@@ -2216,7 +2247,7 @@ nanny_connect_select (DESCRIPTOR_DATA * d, char *argument)
             SEND_TO_Q ("ANSI color #2enabled#0.\n", d);
             SEND_TO_Q ("#1NOTE: For best results, "
                        "a default of #0white#1 or #0whitish-gray#1 text "
-                       "is recommended.\n", d);
+                       "is recommended.#0\n", d);
             d->color = 1;
         }
         else
@@ -2306,7 +2337,7 @@ nanny_connect_select (DESCRIPTOR_DATA * d, char *argument)
         ("While visiting as a guest, you will be held responsible for\n"
          "following our policies. Guest logins are provided for new\n"
          "players to experience the game in a limited capacity while\n"
-         "waiting for an application, or for researching Atonement\n"
+         "waiting for an application, or for researching SoI\n"
          "using our in-game material. We hope you enjoy your stay!\n\n"
          "#1Under NO CIRCUMSTANCES should these logins be used to harass\n"
          "immortals regarding pending character applications! We frown\n"
@@ -2380,10 +2411,11 @@ nanny_connect_select (DESCRIPTOR_DATA * d, char *argument)
                     sprintf (state, "#5(Suspended)#0");
                 else
                     sprintf (state, "#1(Deceased)#0");
-                sprintf (buf, "%2d. %-20s %s\n", i, row[0], state);
-                SEND_TO_Q (buf, d);
-                i++;
-            }
+				
+				sprintf (buf, "%2d. %-20s %s\n", i, row[0], state);
+                  SEND_TO_Q (buf, d);
+                  i++;
+		    }
             SEND_TO_Q ("\nYour Selection: ", d);
             d->connected = CON_CHOOSE_PC;
             if (result)
@@ -2452,6 +2484,12 @@ nanny_connect_select (DESCRIPTOR_DATA * d, char *argument)
 
     else if (c == 'h' || argn == 9)
     {
+			// Temporarily disabling this option 0207142053 - Nimrod
+      //SEND_TO_Q
+      //		("Hobbitmail has been temporarily disabled.\n\n\n", d);
+      // display_main_menu (d);
+      //		return;
+	
         if (strcasecmp ("Unknown", d->acct->name.c_str ()) == 0)
         {
             SEND_TO_Q
@@ -2468,6 +2506,12 @@ nanny_connect_select (DESCRIPTOR_DATA * d, char *argument)
 
     else if (c == 'r' || argn == 3)
     {
+		// Temporarily disabling this option 0207142051 - Nimrod
+//		SEND_TO_Q
+//			("\n\nPlease visit www.middle-earth.us/generator to create a character.\n\n\n", d);
+//        display_main_menu (d);
+//		return;
+
         if (str_cmp ("Unknown", d->acct->name.c_str ()) == 0)
         {
             SEND_TO_Q
@@ -2945,7 +2989,7 @@ nanny_choose_pc (DESCRIPTOR_DATA * d, char *argument)
     if (result)
         mysql_free_result (result);
 
-    if (!strstr (d->strClientHostname, "atonementrpi.com"))
+    if (!strstr (d->strClientHostname, "middle-earth.us"))
     {
         for (td = descriptor_list; td; td = td->next)
         {
@@ -3145,9 +3189,13 @@ nanny_choose_pc (DESCRIPTOR_DATA * d, char *argument)
         d->prompt_mode = 1;
         d->connected = CON_PLYNG;
 
+	// Staff see unread messages on boards
         if (d->character->pc->level)
             show_unread_messages (d->character);
 
+	// Everyone sees unread messages on special 'news' board
+	show_unread_news_messages(d->character);
+	
         return;
     }
 
@@ -3191,7 +3239,7 @@ nanny_choose_pc (DESCRIPTOR_DATA * d, char *argument)
         equip_newbie (d->character);
     }
 
-    load_char_objs (d->character, GET_NAME (d->character));
+    load_char_objs (d->character, GET_NAME (d->character));  // This may call equip_newbie again.
 
     if ((!d->character->in_room || d->character->in_room == NOWHERE)
             || !vnum_to_room (d->character->in_room))
@@ -3339,7 +3387,7 @@ nanny_choose_pc (DESCRIPTOR_DATA * d, char *argument)
     {
         send_to_char ("\n", d->character);
         act
-        ("Welcome to Parallel RPI! If you are a new player and have any questions, please type #6HELP HELPLINE#0. If your questions require an admin, please type #6HELP PETITION#0. We don't bite, promise.",
+        ("Welcome to SoI-Laketown RPI! If you are a new player and have any questions, please type #6HELP HELPLINE#0. If your questions require an admin, please type #6HELP PETITION#0. We don't bite, promise.",
          false, d->character, 0, 0, TO_CHAR | _ACT_FORMAT);
     }
 
@@ -3375,6 +3423,7 @@ nanny_choose_pc (DESCRIPTOR_DATA * d, char *argument)
     show_waiting_prisoners (d->character);
     notify_captors (d->character);
     d->character->effort = 0;
+    d->character->dameffort = 0;
 
     if (d->character->max_hit != 40 + d->character->con * CONSTITUTION_MULTIPLIER)
     {
@@ -3388,8 +3437,12 @@ nanny_choose_pc (DESCRIPTOR_DATA * d, char *argument)
         d->character->shock = d->character->max_shock;	// in terms of wound-endurance.
     }
 
+    // Staff see unread posts to boards
     if (d->character->pc->level)
         show_unread_messages (d->character);
+    // Everyone sees messages to the special board 'news'
+    show_unread_news_messages (d->character);
+
 
     if (d->character->pc->creation_comment
             && strlen (d->character->pc->creation_comment) > 2
@@ -3482,9 +3535,9 @@ nanny_choose_pc (DESCRIPTOR_DATA * d, char *argument)
 
     d->character->pc->last_logon = time (0);
 
-	//update_family_clanning (d);
+	update_family_clanning (d);
 
-	conflicting_clan_check(d->character);
+	//conflicting_clan_check(d->character);
 
     return;
 
@@ -3626,7 +3679,7 @@ spitstat (CHAR_DATA * ch, DESCRIPTOR_DATA * recipient)
     char buf4[MAX_STRING_LENGTH] = { '\0' };
     bool missing_info = false;
     int req = 0;
-    bool no_eyes = false;
+    bool no_eyes = true;
 
     sprintf (buf2, "%d inches", ch->height);
 
@@ -3643,7 +3696,7 @@ spitstat (CHAR_DATA * ch, DESCRIPTOR_DATA * recipient)
     sprintf (ADDBUF, "Age: %d\n\n", ch->age);
     SEND_TO_Q (buf, recipient);
     *buf = '\0';
-
+	sprintf(ADDBUF, "Build: %s height and %s build\n\n", ch->height == 1 ? "tiny" : ch->height == 2 ? "short" : ch->height == 3 ? "average" : ch->height == 4 ? "tall" : ch->height == 5 ? "giant" : buf2, frames[ch->frame]);
     /*
     if (!ch->name || !*ch->name || !str_cmp (ch->name, "(null)"))
     {
@@ -3690,19 +3743,19 @@ spitstat (CHAR_DATA * ch, DESCRIPTOR_DATA * recipient)
         }
     }
 
-    if (!ch->d_eyes || !*ch->d_eyes || !str_cmp (ch->d_eyes, "(null)") || ch->height == 0)
-    {
-        sprintf(ADDBUF, "#1Build and Eyes: Type Features to assign a height, build, and eyecolor.#0\n\n");
-        missing_info = true;
-    }
-    else if (no_eyes)
-    {
-        sprintf(ADDBUF, "Build: %s height and %s build\n\n", ch->height == 1 ? "tiny" : ch->height == 2 ? "short" : ch->height == 3 ? "average" : ch->height == 4 ? "tall" : ch->height == 5 ? "giant" : buf2, frames[ch->frame]);
-    }
-    else
-    {
-        sprintf(ADDBUF, "Build and Eyes: %s height and %s build, with %s eyes\n\n", ch->height == 1 ? "tiny" : ch->height == 2 ? "short" : ch->height == 3 ? "average" : ch->height == 4 ? "tall" : ch->height == 5 ? "giant" : buf2, frames[ch->frame], ch->d_eyes);
-    }
+    //if (!ch->d_eyes || !*ch->d_eyes || !str_cmp (ch->d_eyes, "(null)") || ch->height == 0)
+    //{
+    //    sprintf(ADDBUF, "#1Build and Eyes: Type Features to assign a height, build, and eyecolor.#0\n\n");
+    //    missing_info = true;
+    //}
+    //else if (no_eyes)
+    //{
+    //    sprintf(ADDBUF, "Build: %s height and %s build\n\n", ch->height == 1 ? "tiny" : ch->height == 2 ? "short" : ch->height == 3 ? "average" : ch->height == 4 ? "tall" : ch->height == 5 ? "giant" : buf2, frames[ch->frame]);
+    //}
+    //else
+    //{
+    //    sprintf(ADDBUF, "Build and Eyes: %s height and %s build, with %s eyes\n\n", ch->height == 1 ? "tiny" : ch->height == 2 ? "short" : ch->height == 3 ? "average" : ch->height == 4 ? "tall" : ch->height == 5 ? "giant" : buf2, frames[ch->frame], ch->d_eyes);
+    //}
 
     if (!ch->short_descr || !*ch->short_descr
             || !str_cmp (ch->short_descr, "(null)"))
@@ -4008,7 +4061,7 @@ attribute_priorities (DESCRIPTOR_DATA * d, char *arg)
     int attr;
     int i;
     CHAR_DATA *ch = d->character;
-    int attr_starters[] = { 16, 14, 12, 12, 10, 10, 8 };
+    int attr_starters[] = { 16, 15, 12, 12, 11, 8 }; // missing a 10, this gets auto-assigned to aur. Missing so it doesn't get a random boost
     int attr_averages[] = { 12, 12, 12, 12, 12, 10, 12 };
     int attr_priorities[] = { -1, -1, -1, -1, -1, -1, -1 };
     char buf[MAX_STRING_LENGTH];
@@ -4069,7 +4122,7 @@ attribute_priorities (DESCRIPTOR_DATA * d, char *arg)
 
     if (average)
     {
-        for (bonus = 6; bonus;)
+        for (bonus = 10; bonus;)
         {
             attr = number (0, 6);
 
@@ -4095,20 +4148,17 @@ attribute_priorities (DESCRIPTOR_DATA * d, char *arg)
     }
     else
     {
-
-        // Put aura dead last.
-        attr_priorities[5] = 7;
-
-        for (bonus = 4; bonus;)
+        for (bonus = 8; bonus;)
         {
-            attr = number (0, 6);
+	  /* Rather than boosting a particular attr directly and doing the logic for a skip, this boosts one of the six
+	     starting point values as long as it's < 18. At the end, the six starting point values will be mapped onto
+	     attrs 0-4,6 (skipping aur:5) based on the priority array
+	  */
+            int slot = number (0, 5);
 
-            while (attr == 5)
-                attr = number (0, 6);
-
-            if (attr_starters[attr_priorities[attr]] < 18)
+            if (attr_starters[slot] < 18)
             {
-                attr_starters[attr_priorities[attr]]++;
+                attr_starters[slot]++;
                 bonus--;
             }
         }
@@ -4408,8 +4458,8 @@ nanny_char_name_confirm (DESCRIPTOR_DATA * d, char *arg)
     d->character->affected_by = 0;
 
     d->character->intoxication = 0;
-    d->character->thirst = 300;
-    d->character->hunger = 40;
+    d->character->thirst = MAX_THIRST;
+    d->character->hunger = NEWBIE_CALORIES;
 
     d->character->pc->load_count = 1;
     save_char (d->character, false);
@@ -4818,94 +4868,98 @@ height_frame_selection (DESCRIPTOR_DATA * d, char *argument)
     }
 
     d->character->frame = ind;
+	if (d->character->pc->nanny_state)
+		d->character->pc->nanny_state = STATE_SDESC;
 
-    int i;
-    CHAR_DATA *ch = NULL;
+	d->connected = CON_CREATION;
 
-    ch = d->character;
+    //int i;
+    //CHAR_DATA *ch = NULL;
 
-    // Because we go back here is we re-do it all, we need to clear out everything and start afresh.
-    if (ch->delay_who)
-        mem_free(ch->delay_who);
-    if (ch->delay_who2)
-        mem_free(ch->delay_who2);
-    if (ch->delay_who3)
-        mem_free(ch->delay_who3);
+    //ch = d->character;
 
-    if (ch->description)
-        mem_free(ch->description);
-    ch->description = 0;
-    if (ch->short_descr)
-        mem_free(ch->short_descr);
-    ch->short_descr = 0;
-    if (ch->long_descr)
-        mem_free(ch->long_descr);
-    ch->long_descr = 0;
+    //// Because we go back here is we re-do it all, we need to clear out everything and start afresh.
+    //if (ch->delay_who)
+    //    mem_free(ch->delay_who);
+    //if (ch->delay_who2)
+    //    mem_free(ch->delay_who2);
+    //if (ch->delay_who3)
+    //    mem_free(ch->delay_who3);
 
-    if (ch->d_age)
-        mem_free(ch->d_age);
-    if (ch->d_eyes)
-        mem_free(ch->d_eyes);
-    if (ch->d_hairlength)
-        mem_free(ch->d_hairlength);
-    if (ch->d_haircolor)
-        mem_free(ch->d_haircolor);
-    if (ch->d_hairstyle)
-        mem_free(ch->d_hairstyle);
-    if (ch->d_height)
-        mem_free(ch->d_height);
-    if (ch->d_frame)
-        mem_free(ch->d_frame);
-    if (ch->d_feat1)
-        mem_free(ch->d_feat1);
-    if (ch->d_feat1)
-        mem_free(ch->d_feat2);
-    if (ch->d_feat1)
-        mem_free(ch->d_feat3);
-    if (ch->d_feat1)
-        mem_free(ch->d_feat4);
+    //if (ch->description)
+    //    mem_free(ch->description);
+    //ch->description = 0;
+    //if (ch->short_descr)
+    //    mem_free(ch->short_descr);
+    //ch->short_descr = 0;
+    //if (ch->long_descr)
+    //    mem_free(ch->long_descr);
+    //ch->long_descr = 0;
 
-    ch->d_age = 0;
-    ch->d_eyes = 0;
-    ch->d_hairlength = 0;
-    ch->d_haircolor = 0;
-    ch->d_hairstyle = 0;
-    ch->d_height = 0;
-    ch->d_frame = 0;
-    ch->d_feat1 = 0;
-    ch->d_feat2 = 0;
-    ch->d_feat3 = 0;
-    ch->d_feat4 = 0;
+    //if (ch->d_age)
+    //    mem_free(ch->d_age);
+    //if (ch->d_eyes)
+    //    mem_free(ch->d_eyes);
+    //if (ch->d_hairlength)
+    //    mem_free(ch->d_hairlength);
+    //if (ch->d_haircolor)
+    //    mem_free(ch->d_haircolor);
+    //if (ch->d_hairstyle)
+    //    mem_free(ch->d_hairstyle);
+    //if (ch->d_height)
+    //    mem_free(ch->d_height);
+    //if (ch->d_frame)
+    //    mem_free(ch->d_frame);
+    //if (ch->d_feat1)
+    //    mem_free(ch->d_feat1);
+    //if (ch->d_feat1)
+    //    mem_free(ch->d_feat2);
+    //if (ch->d_feat1)
+    //    mem_free(ch->d_feat3);
+    //if (ch->d_feat1)
+    //    mem_free(ch->d_feat4);
 
-    ch->delay_info1 = 0;
-    ch->delay_info2 = 0;
-    ch->delay_info3 = 0;
-    ch->delay_info4 = 0;
-    ch->delay_info5 = 0;
+    //ch->d_age = 0;
+    //ch->d_eyes = 0;
+    //ch->d_hairlength = 0;
+    //ch->d_haircolor = 0;
+    //ch->d_hairstyle = 0;
+    //ch->d_height = 0;
+    //ch->d_frame = 0;
+    //ch->d_feat1 = 0;
+    //ch->d_feat2 = 0;
+    //ch->d_feat3 = 0;
+    //ch->d_feat4 = 0;
 
-    ch = d->character;
+    //ch->delay_info1 = 0;
+    //ch->delay_info2 = 0;
+    //ch->delay_info3 = 0;
+    //ch->delay_info4 = 0;
+    //ch->delay_info5 = 0;
 
-    if (ch->age >= 56)
-        ch->delay_info5 = AGE_AGED;
-    else if (ch->age >= 46)
-        ch->delay_info5 = AGE_MATURE;
-    else if (ch->age >= 26)
-        ch->delay_info5 = AGE_ADULT;
-    else if (ch->age >= 20)
-        ch->delay_info5 = AGE_YOUNG;
-    else if (ch->age >= 13)
-        ch->delay_info5 = AGE_TEEN;
-    else
-        ch->delay_info5 = AGE_CHILD;
+    //ch = d->character;
 
-    if (ch->sex == SEX_FEMALE)
-        ch->d_age = str_dup(fem_ages[ch->delay_info5][0]);
-    else
-        ch->d_age = str_dup(male_ages[ch->delay_info5][0]);
+    //if (ch->age >= 56)
+    //    ch->delay_info5 = AGE_AGED;
+    //else if (ch->age >= 46)
+    //    ch->delay_info5 = AGE_MATURE;
+    //else if (ch->age >= 26)
+    //    ch->delay_info5 = AGE_ADULT;
+    //else if (ch->age >= 20)
+    //    ch->delay_info5 = AGE_YOUNG;
+    //else if (ch->age >= 13)
+    //    ch->delay_info5 = AGE_TEEN;
+    //else
+    //    ch->delay_info5 = AGE_CHILD;
 
-    d->connected = CON_DESC_EYE;
-    d->character->pc->nanny_state = STATE_AUTO_DESC;
-    return;
+    //if (ch->sex == SEX_FEMALE)
+    //    ch->d_age = str_dup(fem_ages[ch->delay_info5][0]);
+    //else
+    //    ch->d_age = str_dup(male_ages[ch->delay_info5][0]);
+
+    //d->connected = CON_DESC_EYE;
+    //d->character->pc->nanny_state = STATE_AUTO_DESC;
+    //return;
 }
 
 int
@@ -5662,7 +5716,7 @@ autodesc_end (DESCRIPTOR_DATA * d, char *argument)
     SEND_TO_Q (get_text_buffer (NULL, text_list, "autodesc_end"), d);
 
     SEND_TO_Q ("#0", d);
-    SEND_TO_Q("\nEnter your choice - #9#61)#0 Custom, #9#62)#0 Assisted, #9#63)#0 Redo: ", d);
+    SEND_TO_Q("\nEnter your choice - #9#61)#0 Custom, #9#62)#0 Redo: ", d);
 
     *buf = '\0';
     *buf2 = '\0';
@@ -5712,7 +5766,7 @@ autodesc_result (DESCRIPTOR_DATA * d, char *argument)
 
     ch = d->character;
 
-    max = 3;
+    max = 2;
 
     if (!*argument)
     {
@@ -5720,7 +5774,7 @@ autodesc_result (DESCRIPTOR_DATA * d, char *argument)
         SEND_TO_Q (buf, d);
         return;
     }
-    else if (!str_cmp(argument, "REDO") || !str_cmp(argument, "redo") || (atoi(argument) == 3))
+    else if (!str_cmp(argument, "REDO") || !str_cmp(argument, "redo") || (atoi(argument) == 2))
     {
         create_menu_actions (d, "HEIGHT");
         return;
@@ -5734,27 +5788,11 @@ autodesc_result (DESCRIPTOR_DATA * d, char *argument)
 
     j = atoi(argument);
 
-    if (j == 1 || ((d->character->race == lookup_race_id("Cybernetic") || d->character->race == lookup_race_id("Mutation")) && j != 2))
+    if (j == 1)
     {
         d->character->pc->nanny_state = STATE_SDESC;
         d->connected = CON_CREATION;
         create_menu_options(d);
-        return;
-    }
-	else if ((d->character->race == lookup_race_id("Cybernetic") || d->character->race == lookup_race_id("Mutation")) && j == 2)
-	{
-        create_menu_actions (d, "HEIGHT");
-        return;
-	}
-	else if (j == 2)
-	{
-		d->connected = CON_DESC_HEIGHT;
-		autodesc_height (d);
-		return;
-	}
-    else
-    {
-        create_menu_actions (d, "HEIGHT");
         return;
     }
     return;
@@ -8581,10 +8619,10 @@ create_menu_actions (DESCRIPTOR_DATA * d, char *arg)
         ("You will receive an email at the address registered for this\n"
          "account when the application has been reviewed, along with any\n"
          "comments the reviewing administrator wished to make.\n" "\n"
-         "Character review generally takes anywhere from 48-72 hours,\n"
+         "Character review generally takes anywhere from 12 to 24 hours,\n"
          "depending on the workload of our roleplay admins. We thank you\n"
-         "in advance for your patience, and for your interest in Atonement RPI!\n"
-         "We'll see you soon, in the Future!\n", d);
+         "in advance for your patience, and for your interest in Shadows\n"
+         "of Isildur! We'll see you in-game soon!\n", d);
         d->character->time.birth = time (0);
         d->character->time.played = 0;
         d->character->time.logon = time (0);

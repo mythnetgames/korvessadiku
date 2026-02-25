@@ -37,20 +37,23 @@ const char *enviro_desc[COND_TYPE_MAX][6] = {
 };
 
 
-
+/*
 const char *damage_type[DAMAGE_TYPE_MAX + 1] = {
 	"pierce",
 	"blunt",
 	"slash",
-	"freeze",			/*  5 */
+	"freeze",		 
 	"burn",
 	"fist",
-	"blood",			/* 10 */
+	"blood",			
 	"water",
-	"permanent",			/* 13 */
+	"permanent",		
 	"repair",
 	"\n"
 };
+*/
+const char *damage_type[DAMAGE_TYPE_MAX + 1] =
+{ "stab", "pierce", "chop", "crush", "slash", "chill", "burn", "bite", "claw", "fist", "bullet", "\n" };
 
 const char *material_type[MATERIAL_TYPE_MAX + 1] = {
 	"undefined",
@@ -522,7 +525,7 @@ npc_repair (CHAR_DATA * ch, CHAR_DATA * mob, OBJ_DATA *obj, char *argument)
 		}
 
 		sprintf (buf,
-		         "whisper %s I'll get you taken care of for a total of %d credits.",
+		         "whisper %s I'll get you taken care of for a total of %d coppers.",
 		         buf3, (int) cost);
 		command_interpreter (mob, buf);
 		return;
@@ -604,7 +607,7 @@ npc_repair (CHAR_DATA * ch, CHAR_DATA * mob, OBJ_DATA *obj, char *argument)
 
 		if (!can_subtract_money (ch, (int) cost, mob->mob->currency_type))
 		{
-			sprintf (buf, "%s You seem to be a little short on credits to trade.", buf3);
+			sprintf (buf, "%s You seem to be a little short on coins to trade.", buf3);
 			do_whisper (mob, buf, 83);
 			return;
 		}
@@ -1226,7 +1229,7 @@ delayed_mend2 (CHAR_DATA * ch)
 			}
 		}
 
-		running_cost = cost;
+		running_cost = cost; 
 
 		if (GET_ITEM_TYPE(obj) == ITEM_FIREARM || GET_ITEM_TYPE(obj) == ITEM_WEAPON)
 		{
@@ -1622,7 +1625,7 @@ void delayed_long_clean(CHAR_DATA *ch)
                 if (obj)
                 {
                     sprintf(buf, "You finish cleaning $p, and start cleaning $P.");
-                    sprintf(buf2, "$n finish cleaning $p, and start cleaning $P.");
+                    sprintf(buf2, "$n finishes cleaning $p, and starts cleaning $P.");
                     act (buf, false, ch, ch->delay_obj, obj, TO_CHAR | _ACT_FORMAT);
                     //act (buf2, false, ch, ch->delay_obj, obj, TO_ROOM | _ACT_FORMAT);
 
@@ -1637,7 +1640,7 @@ void delayed_long_clean(CHAR_DATA *ch)
                 else
                 {
                     sprintf(buf, "You finish cleaning $p, and have nothing more to clean.");
-                    sprintf(buf2, "$n finish cleaning $p, and have nothing more to clean.");
+                    sprintf(buf2, "$n finishes cleaning $p, and has nothing more to clean.");
                     act (buf, false, ch, ch->delay_obj, 0, TO_CHAR | _ACT_FORMAT);
                     act (buf2, false, ch, ch->delay_obj, 0, TO_ROOM | _ACT_FORMAT);
                     return;

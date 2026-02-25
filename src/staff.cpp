@@ -20,7 +20,7 @@
 #include <mysql/mysql.h>
 #include <limits.h>
 #include <vector>
-#include <iterator> 
+#include <string>
 
 #include "server.h"
 #include "structs.h"
@@ -39,7 +39,7 @@ char b_buf[ B_BUF_SIZE ];
 const char *player_bits[] = { "Brief", "NoShout", "Compact", "DONTSET", "Quiet", "Reboot", "Shutdown", "Build",
 		"Approval", "Outlaw", "\n" };
 
-const char* trap_attrs[ 8 ] = { "None", "Str", "Dex", "Con", "Int", "Wil", "Mut", "Agi" };
+const char* trap_attrs[ 8 ] = { "None", "Str", "Dex", "Con", "Int", "Wil", "Pre", "Agi" };
 
 extern rpie::server engine;
 extern const char *skills[];
@@ -387,17 +387,24 @@ void do_roster( CHAR_DATA * ch, char *argument, int cmd ) {
 	if ( tch )
 		unload_pc( tch );
 
-	if ( !str_cmp( buf, "add" ) ) {
+	if (ch->pc && ch->pc->level >= 5)
+	  {
+	    if (!str_cmp( buf, "add" ) ) {
 		mysql_safe_query( "INSERT INTO staff_roster VALUES ('%s', '%s',  %d, '%s', %d)", admin, title,
 				( int ) time( 0 ), depart, weight );
 		send_to_char( "The specified individual has been added to the staff roster.\n", ch );
 		return;
-	} else if ( !str_cmp( buf, "remove" ) ) {
+	    } else if ( !str_cmp( buf, "remove" ) ) {
 		mysql_safe_query( "DELETE FROM staff_roster WHERE name = '%s'", admin );
 		mysql_safe_query( "DELETE FROM clan_assignments WHERE imm_name = '%s'", admin );
 		send_to_char( "The specified individual has been removed from the roster.\n", ch );
 		return;
-	}
+	    }
+	  }
+	else
+	  {
+	    send_to_char("You must be at least a level 5 staffer to manipulate the roster.\n", ch);
+	  }
 
 	send_to_char( "Usage: roster (add | remove) <admin name> (<title> <department>)\n Usage: roster list\n", ch );
 	return;
@@ -1425,6 +1432,7 @@ void do_disconnect( CHAR_DATA * ch, char *argument, int cmd ) {
 	}
 }
 
+
 /*                                                                          *
  * funtion: do_ban                      < e.g.> ban [ <host> <duration> ]   *
  *                                                                          *
@@ -2288,8 +2296,20 @@ void charstat( CHAR_DATA * ch, char *name, bool bPCsOnly ) {
 			send_to_char( buf, ch );
 		}
 	}
+	else if (IS_NPC (k) && instance)
+	{
+	  for (j=0 ; j < 10; j++)
+	  {
+	    if (k->mob_color_cat[j] && k->mob_color_name[j])
+		{
+	      sprintf( buf, "Variable%d: %s is set as: %s.\n", j, k->mob_color_cat[j], k->mob_color_name[j]);
+		  send_to_char(buf, ch);
+		}
+	  }
 
-	send_to_char( "\n", ch );
+	}
+		send_to_char( "\n", ch );
+		
 
 	sprintf( buf, "#2Str:#0 %d/%d", GET_STR (k), k->str );
 	pad_buffer( buf, 25 );
@@ -2411,14 +2431,24 @@ void charstat( CHAR_DATA * ch, char *name, bool bPCsOnly ) {
 		*buf = '\0';
 		sprintf( buf, "#2Sum:#0 %d", k->str + k->dex + k->con + k->intel + k->wil + k->aur + k->agi );
 		pad_buffer( buf, 25 );
-		sprintf( buf + strlen( buf ), "#2Skillcap:#0 %d/%d", skill_max( k, 0, 1 ),
-				( 550 + ( 40 * ( k->intel - 10 ) )) );
+		sprintf( buf + strlen( buf ), "#2Skillcap:#0 %d/%d", skill_max( k, 0, 1 ), skill_max(k,0,2));
 		pad_buffer( buf, 53 );
 		if ( k->pc->level > 5 ) {
 			strcat( buf, "#2Level:#0 Implementor" );
 		} else {
 			sprintf( buf + strlen( buf ), "#2Level:#0 %d", k->pc->level );
 		}
+		sprintf( ADD, "\n" );
+		send_to_char( buf, ch );
+
+		// Natural features copied from NPCs such as carcass and skin objects, natural attack info etc
+		// Carcass/skin to be completed [need to find that data outside of the mob struct]
+		*buf = '\0';
+		sprintf( buf + strlen( buf ), "#2Att:#0 %s", attack_names[ k->nat_attack_type ] );
+		pad_buffer( buf, 25 );
+		sprintf( ADD, "#2NDam:#0     %dd%d + %d", k->damnodice, k->damsizedice, k->damroll );
+		pad_buffer( buf, 53 );
+		sprintf( ADD, "#2NNatDelay:#0   %d", k->natural_delay );
 		sprintf( ADD, "\n" );
 		send_to_char( buf, ch );
 	}
@@ -3919,8 +3949,23 @@ void objstat( CHAR_DATA * ch, char *name ) {
 		return;
 	}
 
+// Nimrod test
+char var_list[10][100];
+char *vari_list[10];
+
+// Initalize pointer array and slot
+	for (i = 0; i<10;i++)
+	{
+	  vari_list[i] = var_list[i]; // initialize pointer
+	  *var_list[i] = '\0'; // Set these to null while we're at it.
+    }
+	i = 0;
+	
 	if ( just_a_number( name ) && vtoo( atoi( name ) ) )
-		j = vtoo( atoi( name ) );
+	{
+	  j = vtoo( atoi( name ) );
+	  fetch_variable_categories ( vari_list, atoi(name), 0);
+	}
 
 	else if ( ( j = get_obj_in_list_vis( ch, name, ch->right_hand ) )
 			|| ( j = get_obj_in_list_vis( ch, name, ch->left_hand ) )
@@ -4181,7 +4226,7 @@ void objstat( CHAR_DATA * ch, char *name ) {
 		case ITEM_FLUID:
 			sprintf( buf, "#2Oval0 - Alcohol:#0 %d per sip\n"
 					"#2Oval1 - Water:#0   %d per sip\n"
-					"#2Oval2 - Food:#0    %d per sip\n", j->o.fluid.alcohol, j->o.fluid.water, j->o.fluid.food );
+					"#2Oval2 - Calories:#0    %d per sip\n", j->o.fluid.alcohol, j->o.fluid.water, j->o.fluid.food );
 			break;
 
 		case ITEM_LIGHT:
@@ -4210,7 +4255,7 @@ void objstat( CHAR_DATA * ch, char *name ) {
 			break;
 
 		case ITEM_FOOD:
-			sprintf( buf, "#2Oval0 - Food Value:#0 %d\n"
+			sprintf( buf, "#2Oval0 - Calories:#0 %d\n"
 					"#2Oval1 - Bites:#0 %d\n"
 					"#2Oval1 - Junk Obj:#0 %d\n", j->o.od.value[ 0 ], j->o.od.value[ 1 ], j->o.od.value[ 2 ] );
 			break;
@@ -4503,33 +4548,33 @@ void objstat( CHAR_DATA * ch, char *name ) {
         break;
 
     case ITEM_BULLET:
-        sprintf (buf,                "#2Oval0 - State    :#0 %d\n", j->o.od.value[0]);
-        sprintf (buf + strlen (buf), "#2Oval1 - Origin   :#0 %d\n", j->o.od.value[1]);
-        sprintf (buf + strlen (buf), "#2Oval2 - Caliber  :#0 %s [#2%d#0]\n", calibers[j->o.bullet.caliber], j->o.bullet.caliber);
-        sprintf (buf + strlen (buf), "#2Oval4 - Ammo Type:#0 %s [#2%d#0]\n", ammo_bits[j->o.bullet.type], j->o.bullet.type);
+        sprintf (buf,                "#2Oval0 - State     :#0 %d\n", j->o.od.value[0]);
+        sprintf (buf + strlen (buf), "#2Oval1 - Origin    :#0 %d\n", j->o.od.value[1]);
+        sprintf (buf + strlen (buf), "#2Oval2 - Ammo Size :#0 %s [#2%d#0]\n", calibers[j->o.bullet.caliber], j->o.bullet.caliber);
+        sprintf (buf + strlen (buf), "#2Oval4 - Ammo Type :#0 %s [#2%d#0]\n", ammo_bits[j->o.bullet.type], j->o.bullet.type);
         break;
 
     case ITEM_CASE:
-        sprintf (buf,                "#2Oval0 - State    :#0 %d\n", j->o.od.value[0]);
-        sprintf (buf + strlen (buf), "#2Oval1 - Origin   :#0 %d\n", j->o.od.value[1]);
-        sprintf (buf + strlen (buf), "#2Oval2 - Caliber  :#0 %s [#2%d#0]\n", calibers[j->o.bullet.caliber], j->o.bullet.caliber);
-        sprintf (buf + strlen (buf), "#2Oval4 - Ammo Type:#0 %s [#2%d#0]\n", ammo_bits[j->o.bullet.type], j->o.bullet.type);
+        sprintf (buf,                "#2Oval0 - State     :#0 %d\n", j->o.od.value[0]);
+        sprintf (buf + strlen (buf), "#2Oval1 - Origin    :#0 %d\n", j->o.od.value[1]);
+        sprintf (buf + strlen (buf), "#2Oval2 - Ammo Size :#0 %s [#2%d#0]\n", calibers[j->o.bullet.caliber], j->o.bullet.caliber);
+        sprintf (buf + strlen (buf), "#2Oval4 - Ammo Type :#0 %s [#2%d#0]\n", ammo_bits[j->o.bullet.type], j->o.bullet.type);
         break;
 
     case ITEM_ROUND:
-        sprintf (buf,                "#2Oval0 - Dam Bonus:#0 %d\n", j->o.bullet.damage);
-        sprintf (buf + strlen (buf), "#2Oval1 - Sides    :#0 %d\n", j->o.bullet.sides);
-        sprintf (buf + strlen (buf), "#2Oval2 - Caliber  :#0 %s [#2%d#0]\n", calibers[j->o.bullet.caliber], j->o.bullet.caliber);
-        sprintf (buf + strlen (buf), "#2Oval4 - Ammo Type:#0 %s [#2%d#0]\n", ammo_bits[j->o.bullet.type], j->o.bullet.type);
-        sprintf (buf + strlen (buf), "#2Oval5 - Size     :#0 %s [#2%d#0]\n", ammo_sizes[j->o.bullet.size], j->o.bullet.size);
+        sprintf (buf,                "#2Oval0 - Dam Bonus :#0 %d\n", j->o.bullet.damage);
+        sprintf (buf + strlen (buf), "#2Oval1 - Sides     :#0 %d\n", j->o.bullet.sides);
+        sprintf (buf + strlen (buf), "#2Oval2 - Ammo Size :#0 %s [#2%d#0]\n", calibers[j->o.bullet.caliber], j->o.bullet.caliber);
+        sprintf (buf + strlen (buf), "#2Oval4 - Ammo Type :#0 %s [#2%d#0]\n", ammo_bits[j->o.bullet.type], j->o.bullet.type);
+        sprintf (buf + strlen (buf), "#2Oval5 - Weapon    :#0 %s [#2%d#0]\n", ammo_sizes[j->o.bullet.size], j->o.bullet.size);
         break;
 
     case ITEM_CLIP:
-        sprintf (buf,                "#2Oval0 - Bullets :#0 %d\n", j->o.clip.amount);
-        sprintf (buf + strlen (buf), "#2Oval1 - Capacity:#0 %d\n", j->o.clip.max);
-        sprintf (buf + strlen (buf), "#2Oval2 - Caliber :#0 %s [#2%d#0]\n", calibers[j->o.clip.caliber], j->o.clip.caliber);
-        sprintf (buf + strlen (buf), "#2Oval3 - Type    :#0 %s [#2%d#0]\n", gun_bits[j->o.clip.type], j->o.clip.type);
-        sprintf (buf + strlen (buf), "#2Oval5 - Size    :#0 %s [#2%d#0]\n", ammo_sizes[j->o.clip.size], j->o.clip.size);
+        sprintf (buf,                "#2Oval0 - Bullets  :#0 %d\n", j->o.clip.amount);
+        sprintf (buf + strlen (buf), "#2Oval1 - Capacity :#0 %d\n", j->o.clip.max);
+        sprintf (buf + strlen (buf), "#2Oval2 - Ammo Size:#0 %s [#2%d#0]\n", calibers[j->o.clip.caliber], j->o.clip.caliber);
+        sprintf (buf + strlen (buf), "#2Oval3 - Type     :#0 %s [#2%d#0]\n", gun_bits[j->o.clip.type], j->o.clip.type);
+        sprintf (buf + strlen (buf), "#2Oval5 - Size     :#0 %s [#2%d#0]\n", ammo_sizes[j->o.clip.size], j->o.clip.size);
         break;
 
     case ITEM_FIREARM:
@@ -4544,12 +4589,12 @@ void objstat( CHAR_DATA * ch, char *name ) {
         if (!*buf2)
             sprintf (buf2, "None\n");
 
-        sprintf (buf,                "#2Oval0 - Hands:#0      %d\n", j->o.firearm.handedness);
-        sprintf (buf + strlen (buf), "#2Oval1 - Bits:#0       %s\n", buf2);
-        sprintf (buf + strlen (buf), "#2Oval2 - Caliber:#0    %s [#2%d#0]\n", calibers[j->o.firearm.caliber], j->o.firearm.caliber);
-        sprintf (buf + strlen (buf), "#2Oval3 - Skill Used:#0 %s [skill number %d]\n", skills[j->o.od.value[3]], j->o.od.value[3]);
-        sprintf (buf + strlen (buf), "#2Oval4 - Setting:#0    %s [#2%d#0]\n", (j->o.firearm.setting < 0 ? "jammed" : gun_set[j->o.firearm.setting]), j->o.firearm.setting);
-        sprintf (buf + strlen (buf), "#2Oval5 - Recoil:#0  %d\n", j->o.firearm.recoil);
+        sprintf (buf,                "#2Oval0 - Hands      :#0      %d\n", j->o.firearm.handedness);
+        sprintf (buf + strlen (buf), "#2Oval1 - Bits       :#0       %s\n", buf2);
+        sprintf (buf + strlen (buf), "#2Oval2 - Ammo Size  :#0    %s [#2%d#0]\n", calibers[j->o.firearm.caliber], j->o.firearm.caliber);
+        sprintf (buf + strlen (buf), "#2Oval3 - Skill Used :#0 %s [skill number %d]\n", skills[j->o.od.value[3]], j->o.od.value[3]);
+        sprintf (buf + strlen (buf), "#2Oval4 - Setting    :#0    %s [#2%d#0]\n", (j->o.firearm.setting < 0 ? "jammed" : gun_set[j->o.firearm.setting]), j->o.firearm.setting);
+        sprintf (buf + strlen (buf), "#2Oval5 - Recoil     :#0  %d\n", j->o.firearm.recoil);
         break;
 
     case ITEM_MISSILE:
@@ -5191,6 +5236,14 @@ void objstat( CHAR_DATA * ch, char *name ) {
 		}
 		send_to_char( buf, ch );
 	}
+// Add note listing here -Nimrod
+// j->nVirtual is the object number
+// sprintf( buf, "\nCommand will be: help objects %d \n", j->nVirtual);
+// send_to_char (buf, ch);
+
+sprintf( buf, "objects %d", j->nVirtual);
+do_help (ch, buf, 100);
+
 
 }
 
@@ -5430,7 +5483,7 @@ void do_shutdown( CHAR_DATA * ch, char *argument, int cmd ) {
 		sprintf( buf, "%s has cancelled the pending reboot.", ch->tname );
 		send_to_gods( buf );
 	} else if ( !str_cmp( arg, "reboot" ) ) {
-		if ( engine.in_play_mode() && GET_TRUST (ch) < 5 ) {
+		if ( engine.in_play_mode() && GET_TRUST (ch) < 4 ) {
 			send_to_char( "You'll need to wait for the 4 AM PST auto-reboot.\n", ch );
 			return;
 		}
@@ -6023,7 +6076,7 @@ if(	!(ptrBow = get_equip (ch, WEAR_PRIM))
 		/* no arguments specified check off-hand first */
 
 		if ( ptrOffHand ) {
-
+			// Temporarily changing item_missile to item_round - Nimrod 29 Aug 13
 			if ( GET_ITEM_TYPE (ptrOffHand) == ITEM_MISSILE && ptrOffHand->count == 1
 					&& isname( ( bBolts ) ? "bolt" : "arrow", ptrOffHand->name ) ) {
 
@@ -6055,7 +6108,7 @@ if(	!(ptrBow = get_equip (ch, WEAR_PRIM))
 		/* check first for arrow in hand */
 
 		if ( ptrOffHand ) {
-
+				// Temporarily changing item_missile to item_round for testing.  -Nimrod
 			if ( GET_ITEM_TYPE (ptrOffHand) == ITEM_MISSILE && ptrOffHand->count == 1
 					&& isname( strMissile, ptrOffHand->name )
 					&& isname( ( bBolts ) ? "bolt" : "arrow", ptrOffHand->name ) ) {
@@ -7337,7 +7390,8 @@ void do_day( CHAR_DATA * ch, char *argument, int cmd ) {
 		times = 1;
 
 	for ( i = 1; i <= times; i++ ) {
-		time_info.hour += 84;
+		// Nimrod remarked out next line for time update 11 Sept 13
+		//time_info.hour += 84;
 		next_hour_update = time( 0 );
 		next_minute_update = time( 0 );
 		weather_and_time( 1 );
@@ -7563,6 +7617,17 @@ void do_set( CHAR_DATA * ch, char *argument, int cmd ) {
 		}
 		return;
 	}
+	else if ( !str_cmp( subcmd, "debug" ) )
+	  {
+	  if ( !IS_SET (ch->plr_flags, DEBUG_PROMPT) ) {
+	    ch->plr_flags |= DEBUG_PROMPT;
+	    send_to_char( "You will now display extra debugging information on your prompt.\n", ch );
+	    return;
+	  }
+	  ch->plr_flags &= ~DEBUG_PROMPT;
+	  send_to_char( "You will now no longer display extra debugging information on your prompt.\n", ch );
+	  return;
+	  }
 
 	else if ( !str_cmp( subcmd, "ansi" ) ) {
 		if ( !IS_SET (ch->flags, FLAG_GUEST) ) {
@@ -7621,7 +7686,30 @@ void do_set( CHAR_DATA * ch, char *argument, int cmd ) {
 		ch->plr_flags &= ~MENTOR;
 		return;
 	}
-
+	else if( ! str_cmp( subcmd, "status" ) )
+	{
+		if( ! *argument )
+		{
+			sprintf( buf, "Your current status string: (#2%s#0)\n", ( ch->status_str ) ? ch->status_str : "none" );
+			send_to_char( buf, ch );
+		}
+		else if( ! strcmp( argument, "normal" ) )
+		{
+			sprintf( buf, "Your current status string has been cleared." );
+			act( buf, false, ch, 0, 0, TO_CHAR );
+			clear_status( ch );
+		}
+		else if( ch && argument )
+		{
+			ch->status_str = str_dup( std::string( argument ).substr( 0, 20 ).c_str( ) );
+			if( ! IS_NPC( ch ) )
+			{
+				sprintf( buf, "Your status string is now: %s", argument );
+				act( buf, false, ch, 0, 0, TO_CHAR | _ACT_FORMAT );
+			}
+		}
+		return;
+	}
 	else if ( !str_cmp( subcmd, "prompt" ) ) {
 		if ( !GET_FLAG (ch, FLAG_NOPROMPT) ) {
 			ch->flags |= FLAG_NOPROMPT;
@@ -7753,9 +7841,24 @@ void do_set( CHAR_DATA * ch, char *argument, int cmd ) {
 			ch->effort = 100;
 		} else {
 			ch->effort = atoi( buf );
-			sprintf( buf2, "You will now fight at #6%d percent#0 of your cabability.\n", atoi( buf ) );
+			sprintf( buf2, "You will now fight at #6%d percent#0 of your capability.\n", atoi( buf ) );
 			send_to_char( buf2, ch );
 		}
+	} else if ( !str_cmp( subcmd, "dameffort" ) ) {
+		argument = one_argument( argument, buf );
+
+		if ( !*buf ) {
+			send_to_char( "You need to nominate a percentage between 1 and 100, or 0 to reset.\n", ch );
+			ch->dameffort = 100;
+		} else if ( !atoi( buf ) || atoi( buf ) > 100 || atoi( buf ) < 0 ) {
+			send_to_char( "You need to nominate a percentage between 1 and 100, or 0 to reset.\n", ch );
+			ch->dameffort = 100;
+		} else {
+			ch->dameffort = atoi( buf );
+			sprintf( buf2, "You will now deliver wounds that hurt at #6%d percent#0 of your capability.\n", atoi( buf ) );
+			send_to_char( buf2, ch );
+		}
+
 	} else if ( !IS_MORTAL (ch) && !str_cmp( subcmd, "guardian" ) ) {
 
 		argument = one_argument( argument, buf );
@@ -8107,6 +8210,7 @@ void do_set( CHAR_DATA * ch, char *argument, int cmd ) {
 		s( "   Newbie     - Turn off your #2(new player)#0 ldesc tag" );
 		s( "   Prompt     - Toggle informative prompt on and off" );
 		s( "   Rp         - Toggle output of Reward total in SCORE" );
+		s( "   Debug      - Toggle output of extra debug information in your prompt");
 		//    s ("   Voting     - Toggle receipt of voting reminders at login");
 		if ( !IS_MORTAL (ch) ) {
 			s( "\n   #6Staff-Only Commands:#0" );
@@ -9321,15 +9425,33 @@ void display_craft( CHAR_DATA * ch, SUBCRAFT_HEAD_DATA * craft ) {
 
 		if ( phase->hit_cost )
 			sprintf( b_buf + strlen( b_buf ), "   Cost:  hits %d\n", phase->hit_cost );
+			
+		if (phase->phase_start_prog)
+		    sprintf (b_buf + strlen( b_buf ), "   Startprog: %s\n", phase->phase_start_prog);
+			
+		if (phase->phase_end_prog)
+		    sprintf (b_buf + strlen( b_buf ), "     Endprog: %s\n", phase->phase_end_prog);
 
+		if (phase->phase_fail_prog)
+		    sprintf (b_buf + strlen( b_buf ), "    Failprog: %s\n", phase->phase_fail_prog);			
+			
 		if ( craft->craft_variable ) {
 			for ( i = 1; craft->craft_variable[ i ]; i++ ) {
 				vars = craft->craft_variable[ i ];
 				if ( vars->phase != phase )
 					continue;
-				if ( *vars->category ) {
+				if ( *vars->category ) 
+				{
+				  if (vars->from >= 99)
+				    {  // This is a manual varcat transfer, show it as such
+					  sprintf( b_buf + strlen( b_buf ), "      %d;  %s from %s to position %d on Object%d\n", i,
+							vars->manual, vars->category, vars->pos, vars->to );
+					}
+					else
+					{
 					sprintf( b_buf + strlen( b_buf ), "      %d;  %s from Object%d to position %d on Object%d\n", i,
 							vars->category, vars->from, vars->pos, vars->to );
+					}
 				}
 			}
 		}
@@ -11066,15 +11188,15 @@ void do_map( CHAR_DATA * ch, char *argument, int cmd ) {
 	"", /* Outside */
 	"#5", /* Spaceship */
 	"#3", // RuinGym
-			"#3", // Ruin Utility
-			"#3", // Ruin Religion
-			"#3", // Ruin Shop
-			"#3", // Ruin Generator
-			"#3", // Ruin Chemlab
-			"#3", // Ruin Workshop
-			"#3", // Ruin Kitchen
-			"#3", // Ruin Domicile
-			"#3" // FREEFALL
+	"#3", // Ruin Utility
+	"#3", // Ruin Religion
+	"#3", // Ruin Shop
+	"#3", // Ruin Generator
+	"#3", // Ruin Chemlab
+	"#3", // Ruin Workshop
+	"#3", // Ruin Kitchen
+	"#3", // Ruin Domicile
+	"#3" // FREEFALL
 			};
 	unsigned char i = 0, j = 0, x = 0, y = 0, nInRoom = 0, bSearch = 0;
 	int r = 0;
@@ -11186,7 +11308,14 @@ bool csv_obj( CHAR_DATA* ch ) {
 			fp << tobj->zone << ", " << tobj->nVirtual << ", " << '"'
 					<< item_types[ ( size_t ) tobj->obj_flags.type_flag ] << '"' << ", " << '"' << tobj->name << '"'
 					<< ", " << '"' << tobj->short_description << '"' << ", " << '"' << tobj->description << '"' << ", "
-					<< ( ( ( float ) tobj->obj_flags.weight ) * 0.01 ) << ", " << tobj->farthings << ';' << std::endl;
+					<< ( ( ( float ) tobj->obj_flags.weight ) * 0.01 ) << ", " << tobj->farthings << ", "
+					<< tobj->o.od.value[0] << ", "
+					<< tobj->o.od.value[1] << ", "
+					<< tobj->o.od.value[2] << ", "
+					<< tobj->o.od.value[3] << ", "
+					<< tobj->o.od.value[4] << ", "
+					<< tobj->o.od.value[5] << ", 99999"
+					<< ';' << std::endl;
 		}
 		fp.close();
 		success = true;
@@ -11855,3 +11984,84 @@ void do_scents( CHAR_DATA *ch, char *argument, int cmd ) {
 
 	page_string( ch->descr(), output.c_str() );
 }
+
+/*
+fetch_variable_categories() - Added 0219141251 -Nimrod
+Used to read the variable categories on PROTOTYPE of mob or object
+   var_list is an array of pointers that will point to strings that will hold variable list
+   target is vnumber of object prototype or mobile prototype
+   target_type specifies if it is an object or mobile 0 = object, 1 = mobile
+   Note - array of strings and pointer array var_list must be initialized in calling function
+   Example of required elements prior to call:
+   
+   	char var_list[10][100];
+	char *var_list_pointers[10];
+   	// Initalize pointer array
+	for (j = 0; j<10;j++)
+	{
+	  var_list_pointers[j] = var_list[j];
+	  *var_list[j] = '\0'; // Set these to null while we're at it.
+	}
+    // Then call the function thus:
+    fetch_variable_categories ( var_list_pointers, vnum, 0);
+	
+	Variable categories are returned in the order they are read from the full description of mob or object.
+	
+	To-do:
+	  Check to see if mob and obj need to be freed prior to exit
+	  Move initialization of pointers and strings to function so we don't have to repeat it prior to calls
+	  Check out use of slot designations on from object will affect function
+	  Strip trailing digits from variable name prior to returning
+*/
+void fetch_variable_categories ( char **var_list, int target, int target_type) {
+  OBJ_DATA *obj;
+  CHAR_DATA *mob;
+  char temp[100] = { '\0' };
+  char *point;
+  int k = 0;
+  int i = 0;
+  char buf[ MAX_STRING_LENGTH ];
+   
+  switch (target_type)
+  {
+    case 0:  // Object Specified 
+	  if (!(obj = vtoo(target))) // Set obj to object 
+	    return;
+	  point = obj->full_description; // Set point to address of obj description
+	  break;
+	case 1: // Mobile Specified
+      if (!(mob = vnum_to_mob(target))) // Set mob to called mobile
+	    return;
+	  point = mob->description; // Set point to address of mob description
+	  break;
+	default:
+	  return;
+  }
+ 
+  while ( k < 10 ) // 10 is max number of variables on an obj or mob
+  { 
+    point = one_argument( point, temp ); // Read first word
+    if (!temp)
+      break;
+	  
+    if (temp[0] == '$')  // Check to see if word is a variable category
+    {
+	  strcpy(var_list[k], "$");
+	  for ( i = 1; i < strlen( temp ); i++ ) 
+	  {
+		if (isalpha(temp[i]))  // Only copy alpha chars 0317140414 -Nimrod
+		  sprintf (var_list[k] + strlen (var_list[k]), "%c", temp[i]);
+	  }				
+      // sprintf( buf, "Variable # %d is: >>>%s<<<\n", k, var_list[k] ); // Just for testing purposes
+      // send_to_gods(buf);
+	  k++;
+	}
+	if (strlen(temp) <= 0) // If there's no more words, break out of the while loop
+	{
+	  // send_to_gods("Temp length is zero or less");
+	  break;
+	} 
+    
+  }
+  return;
+} 

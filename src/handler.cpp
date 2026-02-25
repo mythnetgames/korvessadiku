@@ -157,7 +157,7 @@ fname (char *namelist)
     if (!namelist)
         return "";
 
-    for (point = holder; isalpha (*namelist); namelist++, point++)
+    for (point = holder; isalpha (*namelist) || *namelist == '-'; namelist++, point++)
         *point = *namelist;
 
     *point = '\0';
@@ -1172,51 +1172,32 @@ char_to_room (CHAR_DATA * ch, int room_num)
     ch->in_room = room->vnum;
     ch->room = room;
 
-  if (!IS_NPC (ch) && !GET_TRUST (ch))
-        room->room_flags |= PC_ENTERED; 
-
-
- if (IS_SET(room->room_flags, LOWAIR)
-   && !get_affect (ch, AFFECT_CHOKING))
-{ 
-	if (has_breather(ch))
-     { 
-		act
-        ("You suck in a breath of metallic, generated oxygen.\n",
-        false, ch, 0, 0, TO_CHAR); 
-	}
-}
+    if (!IS_NPC (ch) && !GET_TRUST (ch))
+        room->room_flags |= PC_ENTERED;
 
     if (IS_SET(room->room_flags, LOWAIR)
         && !get_affect (ch, AFFECT_CHOKING))
     {
-        if (IS_MORTAL (ch) && !(has_breather(ch)))
+        if (IS_MORTAL (ch))
         {
             act
             ("Your breathing becomes labored as the air grows thin...",
              false, ch, 0, 0, TO_CHAR);
             send_to_char ("\n", ch);
-            curr = MAX ((ch->con + ch->str + ch->agi) * number (1, 3), 25);
+            curr = MAX ((ch->con*2 + ch->str + ch->agi) * number (1, 3), 25);
             magic_add_affect (ch, AFFECT_CHOKING, curr, 0, 0, 0, curr);
         }    
-    } 
-	
+    }
     else if (IS_SET(room->room_flags, NOAIR)
         && !get_affect (ch, AFFECT_CHOKING))
-	{ 
-		if (has_breather(ch))
-		{ 
-			act
-            ("You suck in a breath of metallic, generated oxygen.\n",
-             false, ch, 0, 0, TO_CHAR); 
-		}
-        if (IS_MORTAL (ch) && !(has_breather(ch)))
+    {
+        if (IS_MORTAL (ch))
         {
             act
             ("You take a deep breath just before entering the oxygen-deprived zone...",
              false, ch, 0, 0, TO_CHAR);
             send_to_char ("\n", ch);
-            curr = MAX ((ch->con + ch->str/2 + ch->agi/2) * number (1, 3), 25);
+            curr = MAX ((ch->con*2 + ch->str + ch->agi) * number (1, 3), 25);
             magic_add_affect (ch, AFFECT_CHOKING, curr, 0, 0, 0, curr);
         }
     }
@@ -2392,7 +2373,7 @@ extract_obj (OBJ_DATA * obj)
 void
 morph_obj (OBJ_DATA * obj)
 {
-
+    char nbuf[MAX_STRING_LENGTH] = {'\0'};
     char buf[MAX_STRING_LENGTH];
     OBJ_DATA *newObj;
 
@@ -2413,7 +2394,15 @@ morph_obj (OBJ_DATA * obj)
         else
         {
 			newObj = LOAD_COLOR(obj, obj->morphto);
-			fluid_object(newObj);
+			if (newObj)
+			{
+			  fluid_object(newObj);
+			}
+			else
+			{
+			  sprintf (nbuf, "Problem with morphing obj: %d - In room: %d\n", obj->nVirtual, obj->in_room);
+              send_to_gods(nbuf);
+			}
         }
     }
     else
@@ -3569,11 +3558,11 @@ update_delays (void)
         if (!ch || ch->deleted || !ch->room || ch->in_room == NOWHERE)
             continue;
 
-/*  if (IS_MORTAL (ch) && (af = get_affect (ch, AFFECT_HOLDING_BREATH)))
+        if (IS_MORTAL (ch) && (af = get_affect (ch, AFFECT_HOLDING_BREATH)))
         {
             if (has_breather(ch))
             {
-                send_to_char( "You suck in a breath of metallic, generated oxygen.\n", ch);
+                send_to_char( "Your suck in a breath of metallic, generated oxygen.\n", ch);
                 continue;
             }
             
@@ -3583,13 +3572,13 @@ update_delays (void)
                     continue;
             }
         }
-*/
-    if (IS_MORTAL (ch) && (af = get_affect (ch, AFFECT_CHOKING)))
+
+        if (IS_MORTAL (ch) && (af = get_affect (ch, AFFECT_CHOKING)))
         {
             if (has_breather(ch))
             {
                 if (number(0, 4))
-                    //send_to_char( "You suck in a breath of metallic, generated oxygen.\n", ch);
+                    send_to_char( "Your suck in a breath of metallic, generated oxygen.\n", ch);
                 continue;
             }
             
@@ -3675,14 +3664,16 @@ update_delays (void)
         {
 
             obj = get_equip (ch, WEAR_BOTH);
-            if (!obj || GET_ITEM_TYPE(obj) != ITEM_FIREARM)
+			
+            if (!obj || !((GET_ITEM_TYPE(obj) == ITEM_FIREARM) || (GET_ITEM_TYPE(obj) == ITEM_SHORTBOW)))
                 obj = get_equip (ch, WEAR_PRIM);
-            else if (!obj || GET_ITEM_TYPE(obj) != ITEM_FIREARM)
+            else if (!obj || !((GET_ITEM_TYPE(obj) == ITEM_FIREARM) || (GET_ITEM_TYPE(obj) == ITEM_SHORTBOW)))
                 obj = get_equip (ch, WEAR_SEC);
-            else if (!obj || GET_ITEM_TYPE(obj) != ITEM_FIREARM)
+            else if (!obj || !((GET_ITEM_TYPE(obj) == ITEM_FIREARM) || (GET_ITEM_TYPE(obj) == ITEM_SHORTBOW)))
                 obj = NULL;
 
-            // If we are not wielding a firearm, then we need to break our aim.
+            // If we are not wielding a firearm, then we need to break our aim. BAH!
+			
             if (!obj || !ch->aiming_at)
             {
                 broke_aim(ch, 0);
@@ -3714,7 +3705,7 @@ update_delays (void)
                 ch->aim++;
                 if ((ch->in_room == ch->aiming_at->in_room && ch->aim >= 5 && IS_NPC (ch)) || ch->aim >= 11)
                 {
-                    send_to_char ("", ch);
+                    send_to_char ("You feel you have the best aim you're going to get.\n", ch);
                     if (IS_NPC (ch) && !ch->descr() && !IS_FROZEN (ch->room->zone))
                     {
                         if (CAN_SEE (ch, ch->aiming_at) &&
@@ -3864,15 +3855,6 @@ update_delays (void)
         case DEL_CAMP4:
             delayed_camp4 (ch);
             break;
-  case DEL_HOME_CAMP1:
-            delayed_home_camp1 (ch);
-            break;
-        case DEL_HOME_CAMP2:
-            delayed_home_camp2 (ch);
-            break;
-        case DEL_HOME_CAMP3:
-            delayed_home_camp3 (ch);
-            break;
         case DEL_COVER:
             delayed_cover (ch);
             break;
@@ -3975,6 +3957,8 @@ update_delays (void)
         // then clear out all of the delay info we might still be carrying on us.
         if (!ch->delay)
             clear_delays(ch);
+			
+			
 
     }
 }
@@ -4282,9 +4266,6 @@ break_delay (CHAR_DATA * ch)
     case DEL_CAMP1:
     case DEL_CAMP2:
     case DEL_CAMP3:
- case DEL_HOME_CAMP1:
-        case DEL_HOME_CAMP2: 
-        case DEL_HOME_CAMP3:   
     case DEL_CAMP4:
         ch->delay = 0;
         send_to_char ("You stop building your camp.\n", ch);
@@ -5227,51 +5208,76 @@ setup_registry (void)
     for (i = 1; i < LAST_SKILL; i++)
         add_registry (REG_CRAFT_MAGIC, MAGIC_SKILL_MOD_FIRST + i, skills[i]);
 
-    add_registry (REG_SKILLS, SKILL_BRAWLING, "Brawling");
-    add_registry (REG_SKILLS, SKILL_SMALL_BLADE, "Small-Blade");
-    add_registry (REG_SKILLS, SKILL_LONG_BLADE, "Long-Blade");
-    add_registry (REG_SKILLS, SKILL_POLEARM, "Polearm");
-    add_registry (REG_SKILLS, SKILL_BLUDGEON, "Bludgeon");
-    add_registry (REG_SKILLS, SKILL_DEFLECT, "Deflect");
-    add_registry (REG_SKILLS, SKILL_DODGE, "Dodge");
-    add_registry (REG_SKILLS, SKILL_SOLE_WIELD, "Sole-Wield");
-    add_registry (REG_SKILLS, SKILL_DUAL_WIELD, "Dual-Wield");
-    add_registry (REG_SKILLS, SKILL_AIM, "Aim");
-    add_registry (REG_SKILLS, SKILL_HANDGUN, "Handgun");
-    add_registry (REG_SKILLS, SKILL_RIFLE, "Rifle");
-    add_registry (REG_SKILLS, SKILL_SMG, "Machinegun");
-    add_registry (REG_SKILLS, SKILL_GUNNERY, "Gunnery");
-    add_registry (REG_SKILLS, SKILL_ARCHERY, "Archery");
+    add_registry (REG_SKILLS, SKILL_BRAWLING, "Brawling"); // keep
+    add_registry (REG_SKILLS, SKILL_SMALL_BLADE, "Small-Blade"); // keep
+    add_registry (REG_SKILLS, SKILL_LONG_BLADE, "Long-Blade"); // keep
+    add_registry (REG_SKILLS, SKILL_POLEARM, "Polearm"); // keep
+    add_registry (REG_SKILLS, SKILL_BLUDGEON, "Bludgeon"); // keep
+    add_registry (REG_SKILLS, SKILL_DEFLECT, "Deflect"); // keep
+    add_registry (REG_SKILLS, SKILL_DODGE, "Dodge"); // keep
+    add_registry (REG_SKILLS, SKILL_SOLE_WIELD, "Sole-Wield"); // keep
+    add_registry (REG_SKILLS, SKILL_DUAL_WIELD, "Dual-Wield"); // keep
+    add_registry (REG_SKILLS, SKILL_AIM, "Aim"); // keep
+    add_registry (REG_SKILLS, SKILL_HANDGUN, "Handgun"); // can be deleted
+    add_registry (REG_SKILLS, SKILL_RIFLE, "Rifle"); // can be deleted
+    add_registry (REG_SKILLS, SKILL_SMG, "Machinegun"); // can be deleted
+    add_registry (REG_SKILLS, SKILL_GUNNERY, "Gunnery"); // can be deleted
+    add_registry (REG_SKILLS, SKILL_EXPLOSIVES, "Explosives"); // can be deleted
 
-    add_registry (REG_SKILLS, SKILL_SNEAK, "Sneak");
-    add_registry (REG_SKILLS, SKILL_HIDE, "Hide");
-    add_registry (REG_SKILLS, SKILL_STEAL, "Steal");
-    add_registry (REG_SKILLS, SKILL_PICK, "Picklock");
-    add_registry (REG_SKILLS, SKILL_HAGGLE, "Haggle");
-    add_registry (REG_SKILLS, SKILL_HANDLE, "Handle");
-    add_registry (REG_SKILLS, SKILL_HUNTING, "Hunting");
-    add_registry (REG_SKILLS, SKILL_FIRSTAID, "First-Aid");
-    add_registry (REG_SKILLS, SKILL_MEDICINE, "Medicine");
-    add_registry (REG_SKILLS, SKILL_FORAGE, "Scavenge");
-    add_registry (REG_SKILLS, SKILL_EAVESDROP, "Eavesdrop");
-    add_registry (REG_SKILLS, SKILL_BUTCHERY, "Butchery");
+    add_registry (REG_SKILLS, SKILL_SNEAK, "Sneak"); // keep
+    add_registry (REG_SKILLS, SKILL_HIDE, "Hide"); // keep
+    add_registry (REG_SKILLS, SKILL_STEAL, "Steal"); // keep
+    add_registry (REG_SKILLS, SKILL_PICK, "Picklock"); // keep
+    add_registry (REG_SKILLS, SKILL_HAGGLE, "Haggle"); // keep
+    add_registry (REG_SKILLS, SKILL_HANDLE, "Handle"); // keep
+    add_registry (REG_SKILLS, SKILL_HUNTING, "Hunting"); // keep
+    add_registry (REG_SKILLS, SKILL_FIRSTAID, "First-Aid"); // keep
+    add_registry (REG_SKILLS, SKILL_MEDICINE, "Medicine"); // keep
+    add_registry (REG_SKILLS, SKILL_FORAGE, "Forage"); // Possibly rename FORAGING?
+    add_registry (REG_SKILLS, SKILL_EAVESDROP, "Eavesdrop"); // keep
+    add_registry (REG_SKILLS, SKILL_BUTCHERY, "Butchery"); // keep
 
-    add_registry (REG_SKILLS, SKILL_CHEMISTRY, "Chemistry");
-    add_registry (REG_SKILLS, SKILL_MECHANICS, "Mechanics");
-    add_registry (REG_SKILLS, SKILL_GUNSMITH, "Gunsmith");
-    add_registry (REG_SKILLS, SKILL_COMPUTEROLOGY, "Computerology");
-    add_registry (REG_SKILLS, SKILL_ELECTRONICS, "Electronics");
-    add_registry (REG_SKILLS, SKILL_BIOLOGY, "Biology");
-    add_registry (REG_SKILLS, SKILL_WEAPONCRAFT, "Weaponcraft");
-    add_registry (REG_SKILLS, SKILL_ARMORCRAFT, "Armorcraft");
-    add_registry (REG_SKILLS, SKILL_HANDICRAFT, "Handicraft");
-    add_registry (REG_SKILLS, SKILL_ARTISTRY, "Artistry");
+    add_registry (REG_SKILLS, SKILL_CHEMISTRY, "Chemistry"); // can remove
+    add_registry (REG_SKILLS, SKILL_MECHANICS, "Mechanics"); // can remove
+    add_registry (REG_SKILLS, SKILL_GUNSMITH, "Gunsmith"); // can remove
+    add_registry (REG_SKILLS, SKILL_COMPUTEROLOGY, "Computerology"); // can remove
+    add_registry (REG_SKILLS, SKILL_ELECTRONICS, "Electronics"); // can remove
+    add_registry (REG_SKILLS, SKILL_BIOLOGY, "Biology"); // can remove
+    add_registry (REG_SKILLS, SKILL_WEAPONCRAFT, "Weaponcraft"); // keep
+    add_registry (REG_SKILLS, SKILL_ARMORCRAFT, "Armorcraft"); // keep
+    add_registry (REG_SKILLS, SKILL_HANDICRAFT, "Handicraft"); // ?
+    add_registry (REG_SKILLS, SKILL_ARTISTRY, "Artistry"); // keep
 
-    add_registry (REG_SKILLS, SKILL_VOODOO, "Voodoo");
-    add_registry (REG_SKILLS, SKILL_EDUCATION, "Education");
-    add_registry (REG_SKILLS, SKILL_COMMON, "Common");
-
-
+    add_registry (REG_SKILLS, SKILL_VOODOO, "Empathy"); // Changed to Empathy - Nimrod 1-26-13
+    add_registry (REG_SKILLS, SKILL_EDUCATION, "Education"); // keep
+    add_registry (REG_SKILLS, SKILL_COMMON, "Common"); // keep
+	
+    add_registry (REG_SKILLS, SKILL_METALCRAFT, "Metalcraft");
+    add_registry (REG_SKILLS, SKILL_LEATHERCRAFT, "Leathercraft");
+    add_registry (REG_SKILLS, SKILL_TEXTILECRAFT, "Textilecraft");
+    add_registry (REG_SKILLS, SKILL_WOODCRAFT, "Woodcraft");
+    add_registry (REG_SKILLS, SKILL_COOKING, "Cooking");
+    add_registry (REG_SKILLS, SKILL_BAKING, "Baking");
+    add_registry (REG_SKILLS, SKILL_BREWING, "Brewing");
+    add_registry (REG_SKILLS, SKILL_FISHING, "Fishing");
+    add_registry (REG_SKILLS, SKILL_STONECRAFT, "Stonecraft");
+    add_registry (REG_SKILLS, SKILL_EARTHENCRAFT, "Earthencraft");
+    add_registry (REG_SKILLS, SKILL_FARMING, "Farming");
+    add_registry (REG_SKILLS, SKILL_SHORTBOW, "Shortbow");
+    add_registry (REG_SKILLS, SKILL_LONGBOW, "Longbow");
+    add_registry (REG_SKILLS, SKILL_CROSSBOW, "Crossbow");
+    add_registry (REG_SKILLS, SKILL_MUSIC, "Music");
+	add_registry (REG_SKILLS, SKILL_ASTRONOMY, "Astronomy"); // can remove
+	
+	add_registry (REG_SKILLS, SKILL_ORKISH, "Orkish");
+	add_registry (REG_SKILLS, SKILL_WARGISH, "Wargish");
+	add_registry (REG_SKILLS, SKILL_DALISH, "Dalish");
+	add_registry (REG_SKILLS, SKILL_SINDARIN, "Sindarin");
+	add_registry (REG_SKILLS, SKILL_KHUZDUL, "Khuzdul");
+	add_registry (REG_SKILLS, SKILL_TENGWAR, "Tengwar");
+	add_registry (REG_SKILLS, SKILL_CIRITH, "Cirth");
+	add_registry (REG_SKILLS, SKILL_WARCRAFT, "Warcraft");
+	
     add_registry (REG_MISC_NAMES, MISC_DELAY_OFFSET, "Delayoffset");
     add_registry (REG_MISC_NAMES, MISC_MAX_CARRY_N, "Maxcarry_n");
     add_registry (REG_MISC_NAMES, MISC_MAX_CARRY_W, "Maxcarry_w");
@@ -5390,7 +5396,7 @@ morph_mob (CHAR_DATA * ch)
             || IS_RIDER (ch)
             || IS_RIDEE (ch)
             || (IS_DROWNING(ch))
-            || (ch->following != nullptr)
+            || (ch->following != NULL)
             || !IS_NPC (ch)
             || IS_SUFFOCATING (ch))
         return;
@@ -5721,6 +5727,7 @@ char_data::clear_char ()
     this->short_descr = NULL;
     this->long_descr = NULL;
     this->pmote_str = NULL;
+    this->status_str = NULL;
     this->voice_str = NULL;
     this->description = NULL;
     this->sex = 0;
@@ -5807,6 +5814,7 @@ char_data::clear_char ()
     this->group = NULL;
     this->talents = 0;
     this->effort = 0;
+    this->dameffort = 0;
     this->combat_block = 0;
 
     // Variable descs.
@@ -5822,6 +5830,17 @@ char_data::clear_char ()
     this->d_feat2 = NULL;
     this->d_feat3 = NULL;
     this->d_feat4 = NULL;
+
+    this->damnodice = 0;
+    this->damsizedice = 0;
+    this->damroll = 0;
+
+    for (int i=0; i<10; i++)
+      {
+	this->mob_color_name[i] = NULL;
+	this->mob_color_cat[i] = NULL;
+      }
+
 
     this->controlled_by = NULL;
     this->controlling = NULL;
@@ -5982,7 +6001,24 @@ char_data::~char_data ()
     clear_pmote(this);
     clear_dmote(this);
 
-
+    /* Grommit - commented out because, as suspected, causes crashes. Need to assess where this
+     * field is getting set and use the proper freeing command, e.g. mem_free, etc.
+     * For now slow leak is better than crash so omitting.
+    for (int i=0; i<10; i++)
+      {
+	if (mob_color_name[i])
+	  {
+	    delete mob_color_name[i];
+	    mob_color_name[i]=NULL;
+	  }
+	if (mob_color_cat[i])
+	  {
+	    delete mob_color_cat[i];
+	    mob_color_cat[i]=NULL;
+	  }    
+      }
+    */
+    
     if (this->controlled_by)
     {
         this->controlled_by->controlling = NULL;
@@ -6534,6 +6570,11 @@ void char_data::deep_copy (CHAR_DATA *copy_from)
     {
         this->d_feat4 = str_dup(copy_from->d_feat4);
     }
+
+    this->damnodice = copy_from->damnodice;
+    this->damsizedice = copy_from->damsizedice;
+    this->damroll = copy_from->damroll;
+
 
     if (copy_from->clans)
     {
