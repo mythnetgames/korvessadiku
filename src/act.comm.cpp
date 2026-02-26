@@ -2114,8 +2114,8 @@ void do_select_script(CHAR_DATA* ch, char* argument, int cmd) {
 	struct lang_info {
 		char lang[30];
 		int skill;
-	} lang_tab[] = { { "common", SKILL_COMMON }, { "tengwar", SKILL_TENGWAR }, {
-			"cirth", SKILL_CIRITH }, { "\0", 0 } };
+	} lang_tab[] = { { "common", SKILL_COMMON }, { "tengwar", SKILL_CLIMBING }, {
+			"cirth", SKILL_SWIMMING }, { "\0", 0 } };
 
 	argument = one_argument(argument, buf);
 
