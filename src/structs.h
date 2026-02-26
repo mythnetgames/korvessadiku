@@ -1384,10 +1384,15 @@ typedef signed char shortint;
 #define SKILL_DUAL_WIELD        9
 #define SKILL_AIM		        10	/* Ranged aiming (bows) */
 #define SKILL_GRAPPLE	    	11	/* Was HANDGUN - now unarmed grappling */
+#define SKILL_HANDGUN           SKILL_GRAPPLE  /* Old name compatibility */
 #define SKILL_SHORTBOW          12	/* Was RIFLE - moved bow skills to combat */
+#define SKILL_RIFLE             SKILL_SHORTBOW  /* Old name compatibility */
 #define SKILL_LONGBOW       	13	/* Was SMG */
+#define SKILL_SMG               SKILL_LONGBOW  /* Old name compatibility */
 #define SKILL_CROSSBOW		    14	/* Was GUNNERY */
+#define SKILL_GUNNERY           SKILL_CROSSBOW  /* Old name compatibility */
 #define SKILL_THROWN		    15	/* Was EXPLOSIVES - throwing weapons */
+#define SKILL_EXPLOSIVES        SKILL_THROWN  /* Old name compatibility */
 
 #define LAST_WEAPON_SKILL       14      // The last real weaponskill we have.
 
@@ -1405,6 +1410,7 @@ typedef signed char shortint;
 // === SURVIVAL SKILLS (23-27) ===
 #define SKILL_FIRSTAID			23
 #define SKILL_TRACKING			24	/* Was MEDICINE - wilderness tracking */
+#define SKILL_MEDICINE          SKILL_TRACKING  /* Old name compatibility */
 #define SKILL_FORAGE        	25
 #define SKILL_EAVESDROP         26
 #define SKILL_BUTCHERY			27
@@ -1424,6 +1430,7 @@ typedef signed char shortint;
 // === KNOWLEDGE & MISC SKILLS (38-55) ===
 #define SKILL_EDUCATION         38
 #define SKILL_SENSE_MOTIVE      39	/* Was VOODOO - reading people */
+#define SKILL_VOODOO            SKILL_SENSE_MOTIVE  /* Old name compatibility */
 #define SKILL_COMMON            40
 #define SKILL_METALCRAFT        41
 #define SKILL_LEATHERCRAFT      42

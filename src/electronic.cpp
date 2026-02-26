@@ -441,10 +441,10 @@ CHAR_DATA * robot_constructor(OBJ_DATA *robot)
 		(tch->d_feat4 && !str_cmp(tch->d_feat4, "firearms")))
 	{
 	    tch->skills[SKILL_AIM] += 20;
-		tch->skills[SKILL_HANDGUN] += 20;
-		tch->skills[SKILL_SMG] += 20;
-		tch->skills[SKILL_RIFLE] += 20;
-		tch->skills[SKILL_GUNNERY] += 20;
+		tch->skills[SKILL_GRAPPLE] += 20;
+		tch->skills[SKILL_LONGBOW] += 20;
+		tch->skills[SKILL_SHORTBOW] += 20;
+		tch->skills[SKILL_CROSSBOW] += 20;
 	}
 
 	if ((tch->d_feat1 && !str_cmp(tch->d_feat1, "repair")) ||

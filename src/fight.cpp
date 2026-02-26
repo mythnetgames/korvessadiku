@@ -2849,10 +2849,10 @@ strike(CHAR_DATA* src, CHAR_DATA* tar, int attack_num, int mode)
 	/*
     if (attack_weapon &&
             (attack_weapon->o.weapon.use_skill == SKILL_AIM ||
-             attack_weapon->o.weapon.use_skill == SKILL_HANDGUN ||
-             attack_weapon->o.weapon.use_skill == SKILL_SMG ||
-             attack_weapon->o.weapon.use_skill == SKILL_RIFLE ||
-             attack_weapon->o.weapon.use_skill == SKILL_GUNNERY))
+             attack_weapon->o.weapon.use_skill == SKILL_GRAPPLE ||
+             attack_weapon->o.weapon.use_skill == SKILL_LONGBOW ||
+             attack_weapon->o.weapon.use_skill == SKILL_SHORTBOW ||
+             attack_weapon->o.weapon.use_skill == SKILL_CROSSBOW))
         return 0;
     */
 
@@ -2959,10 +2959,10 @@ strike(CHAR_DATA* src, CHAR_DATA* tar, int attack_num, int mode)
 	else if (attack_weapon->obj_flags.type_flag == ITEM_WEAPON)
 	{
 		if (attack_weapon->o.weapon.use_skill == SKILL_AIM ||
-			attack_weapon->o.weapon.use_skill == SKILL_HANDGUN ||
-			attack_weapon->o.weapon.use_skill == SKILL_SMG ||
-			attack_weapon->o.weapon.use_skill == SKILL_RIFLE ||
-			attack_weapon->o.weapon.use_skill == SKILL_GUNNERY)
+			attack_weapon->o.weapon.use_skill == SKILL_GRAPPLE ||
+			attack_weapon->o.weapon.use_skill == SKILL_LONGBOW ||
+			attack_weapon->o.weapon.use_skill == SKILL_SHORTBOW ||
+			attack_weapon->o.weapon.use_skill == SKILL_CROSSBOW)
 		{
 			off_style = SKILL_SOLE_WIELD;
 		}
@@ -3210,10 +3210,10 @@ strike(CHAR_DATA* src, CHAR_DATA* tar, int attack_num, int mode)
 	else if (defense_weapon->obj_flags.type_flag == ITEM_WEAPON)
 	{
 		if (defense_weapon->o.weapon.use_skill == SKILL_AIM ||
-			defense_weapon->o.weapon.use_skill == SKILL_HANDGUN ||
-			defense_weapon->o.weapon.use_skill == SKILL_SMG ||
-			defense_weapon->o.weapon.use_skill == SKILL_RIFLE ||
-			defense_weapon->o.weapon.use_skill == SKILL_GUNNERY)
+			defense_weapon->o.weapon.use_skill == SKILL_GRAPPLE ||
+			defense_weapon->o.weapon.use_skill == SKILL_LONGBOW ||
+			defense_weapon->o.weapon.use_skill == SKILL_SHORTBOW ||
+			defense_weapon->o.weapon.use_skill == SKILL_CROSSBOW)
 		{
 			defense = tar->skills[SKILL_DODGE];
 		}
@@ -3234,9 +3234,9 @@ strike(CHAR_DATA* src, CHAR_DATA* tar, int attack_num, int mode)
 		defense = 0;
 	}
 
-	if (real_skill(tar, SKILL_VOODOO))
-		if (skill_use(tar, SKILL_VOODOO, 0))
-			defense += tar->skills[SKILL_VOODOO] / 5;
+	if (real_skill(tar, SKILL_SENSE_MOTIVE))
+		if (skill_use(tar, SKILL_SENSE_MOTIVE, 0))
+			defense += tar->skills[SKILL_SENSE_MOTIVE] / 5;
 	/* On a successful use of the Danger Sense skill, if */
 	/* the skill being checked is a defensive combat skill, */
 	/* it grants them a bonus; they are able to sense the */
