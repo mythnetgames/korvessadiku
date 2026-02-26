@@ -6210,8 +6210,8 @@ do_teach(CHAR_DATA* ch, char* argument, int cmd)
 		send_to_char("You cannot teach education.\n", ch);
 		return;
 
-	case SKILL_VOODOO:
-		send_to_char("Psionics cannot be taught.\n", ch);
+	case SKILL_SENSE_MOTIVE:
+		send_to_char("Sense Motive cannot be taught.\n", ch);
 		return;
 
 		//Dependant skills
@@ -6231,8 +6231,8 @@ do_teach(CHAR_DATA* ch, char* argument, int cmd)
 		} /// \todo Check if the above condition is always true.
 		break;
 
-	case SKILL_MEDICINE:
-		if (!prereq_skill(ch, victim, SKILL_MEDICINE, SKILL_FIRSTAID, 0))
+	case SKILL_TRACKING:
+		if (!prereq_skill(ch, victim, SKILL_TRACKING, SKILL_FIRSTAID, 0))
 		{
 			send_to_char("They don't know enough about first aid.\n\r", ch);
 			return;
