@@ -11186,6 +11186,8 @@ void write_dynamic_registry( CHAR_DATA * ch ) {
 void fill_map( ROOM_DATA * ptrRoom, int x, int y, int map[ MAP_GRID_DEPTH ][ MAP_GRID_WIDTH ][ MAP_GRID_WIDTH ] ) {
 	int n = 0, e = 0, s = 0, w = 0;
 	static unsigned char radius = 0;
+	if ( x < 0 || x >= MAP_GRID_WIDTH || y < 0 || y >= MAP_GRID_WIDTH )
+		return;
 	ROOM_DIRECTION_DATA *ptrNExit = NULL;
 	ROOM_DIRECTION_DATA *ptrEExit = NULL;
 	ROOM_DIRECTION_DATA *ptrSExit = NULL;
@@ -11218,13 +11220,13 @@ void fill_map( ROOM_DATA * ptrRoom, int x, int y, int map[ MAP_GRID_DEPTH ][ MAP
 	if ( ( y > 0 ) && !map[ 0 ][ x ][ y - 1 ] && ( ptrNExit = ptrRoom->dir_option[ 0 ] ) ) {
 		n = ptrNExit->to_room;
 	}
-	if ( !map[ 0 ][ x + 1 ][ y ] && ( x + 1 < MAP_GRID_WIDTH ) && ( ptrEExit != NULL ) ) {
+	if ( ( x + 1 < MAP_GRID_WIDTH ) && !map[ 0 ][ x + 1 ][ y ] && ( ptrEExit != NULL ) ) {
 		e = ptrEExit->to_room;
 	}
-	if ( !map[ 0 ][ x ][ y + 1 ] && ( y + 1 < MAP_GRID_WIDTH ) && ( ptrSExit != NULL ) ) {
+	if ( ( y + 1 < MAP_GRID_WIDTH ) && !map[ 0 ][ x ][ y + 1 ] && ( ptrSExit != NULL ) ) {
 		s = ptrSExit->to_room;
 	}
-	if ( !map[ 0 ][ x - 1 ][ y ] && ( x - 1 >= 0 ) && ( ptrWExit = ptrRoom->dir_option[ 3 ] ) ) {
+	if ( ( x - 1 >= 0 ) && !map[ 0 ][ x - 1 ][ y ] && ( ptrWExit = ptrRoom->dir_option[ 3 ] ) ) {
 		w = ptrWExit->to_room;
 	}
 
