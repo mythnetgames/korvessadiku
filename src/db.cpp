@@ -821,7 +821,7 @@ void save_world_time(void)
 	FILE *fp;
 	char filename[MAX_STRING_LENGTH];
 	
-	sprintf(filename, "%s/world_time", PATH_MISC);
+	sprintf(filename, "world_time");
 	
 	if (!(fp = fopen(filename, "w")))
 	{
@@ -848,7 +848,7 @@ int load_world_time(void)
 	int year, month, day, hour;
 	int result;
 	
-	sprintf(filename, "%s/world_time", PATH_MISC);
+	sprintf(filename, "world_time");
 	
 	if (!(fp = fopen(filename, "r")))
 	{
