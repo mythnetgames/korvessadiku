@@ -5531,10 +5531,6 @@ render_minimap(CHAR_DATA *ch)
 	char line[512];
 	int pos;
 
-	/* Direction offsets: NORTH=0 (0,-1), EAST=1 (1,0), SOUTH=2 (0,1), WEST=3 (-1,0) */
-	const int dx[4] = {  0, 1, 0, -1 };
-	const int dy[4] = { -1, 0, 1,  0 };
-
 	if (!ch || !ch->room)
 		return;
 
@@ -5553,7 +5549,7 @@ render_minimap(CHAR_DATA *ch)
 	qv[tail] = ch->room->vnum;
 	tail++;
 
-	/* BFS traversal - cardinal only, up to MAP_RADIUS steps */
+	/* BFS traversal - all horizontal directions (cardinal + diagonal) */
 	while (head < tail) {
 		x   = qx[head];
 		y   = qy[head];
@@ -5563,9 +5559,41 @@ render_minimap(CHAR_DATA *ch)
 		if (!cur)
 			continue;
 
-		for (d = 0; d < 4; d++) {
-			nx = x + dx[d];
-			ny = y + dy[d];
+		/* Check all directions; compute grid offset based on direction index */
+		for (d = 0; d < 28; d++) {
+			int gx = 0, gy = 0;
+
+			/* Map each direction to grid offset (x, y) */
+			switch (d) {
+				/* Cardinal directions */
+				case 0:  gx = 0;  gy = -1; break; /* NORTH */
+				case 1:  gx = 1;  gy = 0;  break; /* EAST */
+				case 2:  gx = 0;  gy = 1;  break; /* SOUTH */
+				case 3:  gx = -1; gy = 0;  break; /* WEST */
+				case 4:  case 5:  continue;       /* UP, DOWN - skip */
+				/* UP variants */
+				case 6:  gx = 0;  gy = -1; break; /* UPNORTH */
+				case 7:  gx = 1;  gy = 0;  break; /* UPEAST */
+				case 8:  gx = 0;  gy = 1;  break; /* UPSOUTH */
+				case 9:  gx = -1; gy = 0;  break; /* UPWEST */
+				case 10: gx = 1;  gy = -1; break; /* UPNORTHEAST */
+				case 11: gx = -1; gy = -1; break; /* UPNORTHWEST */
+				case 12: gx = 1;  gy = 1;  break; /* UPSOUTHEAST */
+				case 13: gx = -1; gy = 1;  break; /* UPSOUTHWEST */
+				/* DOWN variants */
+				case 14: gx = 0;  gy = -1; break; /* DOWNNORTH */
+				case 15: gx = 1;  gy = 0;  break; /* DOWNEAST */
+				case 16: gx = 0;  gy = 1;  break; /* DOWNSOUTH */
+				case 17: gx = -1; gy = 0;  break; /* DOWNWEST */
+				case 18: gx = 1;  gy = -1; break; /* DOWNNORTHEAST */
+				case 19: gx = -1; gy = -1; break; /* DOWNNORTHWEST */
+				case 20: gx = 1;  gy = 1;  break; /* DOWNSOUTHEAST */
+				case 21: gx = -1; gy = 1;  break; /* DOWNSOUTHWEST */
+				default: continue;
+			}
+
+			nx = x + gx;
+			ny = y + gy;
 
 			if (nx < 0 || nx >= MAP_SIZE || ny < 0 || ny >= MAP_SIZE)
 				continue;
