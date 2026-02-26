@@ -5227,9 +5227,9 @@ void delayed_search(CHAR_DATA * ch) {
 	AFFECTED_TYPE *saf = NULL;
 	char buf[MAX_STRING_LENGTH] = { '\0' };
 	int trap_roll =
-			ch->skills[SKILL_MECHANICS] ?
-					(ch->skills[SKILL_MECHANICS] / 2)
-							+ (number(0, (ch->skills[SKILL_MECHANICS] * 2))) :
+			ch->skills[SKILL_SNEAK] ?
+					(ch->skills[SKILL_SNEAK] / 2)
+							+ (number(0, (ch->skills[SKILL_SNEAK] * 2))) :
 					search_base / 2;
 	trap_roll = trap_roll - 15;
 
@@ -13010,7 +13010,7 @@ void show_evaluate_information(CHAR_DATA *ch, OBJ_DATA *obj) {
 	if (obj->obj_flags.type_flag == ITEM_FOOD
 			&& GET_MATERIAL_TYPE(obj) == 1 << 9) {
 
-		if (ch->skills[SKILL_BIOLOGY] >= obj->o.od.value[4]
+		if (ch->skills[SKILL_LORE] >= obj->o.od.value[4]
 				|| ch->skills[SKILL_FORAGE] >= obj->o.od.value[4]) {
 			switch (obj->o.od.value[3]) {
 			case 1:
@@ -13033,7 +13033,7 @@ void show_evaluate_information(CHAR_DATA *ch, OBJ_DATA *obj) {
 				sprintf(buffer, "You're unable to determine what use it is.\n");
 				break;
 			}
-		} else if (ch->skills[SKILL_BIOLOGY] >= obj->o.od.value[4] / 2
+		} else if (ch->skills[SKILL_LORE] >= obj->o.od.value[4] / 2
 				|| ch->skills[SKILL_FORAGE] >= obj->o.od.value[4] / 2) {
 			switch (obj->o.od.value[3]) {
 			case 1:
