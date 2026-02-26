@@ -1713,20 +1713,11 @@ void
 
    switch (ptrFirearm->o.firearm.use_skill) // Set the size of missile/round
   {
-    case SKILL_RIFLE:
-	  size = 2;
-	  break;
-	case SKILL_SMG:
-	  size = 1;
-	  break;
-	case SKILL_GUNNERY:
-	  size = 1;
-	  break;
-	case SKILL_HANDGUN:
+    case SKILL_GRAPPLE:
 	  size = 0;
 	  break;
-	case 53:  // Shortbow skill
-	  size = 12;
+	case SKILL_SHORTBOW:
+	  size = 2;
 	  break;
 	case SKILL_LONGBOW:
 	  size = 2;
@@ -2391,16 +2382,7 @@ void
   // Why the heck are we even setting 'size' - it's not even called again in this function!  0303141143 -Nimrod
   switch (ptrFirearm->o.firearm.use_skill) // Set the size of missile/round
   {
-    case SKILL_RIFLE:
-	  size = 2;
-	  break;
-	case SKILL_SMG:
-	  size = 1;
-	  break;
-	case SKILL_GUNNERY:
-	  size = 1;
-	  break;
-	case SKILL_HANDGUN:
+    case SKILL_GRAPPLE:
 	  size = 0;
 	  break;
 	case SKILL_SHORTBOW:
