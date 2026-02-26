@@ -811,8 +811,8 @@ void do_think(CHAR_DATA* ch, char* argument, int cmd) {
 			continue;
 		if (!IS_MORTAL(tch)) /* Imms get a different echo */
 			continue;
-		if (skill_use(tch, SKILL_VOODOO, ch->skills[SKILL_VOODOO] / 3)
-				|| (IS_NPC (ch) && tch->skills[SKILL_VOODOO]))
+		if (skill_use(tch, SKILL_SENSE_MOTIVE, ch->skills[SKILL_SENSE_MOTIVE] / 3)
+				|| (IS_NPC (ch) && tch->skills[SKILL_SENSE_MOTIVE]))
 			send_to_char(buf2, tch);
 	}
 }
@@ -883,8 +883,8 @@ void do_feel(CHAR_DATA* ch, char* argument, int cmd) {
 			continue;
 		if (!IS_MORTAL(tch)) /* Imms get a different echo */
 			continue;
-		if (skill_use(tch, SKILL_VOODOO, ch->skills[SKILL_VOODOO] / 3)
-				|| (IS_NPC (ch) && tch->skills[SKILL_VOODOO]))
+		if (skill_use(tch, SKILL_SENSE_MOTIVE, ch->skills[SKILL_SENSE_MOTIVE] / 3)
+				|| (IS_NPC (ch) && tch->skills[SKILL_SENSE_MOTIVE]))
 			send_to_char(buf2, tch);
 	}
 }
@@ -2074,12 +2074,10 @@ void do_speak(CHAR_DATA* ch, char* argument, int cmd) {
 		char lang[15];
 		int skill;
 	} lang_tab[] = { { "Common", SKILL_COMMON },
-			{ "Orkish", SKILL_ORKISH }, // Orkish, Wargish, Dalish, Sindarin, Khuzdul
-			{ "Wargish", SKILL_WARGISH }, { "Dalish", SKILL_DALISH }, {
-					"Sindarin", SKILL_SINDARIN }, { "Khuzdul", SKILL_KHUZDUL },
+			{ "Orkish", SKILL_PERCEPTION }, // Orkish, Wargish, Dalish, Sindarin, Khuzdul
+			{ "Wargish", SKILL_HANDLE }, { "Dalish", SKILL_HUNTING }, {
+				"Sindarin", SKILL_ENDURANCE }, { "Khuzdul", SKILL_ADAPTABILITY },
 			{ "\0", 0 } };
-
-	argument = one_argument(argument, buf);
 
 	for (i = 0; lang_tab[i].skill; i++)
 		if (strcasecmp(buf, lang_tab[i].lang) == STR_MATCH)
@@ -4167,7 +4165,7 @@ int whisper_it(CHAR_DATA* ch, char* source, char* target, int mode) {
 	char buf[MAX_STRING_LENGTH] = { '\0' };
 	OBJ_DATA* helm = NULL;
 
-	if (ch->skills[SKILL_VOODOO])
+	if (ch->skills[SKILL_SENSE_MOTIVE])
 		bonus = 20;
 
 	if (!ch->skills[SKILL_EAVESDROP])
