@@ -564,7 +564,7 @@ void do_timeconvert(CHAR_DATA * ch, char *argument, int cmd) {
 			strcpy(suf, "th");
 
 		sprintf(buf,
-				"In your timezone, the specified time will fall at or near %d:00 %s on the %d%s day of %s, year %d of the Common Reckoning.",
+				"In your timezone, the specified time will fall at or near %d:00 %s on the %d%s day of %s, year %d AH.",
 				(game_date.hour == 0) ?
 						12 :
 						((game_date.hour > 12) ?
@@ -7944,7 +7944,7 @@ time_string(CHAR_DATA * ch) {
 				patron_name[holiday_table[time_info.holiday].patron]);
 	}
 
-	sprintf(buf + strlen(buf), " %s, year %d of the Common Reckoning.\n",
+	sprintf(buf + strlen(buf), " %s, year %d AH.\n",
 			season_desc[(int) time_info.month], time_info.year);
 
 	sprintf(time_str, "%s", buf);
