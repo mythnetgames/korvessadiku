@@ -2030,7 +2030,7 @@ do_zsave (CHAR_DATA * ch, char *arg, int cmd)
 {
     int num, stat, i;
 
-    if (engine.in_play_mode ())
+    if (engine.in_play_mode () && engine.server_port == 4500)
     {
         send_to_char ("This command cannot be used on the player port.\n", ch);
         return;
