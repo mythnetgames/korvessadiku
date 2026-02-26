@@ -225,7 +225,7 @@ const char *patron_name[] = {
  * Holiday table: 3 holidays per month, 12 months = 36 entries.
  * { month (0-based), day (1-based), patron, short_name, description }
  */
-const struct holiday_data holiday_table[NUM_HOLIDAYS] = {
+struct holiday_data holiday_table[NUM_HOLIDAYS] = {
   /* Plowbreak */
   { MONTH_PLOWBREAK,    3,  PATRON_VELORA,       "Turning Oath",
     "Followers of Velora reaffirm discipline. Tools are cleaned and checked." },

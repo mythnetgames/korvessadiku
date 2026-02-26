@@ -212,7 +212,7 @@ extern const char *month_lkup[];
 extern const char *weekday_name[];
 extern const char *weekday_theme[];
 extern const char *patron_name[];
-extern const struct holiday_data holiday_table[];
+extern struct holiday_data holiday_table[];
 extern const char *verbal_time[];
 extern const char *fullness[];
 extern const char *color_liquid[];
