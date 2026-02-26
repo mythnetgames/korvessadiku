@@ -7407,12 +7407,15 @@ void do_setdate( CHAR_DATA * ch, char *argument, int cmd ) {
 	char buf[MAX_STRING_LENGTH];
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
 	
-	if (!ch || ch->pc == NULL || (ch->pc->rank < 100)) {
+	if (!ch || !ch->pc || ch->pc->level < 5) {
 		send_to_char("You do not have permission to use this command.\n", ch);
 		return;
 	}
 	
-	four_arguments(argument, arg1, arg2, arg3, arg4);
+	argument = one_argument(argument, arg1);
+	argument = one_argument(argument, arg2);
+	argument = one_argument(argument, arg3);
+	argument = one_argument(argument, arg4);
 	
 	if (!*arg1 || !*arg2 || !*arg3 || !*arg4) {
 		send_to_char("Usage: setdate <year> <month> <day> <hour>\n", ch);
@@ -7472,15 +7475,13 @@ void do_setdate( CHAR_DATA * ch, char *argument, int cmd ) {
 	next_minute_update = time(0);
 	
 	/* Announce the change */
-	sprintf(buf, "#3[%s]#0 setdate to Year %d, %s %d, Hour %d", 
+	sprintf(buf, "[IMMORTAL] %s setdate to Year %d, %s %d, Hour %d", 
 	        ch->name, time_info.year, month_lkup[time_info.month], time_info.day, time_info.hour);
-	send_to_gods(buf);
+	system_log(buf, true);
 	
 	sprintf(buf, "You set the Korvessa time to: Year %d, %s %d, Hour %d\n",
 	        time_info.year, month_lkup[time_info.month], time_info.day, time_info.hour);
 	send_to_char(buf, ch);
-	
-	mudlog(buf, 'A', COM_IMMORT, true);
 }
 
 
