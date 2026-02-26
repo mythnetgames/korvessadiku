@@ -5502,6 +5502,125 @@ room__get_description(ROOM_DATA * room) {
 	return description;
 }
 
+/*
+ * render_minimap - Displays a 5x5 ASCII minimap via BFS from the player's
+ * current room.  Cardinal directions only (N/E/S/W), radius 2.
+ *
+ *   "."  = unknown / no room discovered
+ *   "[]" = known room
+ *   "@"  = player's current position
+ *
+ * The middle row has the room name appended after the grid line.
+ */
+#define MAP_RADIUS 2
+#define MAP_SIZE   (MAP_RADIUS * 2 + 1)
+
+static void
+render_minimap(CHAR_DATA *ch)
+{
+	/* grid[y][x]: 0 = nothing, 1 = room exists */
+	int grid[MAP_SIZE][MAP_SIZE];
+	/* BFS queue: store (x, y, room vnum) triples */
+	int qx[MAP_SIZE * MAP_SIZE];
+	int qy[MAP_SIZE * MAP_SIZE];
+	int qv[MAP_SIZE * MAP_SIZE];
+	int head = 0, tail = 0;
+	int visited[MAP_SIZE][MAP_SIZE];
+	int x, y, d, nx, ny;
+	ROOM_DATA *cur, *next;
+	char line[256];
+	char buf[MAX_STRING_LENGTH];
+
+	/* Direction offsets: NORTH=0 (0,-1), EAST=1 (1,0), SOUTH=2 (0,1), WEST=3 (-1,0) */
+	const int dx[4] = {  0, 1, 0, -1 };
+	const int dy[4] = { -1, 0, 1,  0 };
+
+	if (!ch || !ch->room)
+		return;
+
+	/* Initialise grid and visited arrays */
+	for (y = 0; y < MAP_SIZE; y++)
+		for (x = 0; x < MAP_SIZE; x++) {
+			grid[y][x] = 0;
+			visited[y][x] = 0;
+		}
+
+	/* Seed BFS with the player's room at centre */
+	grid[MAP_RADIUS][MAP_RADIUS] = 1;
+	visited[MAP_RADIUS][MAP_RADIUS] = 1;
+	qx[tail] = MAP_RADIUS;
+	qy[tail] = MAP_RADIUS;
+	qv[tail] = ch->room->vnum;
+	tail++;
+
+	/* BFS traversal - cardinal only, up to MAP_RADIUS steps */
+	while (head < tail) {
+		x   = qx[head];
+		y   = qy[head];
+		cur = vnum_to_room(qv[head]);
+		head++;
+
+		if (!cur)
+			continue;
+
+		for (d = 0; d < 4; d++) {
+			nx = x + dx[d];
+			ny = y + dy[d];
+
+			if (nx < 0 || nx >= MAP_SIZE || ny < 0 || ny >= MAP_SIZE)
+				continue;
+			if (visited[ny][nx])
+				continue;
+
+			if (!cur->dir_option[d])
+				continue;
+			if (cur->dir_option[d]->to_room <= 0)
+				continue;
+			if (IS_SET(cur->dir_option[d]->exit_info, EX_CLOSED))
+				continue;
+
+			next = vnum_to_room(cur->dir_option[d]->to_room);
+			if (!next)
+				continue;
+
+			visited[ny][nx] = 1;
+			grid[ny][nx] = 1;
+
+			qx[tail] = nx;
+			qy[tail] = ny;
+			qv[tail] = next->vnum;
+			tail++;
+		}
+	}
+
+	/* Render the grid into output */
+	buf[0] = '\0';
+	strcat(buf, "\n");
+
+	for (y = 0; y < MAP_SIZE; y++) {
+		line[0] = '\0';
+		strcat(line, "  ");
+		for (x = 0; x < MAP_SIZE; x++) {
+			if (x == MAP_RADIUS && y == MAP_RADIUS)
+				strcat(line, "#5@#0 ");
+			else if (grid[y][x])
+				strcat(line, "#6[]#0");
+			else
+				strcat(line, "#1.#0 ");
+		}
+		/* Append room name on the middle row */
+		if (y == MAP_RADIUS && ch->room->name) {
+			strcat(line, "  #6");
+			strcat(line, ch->room->name);
+			strcat(line, "#0");
+		}
+		strcat(line, "\n");
+		strcat(buf, line);
+	}
+
+	send_to_char(buf, ch);
+}
+
 void do_look(CHAR_DATA * ch, char *argument, int cmd) {
 	int temp = 0;
 	int dir = 0;
@@ -6049,6 +6168,10 @@ void do_look(CHAR_DATA * ch, char *argument, int cmd) {
 		/* General look */
 
 		load_weather_obj(ch->room);
+
+		/* Render the ASCII minimap if the player has it toggled on */
+		if (!IS_NPC(ch) && IS_SET(ch->plr_flags, PLR_MAP))
+			render_minimap(ch);
 
 		if (IS_MORTAL(ch)) {
 

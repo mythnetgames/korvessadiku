@@ -4267,6 +4267,7 @@ struct encumberance_info
 #define FIREFIGHT_FILTER        ( 1 << 23 )     // Players sees a lot less firearm-related spam.
 #define AUTO_COVER		( 1 << 24 )     // Players toss themselves in to cover automatially
 #define DEBUG_PROMPT            ( 1 << 25 )     // Displays additional debug information on the prompt
+#define PLR_MAP                 ( 1 << 26 )     // Displays an ASCII minimap on room entry
 
 
 /* char_data.guardian_flags - controls notification of PC initiated attacks */

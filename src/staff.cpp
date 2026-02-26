@@ -7676,6 +7676,15 @@ void do_set( CHAR_DATA * ch, char *argument, int cmd ) {
 		ch->plr_flags &= ~FIREFIGHT_FILTER;
 		send_to_char( "You will now see all firefight combat messages in your area.\n", ch );
 		return;
+	} else if ( !str_cmp( subcmd, "map" ) ) {
+		if ( !IS_SET (ch->plr_flags, PLR_MAP) ) {
+			ch->plr_flags |= PLR_MAP;
+			send_to_char( "You will now see an ASCII minimap when entering rooms.\n", ch );
+			return;
+		}
+		ch->plr_flags &= ~PLR_MAP;
+		send_to_char( "You will no longer see an ASCII minimap when entering rooms.\n", ch );
+		return;
 	}
 
 	else if ( !str_cmp( subcmd, "voting" ) && ch->descr() && ch->descr()->acct ) {
