@@ -7942,7 +7942,7 @@ time_string(CHAR_DATA * ch) {
 		sprintf(buf + strlen(buf), "\n   #2%s#0 (%s).\n   %s",
 				holiday_table[time_info.holiday].name,
 				patron_name[holiday_table[time_info.holiday].patron],
-				holiday_table[time_info.holiday].description);
+				holiday_table[time_info.holiday].desc);
 	}
 
 	sprintf(buf + strlen(buf), " %s, year %d AH.\n",
