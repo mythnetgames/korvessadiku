@@ -1417,11 +1417,17 @@ typedef signed char shortint;
 
 // === CRAFTING SKILLS (28-37) ===
 #define SKILL_HERBALISM         28	/* Was CHEMISTRY */
+#define SKILL_CHEMISTRY         SKILL_HERBALISM  /* Old name compatibility */
 #define SKILL_BLACKSMITHING     29	/* Was MECHANICS */
+#define SKILL_MECHANICS         SKILL_BLACKSMITHING  /* Old name compatibility */
 #define SKILL_CARPENTRY         30	/* Was GUNSMITH */
+#define SKILL_GUNSMITH          SKILL_CARPENTRY  /* Old name compatibility */
 #define SKILL_APPRAISE          31	/* Was COMPUTEROLOGY - item/value assessment */
+#define SKILL_COMPUTEROLOGY     SKILL_APPRAISE  /* Old name compatibility */
 #define SKILL_INVESTIGATION     32	/* Was ELECTRONICS - piecing together clues */
+#define SKILL_ELECTRONICS       SKILL_INVESTIGATION  /* Old name compatibility */
 #define SKILL_LORE              33	/* Was BIOLOGY - scholarly knowledge */
+#define SKILL_BIOLOGY           SKILL_LORE  /* Old name compatibility */
 #define SKILL_WEAPONCRAFT   	34
 #define SKILL_ARMORCRAFT		35
 #define SKILL_HANDICRAFT		36
@@ -1451,13 +1457,21 @@ typedef signed char shortint;
 // === LANGUAGES & LORE (56-65) ===
 #define SKILL_MUSIC             56
 #define SKILL_MEDITATION		57	/* Was ASTRONOMY - ritual/meditation */
+#define SKILL_ASTRONOMY         SKILL_MEDITATION  /* Old name compatibility */
 #define SKILL_PERCEPTION		58	/* Was ORKISH - spotting hidden things */
+#define SKILL_ORKISH            SKILL_PERCEPTION  /* Old name compatibility */
 #define SKILL_HANDLE            59	/* Was WARGISH - animal handling */
+#define SKILL_WARGISH           SKILL_HANDLE  /* Old name compatibility */
 #define SKILL_HUNTING			60	/* Was DALISH - tracking game */
+#define SKILL_DALISH            SKILL_HUNTING  /* Old name compatibility */
 #define SKILL_ENDURANCE			61	/* Was SINDARIN - stamina management */
+#define SKILL_SINDARIN          SKILL_ENDURANCE  /* Old name compatibility */
 #define SKILL_ADAPTABILITY		62	/* Was KHUZDUL - environmental resistance */
+#define SKILL_KHUZDUL           SKILL_ADAPTABILITY  /* Old name compatibility */
 #define SKILL_CLIMBING			63	/* Was TENGWAR - scaling surfaces */
+#define SKILL_TENGWAR           SKILL_CLIMBING  /* Old name compatibility */
 #define SKILL_SWIMMING			64	/* Was CIRITH - water traversal */
+#define SKILL_CIRITH            SKILL_SWIMMING  /* Old name compatibility */
 #define SKILL_WARCRAFT			65
 
 #define LAST_SKILL		SKILL_WARCRAFT
