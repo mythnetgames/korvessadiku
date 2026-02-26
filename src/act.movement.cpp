@@ -2257,16 +2257,16 @@ void enter_room(QE_DATA * qe) {
 			continue;
 		sensed = 0;
 		for (tch = next_room->people; tch; tch = tch->next_in_room) {
-			if (real_skill(tch, SKILL_VOODOO) && !is_brother (ch, tch)
+			if (real_skill(tch, SKILL_SENSE_MOTIVE) && !is_brother (ch, tch)
 			&& IS_MORTAL (tch) && IS_SET (ch->act, ACT_AGGRESSIVE)) {
-				if (skill_use(tch, SKILL_VOODOO, 20)) {
+				if (skill_use(tch, SKILL_SENSE_MOTIVE, 20)) {
 					sprintf(buf,
 							"The hairs on the back of your neck prickle as you glance %sward.\n",
 							direction[dir]);
 					send_to_char(buf, tch);
 				}
 			}
-			if (skill_use(ch, SKILL_VOODOO, 15)
+			if (skill_use(ch, SKILL_SENSE_MOTIVE, 15)
 					&& IS_SET(tch->act, ACT_AGGRESSIVE) && !is_brother(tch, ch)
 					&& !sensed) {
 				sprintf(buf,
