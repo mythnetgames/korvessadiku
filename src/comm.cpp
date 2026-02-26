@@ -748,6 +748,7 @@ game_loop (int s)
         {
             save_player_rooms ();
             save_dwelling_rooms ();
+            save_world_time ();
         }
         if (!(pulse % (120 * SECOND_PULSE)))
         {
@@ -823,20 +824,37 @@ game_loop (int s)
 		   update_room_tracks ();
 		}
 		*/
-        if (time (0) >= next_hour_update)
+        
+        /* RL-driven time advancement system: advances ~1 Korvessa hour per 900 RL seconds */
         {
-            hourly_update ();
-            update_room_tracks ();
-            weather_and_time (1);
-            hour_affect_update ();
-            room_update ();
+            static time_t last_time_update = 0;
+            const int KORVESSA_SECONDS_PER_HOUR = 900;
+            time_t current_time = time(0);
+            
+            if (last_time_update == 0)
+                last_time_update = current_time;
+            
+            int hours_to_advance = (int)((current_time - last_time_update) / KORVESSA_SECONDS_PER_HOUR);
+            
+            while (hours_to_advance > 0)
+            {
+                hourly_update ();
+                update_room_tracks ();
+                weather_and_time (1);
+                hour_affect_update ();
+                room_update ();
 
-			if (engine.in_play_mode ())
-				rent_update ();
+                if (engine.in_play_mode ())
+                    rent_update ();
 
-			if (engine.in_play_mode ())
-				manage_resources ();
-
+                if (engine.in_play_mode ())
+                    manage_resources ();
+                
+                last_time_update += KORVESSA_SECONDS_PER_HOUR;
+                hours_to_advance--;
+            }
+            
+            next_hour_update = last_time_update + KORVESSA_SECONDS_PER_HOUR;
         }
 
         if (knockout)
@@ -886,6 +904,9 @@ game_loop (int s)
 
         first_loop = false;
     }
+
+    /* Save world time on shutdown */
+    save_world_time();
 
     return 0;
 }

@@ -1108,14 +1108,15 @@ weather_and_time (int mode)
 	int i;
 	bool new_day = false;
 
-	next_hour_update += 900;	/* This is a mud hour; 60*60/4 */
+	/* Note: next_hour_update is now managed by the game loop in comm.cpp */
+	/* It is no longer incremented here to avoid double-incrementing */
 
 	sun_light = 0;
 	/*global_moon_light = 0; */
 
 	time_info.hour++;
 
-	if (time_info.hour >= 24)
+	if (time_info.hour >= HOURS_PER_DAY)
 	{
 		time_info.day++;
 		time_info.hour = 0;
@@ -1123,89 +1124,37 @@ weather_and_time (int mode)
 		new_day = true;
 	}
 	
-	if (time_info.dayofweek >= 7)
+	if (time_info.dayofweek >= DAYS_PER_WEEK)
 	  time_info.dayofweek = 0;
 
-	if (time_info.day >= 30 && new_day)
+	if (time_info.day >= DAYS_PER_MONTH && new_day)
 	{
-		if (!time_info.holiday)
-			time_info.month++;
-		if (time_info.month >= 12)
+		time_info.month++;
+		time_info.day = 0;
+
+		if (time_info.month >= NUM_MONTHS)
 		{
+			time_info.year++;
 			time_info.month = 0;
 		}
-		if (time_info.month == 0 || time_info.month == 1
-			|| time_info.month == 11)
+
+		/* Season assignment based on month */
+		if (time_info.month == MONTH_LASTSEED
+			|| time_info.month == MONTH_PLOWBREAK
+			|| time_info.month == MONTH_SEEDWAKE)
 			time_info.season = WINTER;
-		else if (time_info.month >= 2 && time_info.month <= 4)
+		else if (time_info.month >= MONTH_SPROUTMERE
+			&& time_info.month <= MONTH_SUNPRESS)
 			time_info.season = SPRING;
-		else if (time_info.month > 4 && time_info.month <= 7)
+		else if (time_info.month >= MONTH_FIRSTREAP
+			&& time_info.month <= MONTH_STUBBLEWAKE)
 			time_info.season = SUMMER;
-		else if (time_info.month > 7 && time_info.month <= 10)
-			time_info.season = AUTUMN;
-		
-		if (time_info.holiday == HOLIDAY_METTARE)
-		{
-			time_info.holiday = HOLIDAY_YESTARE;
-			time_info.year++;
-		}
-		else if (time_info.holiday == HOLIDAY_LOENDE
-				 && is_leap_year (time_info.year))
-			time_info.holiday = HOLIDAY_ENDERI;
-		else if (time_info.holiday == HOLIDAY_ENDERI)
-		{
-			time_info.holiday = 0;
-			time_info.day = 0;
-		}
-		else if (time_info.month == 0)
-		{
-			if (time_info.holiday != HOLIDAY_YESTARE)
-				time_info.holiday = HOLIDAY_METTARE;
-			else
-			{
-				time_info.holiday = 0;
-				time_info.day = 0;
-			}
-		}
-		else if (time_info.month == 3)
-		{
-			if (time_info.holiday != HOLIDAY_TUILERE)
-				time_info.holiday = HOLIDAY_TUILERE;
-			else
-			{
-				time_info.holiday = 0;
-				time_info.day = 0;
-			}
-		}
-		else if (time_info.month == 6)
-		{
-			if (time_info.holiday != HOLIDAY_LOENDE)
-				time_info.holiday = HOLIDAY_LOENDE;
-			else
-			{
-				time_info.holiday = 0;
-				time_info.day = 0;
-			}
-		}
-		else if (time_info.month == 9)
-		{
-			if (time_info.holiday != HOLIDAY_YAVIERE)
-				time_info.holiday = HOLIDAY_YAVIERE;
-			else
-			{
-				time_info.holiday = 0;
-				time_info.day = 0;
-			}
-		}
 		else
-			time_info.day = 0;
+			time_info.season = AUTUMN;
 	}
 
-	if (time_info.month >= 12)
-	{
-		time_info.year++;
-		time_info.month = 0;
-	}
+	/* Update holiday field: index into holiday_table or -1 */
+	time_info.holiday = lookup_holiday (time_info.month, time_info.day + 1);
 
 	if (sunrise[time_info.month] <= time_info.hour &&
 		sunset[time_info.month] > time_info.hour)

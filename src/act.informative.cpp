@@ -73,23 +73,28 @@ const char *dec_short[12] = { "(none)", "engraved", "embossed", "embroidered",
 		"etched", "painted", "decorated", "enameled", "inked", "stenciled",
 		"sculpted", "sketched" };
 
-const char *month_name[12] = { "January, the Freezing Cold",
-		"February, the Miring Month", "March, the Month of Birches",
-		"April, the Month of Sprouting", "May, the Month of Flowers",
-		"June, the Month of Pearls", "July, the Month of Mutton",
-		"August, the Skyfall", "September, the Harvestmath",
-		"October, the Yellow Month", "November, the Culling Month",
-		"December, the Yuletide" };
+const char *month_name[12] = {
+		"Plowbreak, the Thawing Month",
+		"Seedwake, the Sowing Month",
+		"Sproutmere, the Month of First Green",
+		"Tallgrow, the Month of Tending",
+		"Sunpress, the Month of Heat",
+		"Firstreap, the Early Harvest",
+		"Fullreap, the Month of Plenty",
+		"Stubblewake, the Month of Gleanings",
+		"Turnsoil, the Month of Reckoning",
+		"Coldroot, the Month of Cellars",
+		"Storethin, the Month of Scarcity",
+		"Lastseed, the Month of Endurance" };
 
-const char *short_month_name[12] = { "January", "February", "March", "April",
-		"May", "June", "July", "August", "September", "October", "November",
-		"December" };
+const char *short_month_name[12] = { "Plowbreak", "Seedwake", "Sproutmere",
+		"Tallgrow", "Sunpress", "Firstreap", "Fullreap", "Stubblewake",
+		"Turnsoil", "Coldroot", "Storethin", "Lastseed" };
 
 const char *season_name[4] = { "Spring", "Summer", "Autumn", "Winter" };
 
-const char *day_name[6] = { "Day of the Stars", "Day of the Sun",
-		"Day of the Moon", "Day of the Two Trees", "Day of the Heavens",
-		"Day of the Valar" };
+const char *day_name[DAYS_PER_WEEK] = { "Eveday", "Watchday", "Trialday",
+		"Velorday", "Feyday", "Regaldy" };
 
 int loc_order[MAX_WEAR] = {
 WEAR_LIGHT,
@@ -155,15 +160,12 @@ const char *weather_clouds[] = { "clear sky", "light clouds", "heavy clouds",
 const char *wind_speeds[] =
 		{ "calm", "breeze", "windy", "gale", "stormy", "\n" };
 
-const char *holiday_names[] = { "(null)", "Mettare, the Last Day of the Year",
-		"Yestare, the First Day of the New Year",
-		"the First Day of Enderi, the Celebration of Winter",
-		"the Middle Day of Enderi, the Celebration of Winter",
-		"the Final Day of Enderi, the Celebration of Winter",
-		"the feastday of yaviere", "\n" };
+/* holiday_names and holiday_short_names are now obsolete;
+   holidays are stored in holiday_table[] in constants.cpp
+   and looked up via lookup_holiday(month, day). */
+const char *holiday_names[] = { "(null)", "\n" };
 
-const char *holiday_short_names[] = { "(null)", "Mettare", "Yestare", "Enderi",
-		"Enderi", "Enderi", "yaviere", "\n" };
+const char *holiday_short_names[] = { "(null)", "\n" };
 
 const char *trap_desc_bits[] = { "can be set on exits", "can be set on objects",
 		"can be manually released", "causes damage", "trips its victims",
@@ -562,7 +564,7 @@ void do_timeconvert(CHAR_DATA * ch, char *argument, int cmd) {
 			strcpy(suf, "th");
 
 		sprintf(buf,
-				"In your timezone, the specified time will fall at or near %d:00 %s on the %d%s day of the %s in the year %d of the Third Age.",
+				"In your timezone, the specified time will fall at or near %d:00 %s on the %d%s day of %s, year %d of the Common Reckoning.",
 				(game_date.hour == 0) ?
 						12 :
 						((game_date.hour > 12) ?
@@ -7843,19 +7845,13 @@ time_string(CHAR_DATA * ch) {
 	int day = 0;
 	int minutes = 0;
 	int high_sun = 0;
-	int nCharAstronomySkill = 0;
 	char day_buf[AVG_STRING_LENGTH];
 	char phrase[MAX_STRING_LENGTH];
 	static char time_str[MAX_STRING_LENGTH] = { '\0' };
-	int day_of_week = 0;
-	const char *season_string[AVG_STRING_LENGTH] = { "deep winter",
+	const char *season_desc[12] = { "deep winter",
 			"late winter", "early spring", "mid-spring", "late spring",
 			"early summer", "high summer", "late summer", "early autumn",
 			"mid-autumn", "late autumn", "early winter" };
-	const char *weekday[AVG_STRING_LENGTH] = { "Sunsday", "Moonsday",
-			"Treesday", "Heavensday", "Lakeday", "Highday", "Starsday" };
-
-	//day_of_week = int(((time(0)-GAME_SECONDS_BEGINNING)/GAME_SECONDS_PER_DAY * 4)  % 7);
 
 	minutes = 4 * (15 * 60 - (next_hour_update - time(0))) / 60;
 
@@ -7887,7 +7883,6 @@ time_string(CHAR_DATA * ch) {
 		sprintf(phrase, "high sun");
 	else if (time_info.hour == high_sun + 1)
 		sprintf(phrase, "early afternoon");
-
 	else if (time_info.hour > high_sun
 			&& time_info.hour < sunset[time_info.month] - 2)
 		sprintf(phrase, "afternoon");
@@ -7899,93 +7894,12 @@ time_string(CHAR_DATA * ch) {
 	else if (time_info.hour >= sunset[time_info.month] && time_info.hour < 23)
 		sprintf(phrase, "night time");
 	else if (time_info.hour > high_sun + 1
-			&& time_info.hour < sunset[time_info.hour] - 2)
+			&& time_info.hour < sunset[time_info.month] - 2)
 		sprintf(phrase, "afternoon");
 	else if (time_info.hour > 1
 			&& time_info.hour < sunrise[time_info.month] - 1)
 		sprintf(phrase, "late at night");
 
-	// Astronomy skill gives knowledge of more precise time
-	// Remarking out for now.  -Nimrod 12 Sept 13
-	/*
-	 if (ch && ch->skills[SKILL_ASTRONOMY])
-	 {
-
-	 nCharAstronomySkill = ch->skills[SKILL_ASTRONOMY];
-	 if (!IS_OUTSIDE (ch) || (IS_NIGHT && !moon_light[ch->room->zone]))
-	 {
-	 nCharAstronomySkill -= 40;
-	 }
-	 else
-	 {
-	 nCharAstronomySkill -= (10 * weather_info[ch->room->zone].clouds);
-	 nCharAstronomySkill -= (2 * weather_info[ch->room->zone].state);
-	 }
-
-	 if (nCharAstronomySkill >= 70)
-	 {
-	 if (minutes < 7)
-	 {
-	 sprintf (phrase + strlen (phrase), ", about %s o'clock,",
-	 strTimeWord[time_info.hour]);
-	 }
-	 else if (minutes < 23)
-	 {
-	 sprintf (phrase + strlen (phrase), ", quarter-past %s o'clock,",
-	 strTimeWord[time_info.hour]);
-	 }
-	 else if (minutes < 37)
-	 {
-	 sprintf (phrase + strlen (phrase), ", half-past %s o'clock,",
-	 strTimeWord[time_info.hour]);
-	 }
-	 else if (minutes < 52)
-	 {
-	 sprintf (phrase + strlen (phrase), ", quarter-to %s o'clock,",
-	 strTimeWord[(time_info.hour + 1) % 24]);
-	 }
-	 else
-	 {
-	 sprintf (phrase + strlen (phrase), ", about %s o'clock,",
-	 strTimeWord[(time_info.hour + 1) % 24]);
-	 }
-	 }
-
-	 else if (nCharAstronomySkill >= 50)
-	 {
-	 if (minutes < 15)
-	 {
-	 sprintf (phrase + strlen (phrase), ", about %s o'clock,",
-	 strTimeWord[time_info.hour]);
-	 }
-	 else if (minutes < 45)
-	 {
-	 sprintf (phrase + strlen (phrase), ", half-past %s o'clock,",
-	 strTimeWord[time_info.hour]);
-	 }
-	 else
-	 {
-	 sprintf (phrase + strlen (phrase), ", about %s o'clock,",
-	 strTimeWord[(time_info.hour + 1) % 24]);
-	 }
-	 }
-
-	 else if (nCharAstronomySkill >= 30)
-	 {
-	 if (minutes < 30)
-	 {
-	 sprintf (phrase + strlen (phrase), ", about %s o'clock,",
-	 strTimeWord[time_info.hour]);
-	 }
-	 else
-	 {
-	 sprintf (phrase + strlen (phrase), ", about %s o'clock,",
-	 strTimeWord[(time_info.hour + 1) % 24]);
-	 }
-	 }
-
-	 }
-	 */
 	sprintf(buf, "It is %s ", phrase);
 
 	if (ch && !IS_MORTAL(ch)) {
@@ -7995,10 +7909,10 @@ time_string(CHAR_DATA * ch) {
 				((time_info.hour >= 12) ? "pm" : "am"));
 	}
 
-	// Adding day of week - Nimrod
-	sprintf(buf + strlen(buf), "on %s, ", weekday[time_info.dayofweek]);
+	/* Day of week from the Six-Day Turning */
+	sprintf(buf + strlen(buf), "on %s, ", weekday_name[time_info.dayofweek]);
 
-	day = time_info.day + 1; /* day in [1..35] */
+	day = time_info.day + 1; /* day in [1..30] */
 
 	if (day == 1)
 		strcpy(suf, "st");
@@ -8019,34 +7933,19 @@ time_string(CHAR_DATA * ch) {
 
 	sprintf(day_buf, "%d%s", day, suf);
 
-	/* Special output for holidays */
+	/* Date and month */
+	sprintf(buf + strlen(buf), " the %s day of %s,", day_buf,
+			month_name[(int) time_info.month]);
 
-	if (time_info.holiday == 0 && !(time_info.month == 1 && day == 12)
-			&& !(time_info.month == 4 && day == 10)
-			&& !(time_info.month == 7 && day == 11)
-			&& !(time_info.month == 10 && day == 12))
-		sprintf(buf + strlen(buf), " the %s day of %s,", day_buf,
-				month_name[(int) time_info.month]);
-	else {
-		if (time_info.holiday > 0) {
-			sprintf(buf + strlen(buf), "on %s,",
-					holiday_names[time_info.holiday]);
-		} else if (time_info.month == 1 && day == 12)
-			sprintf(buf + strlen(buf), "on Erukyerme, The Prayer to Eru,");
-		else if (time_info.month == 4 && day == 10)
-			sprintf(buf + strlen(buf), "on Lairemerende, The Greenfest,");
-		else if (time_info.month == 7 && day == 11)
-			sprintf(buf + strlen(buf), "on Eruhantale, Thanksgiving to Eru,");
-		else if (time_info.month == 10 && day == 12)
-			sprintf(buf + strlen(buf), "on Airilaitale, The Hallowmas,");
+	/* Holiday annotation */
+	if (time_info.holiday >= 0) {
+		sprintf(buf + strlen(buf), "\n   #2%s#0 (%s).",
+				holiday_table[time_info.holiday].name,
+				patron_name[holiday_table[time_info.holiday].patron]);
 	}
 
-//	sprintf (buf + strlen (buf),
-//		" %s in the year %d of the Third Age.\n",
-//		season_string[(int) time_info.month], time_info.year);
-
-	sprintf(buf + strlen(buf), " in the year %d of the Third Age.\n",
-			time_info.year);
+	sprintf(buf + strlen(buf), " %s, year %d of the Common Reckoning.\n",
+			season_desc[(int) time_info.month], time_info.year);
 
 	sprintf(time_str, "%s", buf);
 
@@ -8271,132 +8170,46 @@ time_string(CHAR_DATA * ch) {
 void do_time(CHAR_DATA * ch, char *argument, int cmd) {
 	char buf[MAX_STRING_LENGTH] = { '\0' };
 	char *p;
-	int day = time_info.day + 1, d_day = 0, moon_q = 0, moon_r = 0, moon_s = 0;
-	static char *strRelativeTime[] = { "morning", "morning", "morning",
-			"morning", "afternoon", "afternoon", "evening", "night" };
 
 	sprintf(buf, "\n#6%s#0", time_string(ch));
 
-// Leaving remarked out for the time being because we don't have astronomy skill and a few other
-// minor glitches.  -Nimrod 12 Sept 13 
+	/* Next holiday countdown */
+	{
+		int hi, best = -1, best_days = 999;
+		int cur_day = time_info.day + 1; /* 1-based */
 
-	if (ch->skills[SKILL_ASTRONOMY]) {
-
-		// Sunrise and set
-
-		if (time_info.hour < sunrise[time_info.month]) {
-
-			sprintf(buf + strlen(buf),
-					" #The sun shall rise around %s o'clock this morning and will rest again around %s o'clock today.#0 ",
-					strTimeWord[sunrise[time_info.month]],
-					strTimeWord[sunset[time_info.month]]);
-
-		} else if (time_info.hour > sunset[time_info.month]) {
-
-			sprintf(buf + strlen(buf),
-					" #6The sun shall rise around %s o'clock this morning and will rest again around %s o'clock tomorrow.#0 ",
-					strTimeWord[sunrise[time_info.month]],
-					strTimeWord[sunset[time_info.month]]);
-
-		} else {
-			sprintf(buf + strlen(buf),
-					" #6The sun shall rest around %s o'clock today and will rise again around %s o'clock tomorrow morning.#0 ",
-					strTimeWord[sunset[time_info.month]],
-					strTimeWord[sunrise[time_info.month]]);
-		}
-
-		// Moon rise, set and phase
-
-		d_day = (time_info.day + 15) % 30;
-		moon_q = d_day * 24 / 30;
-		moon_r = (24 + (moon_q - 6)) % 24;
-		moon_s = (24 + (moon_q - 17)) % 24;
-
-		if (moon_r < moon_s) {
-
-			if (time_info.hour < moon_r) {
-				sprintf(buf + strlen(buf),
-						" #6(1) The moon shall rise around %s o'clock this %s and will rest again around %s o'clock this %s.#0 ",
-						strTimeWord[moon_r], strRelativeTime[moon_r / 3],
-						strTimeWord[moon_s], strRelativeTime[moon_s / 3]);
-			} else if (time_info.hour > moon_s) {
-				sprintf(buf + strlen(buf),
-						" #6(2) The moon shall rise around %s o'clock tomorrow %s and will rest again around %s o'clock tomorrow %s.#0 ",
-						strTimeWord[moon_r], strRelativeTime[moon_r / 3],
-						strTimeWord[moon_s], strRelativeTime[moon_s / 3]);
-
-			} else {
-				sprintf(buf + strlen(buf),
-						" #6(3) The moon shall rest around %s o'clock this %s and will rise again around %s o'clock tomorrow %s.#0 ",
-						strTimeWord[moon_s], strRelativeTime[moon_s / 3],
-						strTimeWord[moon_r], strRelativeTime[moon_r / 3]);
-
+		for (hi = 0; hi < NUM_HOLIDAYS; hi++)
+		{
+			int days_away;
+			if (holiday_table[hi].month == time_info.month
+				&& holiday_table[hi].day > cur_day)
+			{
+				days_away = holiday_table[hi].day - cur_day;
 			}
-
-		}
-
-		else {
-			if (time_info.hour < moon_s) {
-				sprintf(buf + strlen(buf),
-						" #6(4) The moon shall rest around %s o'clock this %s and will rise again around %s o'clock this %s.#0 ",
-						strTimeWord[moon_s], strRelativeTime[moon_s / 3],
-						strTimeWord[moon_r], strRelativeTime[moon_r / 3]);
-			} else if (time_info.hour > moon_r) {
-				sprintf(buf + strlen(buf),
-						" #6(5) The moon shall rest around %s o'clock tomorrow %s and will rise again around %s o'clock tomorrow %s.#0 ",
-						strTimeWord[moon_s], strRelativeTime[moon_s / 3],
-						strTimeWord[moon_r], strRelativeTime[moon_r / 3]);
-
-			} else {
-				sprintf(buf + strlen(buf),
-						" #6(6) The moon shall rise around %s o'clock this %s and will rest again around %s o'clock tomorrow %s.#0 ",
-						strTimeWord[moon_r], strRelativeTime[moon_r / 3],
-						strTimeWord[moon_s], strRelativeTime[moon_s / 3]);
-
+			else if (holiday_table[hi].month > time_info.month)
+			{
+				days_away = (holiday_table[hi].month - time_info.month) * DAYS_PER_MONTH
+					+ (holiday_table[hi].day - cur_day);
+			}
+			else
+			{
+				days_away = (NUM_MONTHS - time_info.month + holiday_table[hi].month) * DAYS_PER_MONTH
+					+ (holiday_table[hi].day - cur_day);
+			}
+			if (days_away > 0 && days_away < best_days)
+			{
+				best_days = days_away;
+				best = hi;
 			}
 		}
 
-		// Feastday info
-
-		if (time_info.holiday == 0 && !(time_info.month == 1 && day == 12)
-				&& !(time_info.month == 4 && day == 10)
-				&& !(time_info.month == 7 && day == 11)
-				&& !(time_info.month == 10 && day == 12)) {
-			strcat(buf, "\n#6The next holiday will be ");
-			if (time_info.month < 1
-					|| (time_info.month == 1 && time_info.day <= 12)) {
-				sprintf(buf + strlen(buf), "Erukyerme in %d days.#0",
-						((1 - time_info.month) * 30) + (12 - time_info.day));
-			} else if (time_info.month < 3) {
-				sprintf(buf + strlen(buf),
-						"The Feastday of Tuilere in %d days.#0",
-						((2 - time_info.month) * 30) + (30 - time_info.day));
-			} else if (time_info.month < 4
-					|| (time_info.month == 4 && time_info.day <= 10)) {
-				sprintf(buf + strlen(buf), "The Greenfest in %d days.#0",
-						((4 - time_info.month) * 30) + (10 - time_info.day));
-			} else if (time_info.month < 6) {
-				// todo: add enderi in leapyears
-				sprintf(buf + strlen(buf),
-						"The Feastday of Loende in %d days.#0",
-						((5 - time_info.month) * 30) + (30 - time_info.day));
-			} else if (time_info.month < 7
-					|| (time_info.month == 7 && time_info.day <= 11)) {
-				sprintf(buf + strlen(buf), "Eruhantale in %d days.#0",
-						((7 - time_info.month) * 30) + (11 - time_info.day));
-			} else if (time_info.month < 9) {
-				sprintf(buf + strlen(buf),
-						"The Feastday of Yaviere in %d days.#0",
-						((8 - time_info.month) * 30) + (30 - time_info.day));
-			} else if (time_info.month < 10
-					|| (time_info.month == 10 && time_info.day <= 12)) {
-				sprintf(buf + strlen(buf), "The Hallowmas in %d days.#0",
-						((10 - time_info.month) * 30) + (12 - time_info.day));
-			} else {
-				sprintf(buf + strlen(buf),
-						"The Feastdays of Mettare & Yestare in %d days.#0",
-						((12 - time_info.month) * 30) + (30 - time_info.day));
-			}
+		if (best >= 0)
+		{
+			sprintf(buf + strlen(buf),
+				"\n#6The next observance will be %s (%s) in %d day%s.#0",
+				holiday_table[best].name,
+				patron_name[holiday_table[best].patron],
+				best_days, best_days == 1 ? "" : "s");
 		}
 	}
 

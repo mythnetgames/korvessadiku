@@ -161,35 +161,166 @@ const char *that_time_of_day[] = {
   };
 
 const char *month_short_name[12] = {
-  "First",
-  "Second",
-  "Third",
-  "Fourth",
-  "Fifth",
-  "Sixth",
-  "Seventh",
-  "Eighth",
-  "Ninth",
-  "Tenth",
-  "Eleventh",
-  "Twelfth"
+  "Plowbreak",
+  "Seedwake",
+  "Sproutmere",
+  "Tallgrow",
+  "Sunpress",
+  "Firstreap",
+  "Fullreap",
+  "Stubblewake",
+  "Turnsoil",
+  "Coldroot",
+  "Storethin",
+  "Lastseed"
 };
 
 const char *month_lkup[] = {
   "(null)",
-  "Narvinye",
-  "Nenime",
-  "Sulime",
-  "Viresse",
-  "Lotesse",
-  "Narie",
-  "Cermie",
-  "Urime",
-  "Yavannie",
-  "Narquelie",
-  "Hisime",
-  "Ringare",
+  "Plowbreak",
+  "Seedwake",
+  "Sproutmere",
+  "Tallgrow",
+  "Sunpress",
+  "Firstreap",
+  "Fullreap",
+  "Stubblewake",
+  "Turnsoil",
+  "Coldroot",
+  "Storethin",
+  "Lastseed",
   "\n"
+};
+
+const char *weekday_name[DAYS_PER_WEEK] = {
+  "Eveday",
+  "Watchday",
+  "Trialday",
+  "Velorday",
+  "Feyday",
+  "Regaldy"
+};
+
+const char *weekday_theme[DAYS_PER_WEEK] = {
+  "Beginnings and Intent",
+  "Scrutiny and Truth",
+  "Learning and Testing",
+  "Discipline and Service",
+  "Chance and Risk",
+  "Authority and Consequence"
+};
+
+const char *patron_name[] = {
+  "None",
+  "Velora",
+  "The Watcher",
+  "The Three Children",
+  "Feyliks",
+  "Regalus",
+  "Superstition",
+  "\n"
+};
+
+/*
+ * Holiday table: 3 holidays per month, 12 months = 36 entries.
+ * { month (0-based), day (1-based), patron, short_name, description }
+ */
+const struct holiday_data holiday_table[NUM_HOLIDAYS] = {
+  /* Plowbreak */
+  { MONTH_PLOWBREAK,    3,  PATRON_VELORA,       "Turning Oath",
+    "Followers of Velora reaffirm discipline. Tools are cleaned and checked." },
+  { MONTH_PLOWBREAK,   12,  PATRON_WATCHER,      "The Watched Furrow",
+    "Fields are worked in silence. Lies spoken today are said to surface later." },
+  { MONTH_PLOWBREAK,   21,  PATRON_SUPERSTITION, "The Uneven Line",
+    "One furrow is plowed crooked to confuse ill fate." },
+
+  /* Seedwake */
+  { MONTH_SEEDWAKE,      2,  PATRON_THREE,        "Casting of Hands",
+    "The young and inexperienced are set to sow. Effort matters more than result." },
+  { MONTH_SEEDWAKE,     11,  PATRON_WATCHER,      "Held Seed",
+    "No planting is done. Blight following this day is blamed on those who ignored the warning." },
+  { MONTH_SEEDWAKE,     23,  PATRON_FEYLIKS,      "Open Palm",
+    "Seed is shared freely, gambled, or traded. Hoarding sours fortune." },
+
+  /* Sproutmere */
+  { MONTH_SPROUTMERE,    5,  PATRON_VELORA,       "Green Oath",
+    "Commitments are renewed. Contracts sworn today are expected to endure hardship." },
+  { MONTH_SPROUTMERE,   14,  PATRON_THREE,        "Small Feet",
+    "Children and apprentices walk the fields. Negligence by elders is not forgiven." },
+  { MONTH_SPROUTMERE,   26,  PATRON_WATCHER,      "Watching Leaves",
+    "Fields are inspected closely. Blight found after today is blamed on willful blindness." },
+
+  /* Tallgrow */
+  { MONTH_TALLGROW,      4,  PATRON_VELORA,       "Bound Work",
+    "Crops are tied and corrected. Neglect here is remembered at harvest." },
+  { MONTH_TALLGROW,     13,  PATRON_FEYLIKS,      "Foolstep",
+    "Risky labor is undertaken deliberately. Failure is blamed on luck, not skill." },
+  { MONTH_TALLGROW,     22,  PATRON_SUPERSTITION, "The Quiet Mark",
+    "Midday labor pauses briefly. Ignoring the pause invites injury." },
+
+  /* Sunpress */
+  { MONTH_SUNPRESS,      6,  PATRON_WATCHER,      "Thirstcount",
+    "Water stores are measured honestly. Lying about supply is believed to draw drought." },
+  { MONTH_SUNPRESS,     15,  PATRON_VELORA,       "Heat Mercy",
+    "Excessive punishment and labor are avoided. Cruelty today is remembered." },
+  { MONTH_SUNPRESS,     27,  PATRON_SUPERSTITION, "Flygift",
+    "Food is left out for vermin spirits to keep them from livestock." },
+
+  /* Firstreap */
+  { MONTH_FIRSTREAP,     1,  PATRON_VELORA,       "First Sheaf",
+    "The earliest harvest is cut carefully. Waste today is deeply frowned upon." },
+  { MONTH_FIRSTREAP,    10,  PATRON_FEYLIKS,      "Bread of Chance",
+    "First loaves from new grain are eaten. Ill fortune blamed on luck, not milling." },
+  { MONTH_FIRSTREAP,    19,  PATRON_WATCHER,      "Counted Silence",
+    "Harvest totals are tallied quietly. Boasting invites suspicion." },
+
+  /* Fullreap */
+  { MONTH_FULLREAP,      3,  PATRON_REGALUS,      "Open Field",
+    "Harvest begins under authority. Theft during this period carries harsh consequence." },
+  { MONTH_FULLREAP,     16,  PATRON_VELORA,       "Measure True",
+    "Weights and measures are checked. False accounting is treated as deliberate crime." },
+  { MONTH_FULLREAP,     28,  PATRON_FEYLIKS,      "Feast of Plenty",
+    "Excess is permitted briefly. Those who abstain are assumed fearful." },
+
+  /* Stubblewake */
+  { MONTH_STUBBLEWAKE,   7,  PATRON_THREE,        "Gleaning Right",
+    "The landless may gather remains. Denial is seen as cruelty." },
+  { MONTH_STUBBLEWAKE,  18,  PATRON_SUPERSTITION, "Herd Turn",
+    "Livestock are moved. Injuries are blamed on poor fortune rather than skill." },
+  { MONTH_STUBBLEWAKE,  25,  PATRON_WATCHER,      "The Last Look",
+    "Fields are inspected one final time. Missed harvest is blamed on neglect." },
+
+  /* Turnsoil */
+  { MONTH_TURNSOIL,      4,  PATRON_REGALUS,      "Second Claim",
+    "Land boundaries are reaffirmed or seized. Authority asserted now is expected to hold." },
+  { MONTH_TURNSOIL,     14,  PATRON_SUPERSTITION, "Ashmark",
+    "Controlled burning is permitted. Fire afterward is unforgivable." },
+  { MONTH_TURNSOIL,     26,  PATRON_VELORA,       "Broken Spade",
+    "Tools that fail are repaired or discarded. Using broken tools is stubborn pride." },
+
+  /* Coldroot */
+  { MONTH_COLDROOT,      5,  PATRON_VELORA,       "Rootpull",
+    "Root crops are harvested carefully. Delay beyond today is blamed for rot." },
+  { MONTH_COLDROOT,     17,  PATRON_WATCHER,      "Cellar Seal",
+    "Stores are closed and counted. Missing goods spark accusations." },
+  { MONTH_COLDROOT,     24,  PATRON_SUPERSTITION, "Mistwalk",
+    "Travel avoided where possible. Loss today is attributed to fate." },
+
+  /* Storethin */
+  { MONTH_STORETHIN,     6,  PATRON_REGALUS,      "Short Measure",
+    "Rations are reduced by decree. Failure to comply is treated as defiance." },
+  { MONTH_STORETHIN,    15,  PATRON_WATCHER,      "Quiet Hearth",
+    "Social visits decline. Secrets shared are believed remembered." },
+  { MONTH_STORETHIN,    27,  PATRON_FEYLIKS,      "Coin Turn",
+    "Last risky trades before scarcity bites. Loss is blamed on chance." },
+
+  /* Lastseed */
+  { MONTH_LASTSEED,      3,  PATRON_WATCHER,      "Final Count",
+    "Stores are tallied honestly. Lies now are remembered into the next year." },
+  { MONTH_LASTSEED,     14,  PATRON_VELORA,       "Hard Night",
+    "No excess is permitted. Discipline is observed openly." },
+  { MONTH_LASTSEED,     30,  PATRON_REGALUS,      "Dominion Mark",
+    "The year ends in authority. Debts are named, punishments declared." }
 };
 
 const char *somatics[] = {

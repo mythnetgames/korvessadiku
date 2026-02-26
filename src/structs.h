@@ -244,12 +244,49 @@ typedef signed char shortint;
 //#define HOLIDAY_ENDERI2		4
 //#define HOLIDAY_ENDERI3		5
 
-#define HOLIDAY_METTARE		1
-#define HOLIDAY_YESTARE		2
-#define HOLIDAY_TUILERE		3
-#define HOLIDAY_LOENDE		4
-#define HOLIDAY_ENDERI		5
-#define HOLIDAY_YAVIERE		6
+/* Korvessa does not use intercalary holiday days.
+   Holidays fall on specific days within their months.
+   The holiday field in time_info_data is unused; holidays
+   are looked up dynamically from (month, day) pairs. */
+
+#define NUM_MONTHS          12
+#define DAYS_PER_MONTH      30
+#define DAYS_PER_WEEK       6
+#define HOURS_PER_DAY       24
+
+/* Month indices (0-based) */
+#define MONTH_PLOWBREAK     0
+#define MONTH_SEEDWAKE      1
+#define MONTH_SPROUTMERE    2
+#define MONTH_TALLGROW      3
+#define MONTH_SUNPRESS      4
+#define MONTH_FIRSTREAP     5
+#define MONTH_FULLREAP      6
+#define MONTH_STUBBLEWAKE   7
+#define MONTH_TURNSOIL      8
+#define MONTH_COLDROOT      9
+#define MONTH_STORETHIN     10
+#define MONTH_LASTSEED      11
+
+/* Weekday indices (0-based) */
+#define DAY_EVEDAY          0
+#define DAY_WATCHDAY        1
+#define DAY_TRIALDAY        2
+#define DAY_VELORDAY        3
+#define DAY_FEYDAY          4
+#define DAY_REGALDY         5
+
+/* Holiday patron types */
+#define PATRON_NONE         0
+#define PATRON_VELORA       1
+#define PATRON_WATCHER      2
+#define PATRON_THREE        3   /* Three Children */
+#define PATRON_FEYLIKS      4
+#define PATRON_REGALUS      5
+#define PATRON_SUPERSTITION 6
+
+/* Total holidays: 3 per month x 12 months = 36 */
+#define NUM_HOLIDAYS        36
 
 #define NUM_SEASONS	4
 #define NUM_THAT_TIME_OF_DAY 2
@@ -2439,6 +2476,15 @@ struct reset_time_data
     int flags;
 };
 
+struct holiday_data
+{
+    int month;              /* 0-based month index */
+    int day;                /* 1-based day number */
+    int patron;             /* PATRON_ define */
+    const char *name;       /* Short name, e.g. "Turning Oath" */
+    const char *desc;       /* One-line description */
+};
+
 struct time_info_data
 {
     int hour;
@@ -2447,7 +2493,7 @@ struct time_info_data
     int year;
     int season;
     int minute;
-    int holiday;
+    int holiday;            /* index into holiday_table[], or -1 if none */
     int phaseEarth;         // What phase is the earth in?
     int phaseSun; 	// What phase is the sun in?
 	int dayofweek;
@@ -4256,7 +4302,7 @@ struct encumberance_info
 #define TRIG_PRISONER	11
 #define TRIG_KNOCK		12
 
-#define GAME_BASE_YEAR		2869   // Battle of 5 armies was 2941  189
+#define GAME_BASE_YEAR		1   // Year 1 of Common Field Reckoning
 #define GAME_SECONDS_BEGINNING  100	/* Subtr 10800 to ++gametime 12hr */
 #define GAME_SECONDS_PER_YEAR	31104000 // real life seconds in a year
 #define GAME_SECONDS_PER_MONTH	2592000 // real life seconds in a month

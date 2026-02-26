@@ -7395,6 +7395,95 @@ void do_day( CHAR_DATA * ch, char *argument, int cmd ) {
 	}
 }
 
+/*
+ * do_setdate
+ * Sets the Korvessa calendar to a specific date and hour.
+ * Usage: setdate <year> <month> <day> <hour>
+ * Month and day are 1-based (month 1-12, day 1-30)
+ * Hour is 0-23
+ */
+void do_setdate( CHAR_DATA * ch, char *argument, int cmd ) {
+	int year, month, day, hour;
+	char buf[MAX_STRING_LENGTH];
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
+	
+	if (!ch || ch->pc == NULL || (ch->pc->rank < 100)) {
+		send_to_char("You do not have permission to use this command.\n", ch);
+		return;
+	}
+	
+	four_arguments(argument, arg1, arg2, arg3, arg4);
+	
+	if (!*arg1 || !*arg2 || !*arg3 || !*arg4) {
+		send_to_char("Usage: setdate <year> <month> <day> <hour>\n", ch);
+		send_to_char("       month: 1-12 (Korvessa months)\n", ch);
+		send_to_char("       day: 1-30\n", ch);
+		send_to_char("       hour: 0-23\n", ch);
+		
+		sprintf(buf, "Current time: Year %d, %s %d, Hour %d\n",
+		        time_info.year, month_lkup[time_info.month], time_info.day, time_info.hour);
+		send_to_char(buf, ch);
+		return;
+	}
+	
+	year = atoi(arg1);
+	month = atoi(arg2);
+	day = atoi(arg3);
+	hour = atoi(arg4);
+	
+	/* Validate input ranges */
+	if (year < 1) {
+		send_to_char("Year must be at least 1.\n", ch);
+		return;
+	}
+	
+	if (month < 1 || month > NUM_MONTHS) {
+		sprintf(buf, "Month must be between 1 and %d.\n", NUM_MONTHS);
+		send_to_char(buf, ch);
+		return;
+	}
+	
+	if (day < 1 || day > DAYS_PER_MONTH) {
+		sprintf(buf, "Day must be between 1 and %d.\n", DAYS_PER_MONTH);
+		send_to_char(buf, ch);
+		return;
+	}
+	
+	if (hour < 0 || hour >= HOURS_PER_DAY) {
+		sprintf(buf, "Hour must be between 0 and %d.\n", HOURS_PER_DAY - 1);
+		send_to_char(buf, ch);
+		return;
+	}
+	
+	/* Convert 1-based month to 0-based for internal storage */
+	month--;
+	
+	/* Set the new time */
+	time_info.year = year;
+	time_info.month = month;
+	time_info.day = day;
+	time_info.hour = hour;
+	
+	/* Update holiday lookup */
+	time_info.holiday = lookup_holiday(time_info.month, time_info.day);
+	
+	/* Reset the time update tracking */
+	next_hour_update = time(0) + 900;
+	next_minute_update = time(0);
+	
+	/* Announce the change */
+	sprintf(buf, "#3[%s]#0 setdate to Year %d, %s %d, Hour %d", 
+	        ch->name, time_info.year, month_lkup[time_info.month], time_info.day, time_info.hour);
+	send_to_gods(buf);
+	
+	sprintf(buf, "You set the Korvessa time to: Year %d, %s %d, Hour %d\n",
+	        time_info.year, month_lkup[time_info.month], time_info.day, time_info.hour);
+	send_to_char(buf, ch);
+	
+	mudlog(buf, 'A', COM_IMMORT, true);
+}
+
+
 void char__unbalance( CHAR_DATA * ch, float nMultiplier ) {
 
 	float nPenalty = 0.0;

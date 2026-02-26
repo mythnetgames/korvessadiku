@@ -209,6 +209,10 @@ extern const char *armor_types[]; //fight.cpp
 extern const char *damage_types[]; //fight.cpp
 extern const char *month_short_name[];
 extern const char *month_lkup[];
+extern const char *weekday_name[];
+extern const char *weekday_theme[];
+extern const char *patron_name[];
+extern const struct holiday_data holiday_table[];
 extern const char *verbal_time[];
 extern const char *fullness[];
 extern const char *color_liquid[];
@@ -837,6 +841,7 @@ void do_select_script (CHAR_DATA * ch, char *argument, int cmd);
 void do_send (CHAR_DATA * ch, char *argument, int cmd);
 void do_sense (CHAR_DATA * ch, char *argument, int cmd);
 void do_set (CHAR_DATA * ch, char *argument, int cmd);
+void do_setdate (CHAR_DATA * ch, char *argument, int cmd);
 void do_shadow (CHAR_DATA * ch, char *argument, int cmd);
 void do_shout (CHAR_DATA * ch, char *argument, int cmd);
 void do_shine (CHAR_DATA * ch, char *argument, int cmd);
@@ -1151,6 +1156,8 @@ void fwrite_a_obj (OBJ_DATA * obj, FILE * fp);
 int get_user_seconds ();
 struct time_info_data mud_time_passed (time_t t2, time_t t1);
 struct time_info_data moon_time_passed (time_t t2, time_t t1);
+int lookup_holiday (int month, int day);
+const char *get_holiday_name (int month, int day);
 int fread_number (FILE * fp);
 void update_crafts_file ();
 void list_all_crafts (CHAR_DATA * ch);
@@ -1358,6 +1365,8 @@ void boot_crafts (void);
 void insert_string_variables (OBJ_DATA * new_obj, OBJ_DATA * proto, char *string0, char *string1, char *string2, char *string3,
 			      char *string4, char *string5, char *string6, char *string7, char *string8, char *string9);
 void boot_db (void);
+void save_world_time (void);
+int load_world_time (void);
 void delayed_remove (CHAR_DATA * ch);
 void reg_read_crafts (FILE * fp_reg, char *buf);
 void boot_mobiles (void);

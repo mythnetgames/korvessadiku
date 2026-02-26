@@ -1037,7 +1037,7 @@ struct time_info_data
 
     secs = (t2 - t1) * PULSES_PER_SEC;
 	
-	now.dayofweek = int((secs/GAME_SECONDS_PER_DAY )  % 7);
+	now.dayofweek = int((secs/GAME_SECONDS_PER_DAY )  % DAYS_PER_WEEK);
 
     now.year += secs / GAME_SECONDS_PER_YEAR;
     secs = secs % GAME_SECONDS_PER_YEAR;
@@ -1053,6 +1053,36 @@ struct time_info_data
 	
 
     return now;
+}
+
+/*
+ * lookup_holiday: returns index into holiday_table[] for the given
+ * (month, day) pair, or -1 if no holiday falls on that date.
+ * month is 0-based, day is 1-based.
+ */
+int
+lookup_holiday (int month, int day)
+{
+    int i;
+    for (i = 0; i < NUM_HOLIDAYS; i++)
+    {
+        if (holiday_table[i].month == month && holiday_table[i].day == day)
+            return i;
+    }
+    return -1;
+}
+
+/*
+ * get_holiday_name: returns the short name of the holiday on (month, day),
+ * or NULL if no holiday falls on that date.
+ */
+const char *
+get_holiday_name (int month, int day)
+{
+    int idx = lookup_holiday (month, day);
+    if (idx < 0)
+        return NULL;
+    return holiday_table[idx].name;
 }
 
 

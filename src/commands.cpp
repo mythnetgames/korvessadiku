@@ -354,6 +354,7 @@ const struct command_data commands[] =
 	{"sell", do_sell, SIT, C_BLD},
 	{"sense", do_sense, SIT, C_HID | C_XLS},
 	{"set", do_set, DEAD, C_DEL | C_HID | C_SUB | C_DOA | C_BLD | C_PAR | C_SPL},
+	{"setdate", do_setdate, DEAD, C_LV5},
 	{"sheathe", do_sheathe, REST, C_BLD},
 	{"shadow", do_shadow, STAND, C_WLK | C_SUB | C_HID | C_DEL | C_PAR},
 	{"shine", do_shine, STAND, C_WLK},

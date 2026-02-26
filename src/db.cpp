@@ -413,6 +413,12 @@ void boot_db( void ) {
 
 	system_log( "Resetting the game time:", false );
 	reset_time();
+	
+	/* Load saved world time if it exists */
+	if (!load_world_time())
+	{
+		system_log("No saved world time found; using boot time.", false);
+	}
 
 	mm( "post reset_time" );
 
@@ -760,14 +766,18 @@ reset_time (void)
 		time_info.hour, time_info.day, time_info.month, time_info.year);
 	system_log (buf, false);
 
-	if (time_info.month == 0 || time_info.month == 1 || time_info.month == 11)
+	if (time_info.month == MONTH_LASTSEED
+		|| time_info.month == MONTH_PLOWBREAK
+		|| time_info.month == MONTH_SEEDWAKE)
 		time_info.season = WINTER;
-	else if (time_info.month < 11 && time_info.month > 7)
-		time_info.season = AUTUMN;
-	else if (time_info.month < 8 && time_info.month > 4)
+	else if (time_info.month >= MONTH_SPROUTMERE
+		&& time_info.month <= MONTH_SUNPRESS)
+		time_info.season = SPRING;
+	else if (time_info.month >= MONTH_FIRSTREAP
+		&& time_info.month <= MONTH_STUBBLEWAKE)
 		time_info.season = SUMMER;
 	else
-		time_info.season = SPRING;
+		time_info.season = AUTUMN;
 
 	for (i = 0; i <= 99; i++)
 	{
@@ -799,6 +809,79 @@ reset_time (void)
 	}
 
 	time_info.holiday = 0;
+}
+
+/*
+ * save_world_time()
+ * Saves current Korvessa time to lib/misc/world_time
+ * Format: year month day hour
+ */
+void save_world_time(void)
+{
+	FILE *fp;
+	char filename[MAX_STRING_LENGTH];
+	
+	sprintf(filename, "%s/world_time", PATH_MISC);
+	
+	if (!(fp = fopen(filename, "w")))
+	{
+		fprintf(stderr, "Error: Cannot save world time to %s\n", filename);
+		return;
+	}
+	
+	fprintf(fp, "%d %d %d %d\n", time_info.year, time_info.month, 
+	                              time_info.day, time_info.hour);
+	fclose(fp);
+	
+	/* system_log("World time saved.", false); */
+}
+
+/*
+ * load_world_time()
+ * Loads Korvessa time from lib/misc/world_time
+ * Returns 1 if successful, 0 if file not found or invalid
+ */
+int load_world_time(void)
+{
+	FILE *fp;
+	char filename[MAX_STRING_LENGTH];
+	int year, month, day, hour;
+	int result;
+	
+	sprintf(filename, "%s/world_time", PATH_MISC);
+	
+	if (!(fp = fopen(filename, "r")))
+	{
+		/* File doesn't exist - will use boot time */
+		return 0;
+	}
+	
+	result = fscanf(fp, "%d %d %d %d", &year, &month, &day, &hour);
+	fclose(fp);
+	
+	if (result != 4)
+	{
+		/* Invalid file format */
+		return 0;
+	}
+	
+	/* Validate ranges */
+	if (year < 1 || month < 0 || month >= NUM_MONTHS || 
+	    day < 1 || day > DAYS_PER_MONTH || 
+	    hour < 0 || hour >= HOURS_PER_DAY)
+	{
+		fprintf(stderr, "Warning: Invalid saved world time: %d %d %d %d\n", 
+		                 year, month, day, hour);
+		return 0;
+	}
+	
+	time_info.year = year;
+	time_info.month = month;
+	time_info.day = day;
+	time_info.hour = hour;
+	
+	system_log("World time restored from save file.", false);
+	return 1;
 }
 
 // Commenting out Reset_time to insert old version above -Nimrod 12 Sept 13
