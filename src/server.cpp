@@ -53,6 +53,22 @@ rpie::server::set_config (std::string var_name, std::string var_value = "true")
       else if (var_name == "server_port")
 	{
 	  server_port = strtol (var_value.c_str (), 0, 10);
+	  /* Auto-set mode based on port if using standard ports */
+	  if (server_port == 4500)
+	    {
+	      server_mode = mode_play;
+	      config_variables["server_mode"] = "play";
+	    }
+	  else if (server_port == 4501)
+	    {
+	      server_mode = mode_build;
+	      config_variables["server_mode"] = "build";
+	    }
+	  else if (server_port == 4502)
+	    {
+	      server_mode = mode_test;
+	      config_variables["server_mode"] = "test";
+	    }
 	}
     }
 }
