@@ -386,7 +386,7 @@ do_throw(CHAR_DATA* ch, char* argument, int cmd)
 				// Better your explosive skill is, quicker the grenade goes off - every 20 points is another
 				// second lost.
 				int grenade_counter = 6;
-				grenade_counter = MAX(1, grenade_counter - ((ch->skills[SKILL_EXPLOSIVES] + 10) / 20));
+				grenade_counter = MAX(1, grenade_counter - ((ch->skills[SKILL_THROWN] + 10) / 20));
 				tobj->o.grenade.status = 1;
 				add_second_affect(SA_GRENADE, grenade_counter, 0, tobj, 0, 0);
 				sprintf(buf, "You arm $p before hurling it %sward.", dirs[dir]);
@@ -910,9 +910,9 @@ projectile_shield_block(CHAR_DATA* ch, int result)
 
 	if ((shield_obj = get_equip(ch, WEAR_SHIELD)))
 	{
-		skill_use(ch, SKILL_DEFLECT, 0);
+		skill_use(ch, SKILL_PARRY, 0);
 		roll = number(1, SKILL_CEILING);
-		if (roll <= ch->skills[SKILL_DEFLECT])
+		if (roll <= ch->skills[SKILL_PARRY])
 		{
 			return 1;
 		}
