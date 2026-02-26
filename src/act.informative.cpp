@@ -5528,8 +5528,8 @@ render_minimap(CHAR_DATA *ch)
 	int visited[MAP_SIZE][MAP_SIZE];
 	int x, y, d, nx, ny;
 	ROOM_DATA *cur, *next;
-	char line[256];
-	char buf[MAX_STRING_LENGTH];
+	char line[512];
+	int pos;
 
 	/* Direction offsets: NORTH=0 (0,-1), EAST=1 (1,0), SOUTH=2 (0,1), WEST=3 (-1,0) */
 	const int dx[4] = {  0, 1, 0, -1 };
@@ -5593,32 +5593,27 @@ render_minimap(CHAR_DATA *ch)
 		}
 	}
 
-	/* Render the grid into output */
-	buf[0] = '\0';
-	strcat(buf, "\n");
+	/* Render the grid into output, line-by-line */
+	send_to_char("\n", ch);
 
 	for (y = 0; y < MAP_SIZE; y++) {
-		line[0] = '\0';
-		strcat(line, "  ");
+		pos = 0;
+		pos += sprintf(line + pos, "  ");
 		for (x = 0; x < MAP_SIZE; x++) {
 			if (x == MAP_RADIUS && y == MAP_RADIUS)
-				strcat(line, "#5@#0 ");
+				pos += sprintf(line + pos, "#5@#0 ");
 			else if (grid[y][x])
-				strcat(line, "#6[]#0");
+				pos += sprintf(line + pos, "#6[]#0");
 			else
-				strcat(line, "#1.#0 ");
+				pos += sprintf(line + pos, "#1.#0 ");
 		}
 		/* Append room name on the middle row */
 		if (y == MAP_RADIUS && ch->room->name) {
-			strcat(line, "  #6");
-			strcat(line, ch->room->name);
-			strcat(line, "#0");
+			pos += sprintf(line + pos, "  #6%.80s#0", ch->room->name);
 		}
-		strcat(line, "\n");
-		strcat(buf, line);
+		pos += sprintf(line + pos, "\n");
+		send_to_char(line, ch);
 	}
-
-	send_to_char(buf, ch);
 }
 
 void do_look(CHAR_DATA * ch, char *argument, int cmd) {
