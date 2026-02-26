@@ -7424,7 +7424,7 @@ void do_setdate( CHAR_DATA * ch, char *argument, int cmd ) {
 		send_to_char("       hour: 0-23\n", ch);
 		
 		sprintf(buf, "Current time: Year %d, %s %d, Hour %d\n",
-		        time_info.year, month_lkup[time_info.month], time_info.day, time_info.hour);
+		        time_info.year, short_month_name[time_info.month], time_info.day + 1, time_info.hour);
 		send_to_char(buf, ch);
 		return;
 	}
@@ -7458,8 +7458,9 @@ void do_setdate( CHAR_DATA * ch, char *argument, int cmd ) {
 		return;
 	}
 	
-	/* Convert 1-based month to 0-based for internal storage */
+	/* Convert 1-based inputs to 0-based for internal storage */
 	month--;
+	day--;
 	
 	/* Set the new time */
 	time_info.year = year;
@@ -7467,8 +7468,8 @@ void do_setdate( CHAR_DATA * ch, char *argument, int cmd ) {
 	time_info.day = day;
 	time_info.hour = hour;
 	
-	/* Update holiday lookup */
-	time_info.holiday = lookup_holiday(time_info.month, time_info.day);
+	/* Update holiday lookup (lookup_holiday expects 1-based day) */
+	time_info.holiday = lookup_holiday(time_info.month, time_info.day + 1);
 	
 	/* Reset the time update tracking */
 	next_hour_update = time(0) + 900;
@@ -7476,11 +7477,11 @@ void do_setdate( CHAR_DATA * ch, char *argument, int cmd ) {
 	
 	/* Announce the change */
 	sprintf(buf, "[IMMORTAL] %s setdate to Year %d, %s %d, Hour %d", 
-	        ch->name, time_info.year, month_lkup[time_info.month], time_info.day, time_info.hour);
+	        ch->name, time_info.year, short_month_name[time_info.month], time_info.day + 1, time_info.hour);
 	system_log(buf, true);
 	
 	sprintf(buf, "You set the Korvessa time to: Year %d, %s %d, Hour %d\n",
-	        time_info.year, month_lkup[time_info.month], time_info.day, time_info.hour);
+	        time_info.year, short_month_name[time_info.month], time_info.day + 1, time_info.hour);
 	send_to_char(buf, ch);
 }
 
