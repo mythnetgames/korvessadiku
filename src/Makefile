@@ -35,7 +35,7 @@ object_damage.h protos.h server.h structs.h trigram.h utils.h
 # default target
 ../bin/server: $(OBJS)
 	if test -f ../bin || install -v -d ../bin; then \
-$(CC) $(OBJS) -o $@ `mysql_config --cflags --libs` -lcrypt; fi
+	$(CC) -no-pie $(OBJS) -o $@ `mysql_config --cflags --libs` -lcrypt; fi
 
 %.o: %.cpp $(HEADERS)
 	$(CC) -c $(CFLAGS) $< $(PFLAGS)
