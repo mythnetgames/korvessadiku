@@ -7939,14 +7939,16 @@ time_string(CHAR_DATA * ch) {
 
 	/* Holiday annotation */
 	if (time_info.holiday >= 0) {
-		sprintf(buf + strlen(buf), "\n   #2%s#0 (%s).\n   %s",
+		sprintf(buf + strlen(buf), " #2%s#0 (%s). %s, year %d AH.",
 				holiday_table[time_info.holiday].name,
 				patron_name[holiday_table[time_info.holiday].patron],
+				season_desc[(int) time_info.month], time_info.year);
+		sprintf(buf + strlen(buf), "\n\n%s\n",
 				holiday_table[time_info.holiday].desc);
+	} else {
+		sprintf(buf + strlen(buf), " %s, year %d AH.\n",
+				season_desc[(int) time_info.month], time_info.year);
 	}
-
-	sprintf(buf + strlen(buf), " %s, year %d AH.\n",
-			season_desc[(int) time_info.month], time_info.year);
 
 	sprintf(time_str, "%s", buf);
 
