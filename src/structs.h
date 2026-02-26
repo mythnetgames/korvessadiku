@@ -1379,6 +1379,7 @@ typedef signed char shortint;
 #define SKILL_BLUDGEON      	5
 #define SKILL_DODGE		        6
 #define SKILL_PARRY           	7	/* Was DEFLECT */
+#define SKILL_DEFLECT           SKILL_PARRY  /* Compatibility alias */
 #define SKILL_SOLE_WIELD        8
 #define SKILL_DUAL_WIELD        9
 #define SKILL_AIM		        10	/* Ranged aiming (bows) */
