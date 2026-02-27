@@ -4186,6 +4186,15 @@ void
 
 
 	std::string player_db = engine.get_config ("player_db");
+
+	/* DEBUG: log what plr_flags we are about to save */
+	{
+		char dbgbuf[256];
+		sprintf(dbgbuf, "DEBUG save_char_mysql: saving %s plr_flags=%lu in_room=%d",
+			ch->tname, (unsigned long)ch->plr_flags, ch->in_room);
+		system_log(dbgbuf, false);
+	}
+
 	mysql_safe_query ("SELECT name FROM %s.pfiles WHERE name = '%s'",
 		player_db.c_str (), ch->tname);
 	result = mysql_store_result (database);
@@ -4194,6 +4203,7 @@ void
 	{
 		// Update an existing PC record.
 		mysql_free_result (result);
+		int query_result =
 		mysql_safe_query
 			("UPDATE %s.pfiles SET keywords = '%s', account = '%s', sdesc = '%s', ldesc = '%s', description = '%s', msg = '%s', create_comment = '%s', create_state = %d, "
 			"nanny_state = %d, role = %d, role_summary = '%s', role_body = '%s', role_date = '%s', role_poster = '%s', role_cost = %d, app_cost = %d, level = %d, sex = %d, deity = %d, "
@@ -4245,6 +4255,19 @@ void
 			(ch->d_feat1 ? ch->d_feat1 : NULL), (ch->d_feat2 ? ch->d_feat2 : NULL), (ch->d_feat3 ? ch->d_feat3 : NULL), (ch->d_feat4 ? ch->d_feat4 : NULL),
 			scents, aff_mod,
 			ch->tname);
+		/* DEBUG: log whether update succeeded */
+		{
+			char dbgbuf[256];
+			unsigned int myerr = mysql_errno(database);
+			sprintf(dbgbuf, "DEBUG save_char UPDATE result=%d mysql_error=%u for %s plrflags=%d",
+				query_result, myerr, ch->tname, (int)ch->plr_flags);
+			system_log(dbgbuf, false);
+			if (myerr)
+			{
+				const char *myerrmsg = mysql_error(database);
+				system_log(myerrmsg, true);
+			}
+		}
 		save_dreams (ch);
 	}
 	else
