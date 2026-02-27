@@ -32,18 +32,18 @@
 
 #define ENCRYPT_PASS		"w01fm3a7"
 
-#define STAFF_EMAIL		"staff@korvessa.net"
+#define STAFF_EMAIL		"mythnetgames@gmail.com"
 
-#define APP_EMAIL		"staff@korvessa.net"
-#define CODE_EMAIL		"staff@korvessa.net"
-#define PET_EMAIL		"staff@korvessa.net"
-#define REPORT_EMAIL		"staff@korvessa.net"
+#define APP_EMAIL		"mythnetgames@gmail.com"
+#define CODE_EMAIL		"mythnetgames@gmail.com"
+#define PET_EMAIL		"mythnetgames@gmail.com"
+#define REPORT_EMAIL		"mythnetgames@gmail.com"
 
 #define IMPLEMENTOR_ACCOUNT	"Holmes"
 #define SERVER_LOCATION		"http://korvessa.net"
 
 #define MUD_NAME		"Korvessa"
-#define MUD_EMAIL		"staff@korvessa.net"
+#define MUD_EMAIL		"mythnetgames@gmail.com"
 
 /* Be sure to define without trailing slashes! */
 
