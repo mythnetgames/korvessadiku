@@ -1,0 +1,9 @@
+God
+russell100
+set
+rinit 99 0
+rname 99 0 Test Room
+rdesc 99 0 This is a test room to verify zone persistence.
+zsave 99
+rlist 99
+quit

@@ -7,13 +7,13 @@ rpie::server::server ()
   // Set Defaults
   // Override these in your config file.
   set_config ("mysql_host", "localhost");
-  set_config ("mysql_user","blahblahblah");
-  set_config ("mysql_passwd", "blahblahblahblah");
+  set_config ("mysql_user","gameuser");
+  set_config ("mysql_passwd", "gamepass123");
 
   set_config ("engine_db", "rpi_engine");
   set_config ("player_db", "rpi_player");
   set_config ("player_log_db", "rpi_player_log");
-  set_config ("world_db", "rpi_player_log");
+  set_config ("world_db", "rpi_world_log");
   set_config ("world_log_db", "rpi_world_log");
 
   set_config ("server_mode", "test");
