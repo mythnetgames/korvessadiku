@@ -8,7 +8,7 @@ rpie::server::server ()
   // Override these in your config file.
   set_config ("mysql_host", "localhost");
   set_config ("mysql_user","gameuser");
-  set_config ("mysql_passwd", "gamepass123");
+  set_config ("mysql_passwd", "Korvessa2024Diku");
 
   set_config ("engine_db", "rpi_engine");
   set_config ("player_db", "rpi_player");
