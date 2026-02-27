@@ -3332,6 +3332,9 @@ nanny_choose_pc (DESCRIPTOR_DATA * d, char *argument)
 
     act ("$n enters the area.", true, d->character, 0, 0, TO_ROOM);
 
+    /* Save character to persist corrected room location */
+    save_char (d->character, false);
+
     sprintf (buf, "%s last entered the game %s\n",
              GET_NAME (d->character),
              d->character->pc->last_logon ?
