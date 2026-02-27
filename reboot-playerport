@@ -1,5 +1,6 @@
 #!/bin/bash
 # Reboot only the playerport (4500), keeping buildport (4501) running
+# This will reload all zones from the database on startup
 
 cd ~/RPI
 
@@ -7,10 +8,11 @@ echo "Killing playerport (4500)..."
 pkill -f "bin/server 4500"
 sleep 2
 
-echo "Removing lockfiles..."
-rm -f lib/booting lib/last_crash
+echo "Clearing lockfiles and zone cache to reload from database..."
+rm -f lib/booting lib/last_crash lib/temprooms lib/coldload_ids
+rm -f lib/save/* 2>/dev/null || true
 
-echo "Starting playerport (4500)..."
+echo "Starting playerport (4500) - loading all zones from database..."
 ./start-server pp > /tmp/pp.log 2>&1 &
 
 sleep 4
@@ -19,4 +21,5 @@ echo "Verifying playerport is up..."
 ss -tlnp | grep ':4500'
 ps aux | grep 'bin/server 4500' | grep -v grep
 
-echo "Done. Playerport restarted. Buildport (4501) remains running."
+echo "Done. Playerport restarted with all zones reloaded from database."
+echo "Buildport (4501) remains running with builder changes intact."

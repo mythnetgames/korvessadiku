@@ -12173,8 +12173,8 @@ void do_reboot(CHAR_DATA *ch, char *argument, int cmd)
 		return;
 	}
 
-	send_to_char("Rebooting the player port...\n", ch);
-	sprintf(s_buf, "%s has rebooted the server.\n", ch->name);
+	send_to_char("Rebooting the player port and reloading all zones from database...\n", ch);
+	sprintf(s_buf, "%s has rebooted the server (pulling all zones from database).\n", ch->name);
 	send_to_gods(s_buf);
 
 	system("~/RPI/reboot-playerport > /tmp/reboot.log 2>&1 &");
