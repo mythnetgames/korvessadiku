@@ -4207,13 +4207,13 @@ void
 		mysql_safe_query
 			("UPDATE %s.pfiles SET keywords = '%s', account = '%s', sdesc = '%s', ldesc = '%s', description = '%s', msg = '%s', create_comment = '%s', create_state = %d, "
 			"nanny_state = %d, role = %d, role_summary = '%s', role_body = '%s', role_date = '%s', role_poster = '%s', role_cost = %d, app_cost = %d, level = %d, sex = %d, deity = %d, "
-			"race = %d, room = %d, str = %d, intel = %d, wis = %d, con = %d, dex = %d, cha = %d, start_str = %d, start_intel = %d, start_wis = %d, start_con = %d, start_dex = %d, start_cha = %d, "
+			"race = %d, room = %d, str = %d, intel = %d, wil = %d, con = %d, dex = %d, aur = %d, agi = %d, start_str = %d, start_intel = %d, start_wil = %d, start_con = %d, start_dex = %d, start_aur = %d, start_agi = %d, "
 			"played = %d, birth = %d, time = %d, offense = %d, hit = %d, maxhit = %d, nat_attack_type = %d, move = %d, maxmove = %d, circle = %d, ppoints = %d, fightmode = %d, color = %d, "
 			"speaks = %d, flags = %d, plrflags = %d, boatvnum = %d, speed = %d, mountspeed = %d, sleepneeded = %d, autotoll = %d, coldload = %d, affectedby = %d, "
 			"affects = '%s', age = %d, intoxication = %d, hunger = %d, thirst = %d, height = %d, frame = %d, damage = %d, lastregen = %d, lastroom = %d, harness = %d, maxharness = %d, "
 			"lastlogon = %d, lastlogoff = %d, lastdis = %d, lastconnect = %d, lastdied = %d, hooded = %d, immenter = '%s', immleave = '%s', sitelie = '%s', voicestr = '%s', clans = '%s', skills = '%s', "
 			"wounds = '%s', lodged = '%s', writes = %d, profession = %d, was_in_room = %d, travelstr = '%s', bmi = %d, guardian_mode = %d, hire_storeroom = %d, hire_storeobj = %d, plan = '%s', goal = '%s', role_id = %d, power_level = %d, talents = %d, dmote = '%s', "
-			"d_age = '%s', d_eyes = '%s', d_length = '%s', d_color = '%s', d_style = '%s', d_height = '%s', d_frame = '%s', d_feat1 = '%s', d_feat2 = '%s', d_feat3 = '%s', d_feat4 = '%s', scents = '%s', aff_mod = '%s'"
+			"d_age = '%s', d_eyes = '%s', d_length = '%s', d_color = '%s', d_style = '%s', d_height = '%s', d_frame = '%s', d_feat1 = '%s', d_feat2 = '%s', d_feat3 = '%s', d_feat4 = '%s', scents = '%s', aff_mod = '%s' "
 			"WHERE name = '%s'",
 			player_db.c_str (), ch->name, ch->pc->account_name, ch->short_descr,
 			ch->long_descr, ch->description, ch->pc->msg,
@@ -4224,9 +4224,9 @@ void
 			ch->pc->special_role ? ch->pc->special_role->poster : "~",
 			ch->pc->special_role ? ch->pc->special_role->cost : 0,
 			ch->pc->app_cost, ch->pc->level, ch->sex, ch->deity, ch->race,
-			ch->in_room, ch->str, ch->intel, ch->wis, ch->con, ch->dex, ch->cha,
+			ch->in_room, ch->str, ch->intel, ch->wis, ch->con, ch->dex, ch->cha, 0,
 			ch->pc->start_str, ch->pc->start_intel, ch->pc->start_wis,
-			ch->pc->start_con, ch->pc->start_dex, ch->pc->start_cha,
+			ch->pc->start_con, ch->pc->start_dex, ch->pc->start_cha, 0,
 			(int) (ch->time.played + time (0) - ch->time.logon),
 			(int) ch->time.birth, (int) time (0), ch->offense, ch->hit,
 			ch->max_hit, ch->nat_attack_type, ch->move, ch->max_move, ch->circle,
@@ -4280,7 +4280,7 @@ void
 		mysql_safe_query
 			("INSERT INTO %s.pfiles (name, keywords, account, sdesc, ldesc, description, msg, create_comment, create_state, "
 			"nanny_state, role, role_summary, role_body, role_date, role_poster, role_cost, app_cost, level, sex, deity, "
-			"race, room, str, intel, wis, con, dex, cha, start_str, start_intel, start_wis, start_con, start_dex, start_cha, "
+			"race, room, str, intel, wil, con, dex, aur, agi, start_str, start_intel, start_wil, start_con, start_dex, start_aur, start_agi, "
 			"played, birth, time, offense, hit, maxhit, nat_attack_type, move, maxmove, circle, ppoints, fightmode, color, "
 			"speaks, flags, plrflags, boatvnum, speed, mountspeed, sleepneeded, autotoll, coldload, affectedby, "
 			"affects, age, intoxication, hunger, thirst, height, frame, damage, lastregen, lastroom, harness, maxharness, "
@@ -4289,7 +4289,7 @@ void
 			"d_age, d_eyes, d_length, d_color, d_style, d_height, d_frame, d_feat1, d_feat2, d_feat3, d_feat4, scents, aff_mod) VALUES "
 			"('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', %d, "
 			"%d, %d, '%s', '%s', '%s', '%s', %d, %d, %d, %d, %d, "
-			"%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, "
+			"%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, "
 			"%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, "
 			"%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, "
 			"'%s', %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, "
@@ -4307,9 +4307,9 @@ void
 			ch->pc->special_role ? ch->pc->special_role->poster : "~",
 			ch->pc->special_role ? ch->pc->special_role->cost : 0,
 			ch->pc->app_cost, ch->pc->level, ch->sex, ch->deity, ch->race,
-			ch->in_room, ch->str, ch->intel, ch->wis, ch->con, ch->dex, ch->cha,
+			ch->in_room, ch->str, ch->intel, ch->wis, ch->con, ch->dex, ch->cha, 0,
 			ch->pc->start_str, ch->pc->start_intel, ch->pc->start_wis,
-			ch->pc->start_con, ch->pc->start_dex, ch->pc->start_cha,
+			ch->pc->start_con, ch->pc->start_dex, ch->pc->start_cha, 0,
 			(int) (ch->time.played + time (0) - ch->time.logon),
 			(int) ch->time.birth, (int) time (0), ch->offense, ch->hit,
 			ch->max_hit, ch->nat_attack_type, ch->move, ch->max_move, ch->circle,
