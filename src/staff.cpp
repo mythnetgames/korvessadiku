@@ -12159,4 +12159,23 @@ void fetch_variable_categories ( char **var_list, int target, int target_type) {
     
   }
   return;
-} 
+}
+
+void do_reboot(CHAR_DATA *ch, char *argument, int cmd)
+{
+	if (!engine.in_play_mode()) {
+		send_to_char("The reboot command is only available on the player port.\n", ch);
+		return;
+	}
+
+	if (GET_TRUST(ch) < 3) {
+		send_to_char("You do not have permission to reboot the server.\n", ch);
+		return;
+	}
+
+	send_to_char("Rebooting the player port...\n", ch);
+	sprintf(s_buf, "%s has rebooted the server.\n", ch->name);
+	send_to_gods(s_buf);
+
+	system("~/RPI/reboot-playerport > /tmp/reboot.log 2>&1 &");
+}

@@ -651,6 +651,7 @@ void do_rgate (CHAR_DATA * ch, char *argument, int cmd);
 void do_rdelete (CHAR_DATA * ch, char *argument, int cmd);
 void do_radio (CHAR_DATA * ch, char *argument, int cmd);
 void do_reach (CHAR_DATA * ch, char *argument, int cmd);
+void do_reboot (CHAR_DATA * ch, char *argument, int cmd);
 void do_read (CHAR_DATA * ch, char *argument, int cmd);
 void do_recruit (CHAR_DATA * ch, char *argument, int cmd);
 void do_redesc (CHAR_DATA * ch, char *argument, int cmd);

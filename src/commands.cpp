@@ -508,6 +508,7 @@ const struct command_data commands[] =
 	{"vmob", do_mvariables, DEAD, C_LV1},
 	{"variables", do_variables, DEAD, C_LV1},
 	{"zsave", do_zsave, DEAD, C_LV1},
+	{"reboot", do_reboot, DEAD, C_LV1},
 
 	/*Advanced Builder Level 2:  (mobs and crafts) */
 	{"classify", do_classify, DEAD, C_LV2},
