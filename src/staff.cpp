@@ -11183,9 +11183,8 @@ void write_dynamic_registry( CHAR_DATA * ch ) {
 #define MAP_GRID_WIDTH ((MAP_MAX_RADIUS * 2) + 1)
 #define MAP_GRID_DEPTH 5
 
-void fill_map( ROOM_DATA * ptrRoom, int x, int y, int map[ MAP_GRID_DEPTH ][ MAP_GRID_WIDTH ][ MAP_GRID_WIDTH ] ) {
+void fill_map( ROOM_DATA * ptrRoom, int x, int y, int map[ MAP_GRID_DEPTH ][ MAP_GRID_WIDTH ][ MAP_GRID_WIDTH ], int radius ) {
 	int n = 0, e = 0, s = 0, w = 0;
-	static unsigned char radius = 0;
 	if ( x < 0 || x >= MAP_GRID_WIDTH || y < 0 || y >= MAP_GRID_WIDTH )
 		return;
 	ROOM_DIRECTION_DATA *ptrNExit = NULL;
@@ -11233,27 +11232,24 @@ void fill_map( ROOM_DATA * ptrRoom, int x, int y, int map[ MAP_GRID_DEPTH ][ MAP
 	if ( radius > MAP_MAX_RADIUS + 1 )
 		return;
 
-	radius++;
-
 	if ( n ) {
-		fill_map( vnum_to_room( n ), x, y - 1, map );
+		fill_map( vnum_to_room( n ), x, y - 1, map, radius + 1 );
 	}
 	if ( e ) {
-		fill_map( vnum_to_room( e ), x + 1, y, map );
+		fill_map( vnum_to_room( e ), x + 1, y, map, radius + 1 );
 	}
 	if ( s ) {
-		fill_map( vnum_to_room( s ), x, y + 1, map );
+		fill_map( vnum_to_room( s ), x, y + 1, map, radius + 1 );
 	}
 	if ( w ) {
-		fill_map( vnum_to_room( w ), x - 1, y, map );
+		fill_map( vnum_to_room( w ), x - 1, y, map, radius + 1 );
 	}
-	radius--;
 }
 
 void do_map( CHAR_DATA * ch, char *argument, int cmd ) {
 	int map[ MAP_GRID_DEPTH ][ MAP_GRID_WIDTH ][ MAP_GRID_WIDTH ];
-	char buf[ AVG_STRING_LENGTH * 2] = "";char
-	buf2[ AVG_STRING_LENGTH ] = "";
+	char buf[ MAX_STRING_LENGTH ] = "";
+	char buf2[ MAX_STRING_LENGTH ] = "";
 	char arg1[ AVG_STRING_LENGTH ] = "";
 	char bogy[ 4 ][ 2 ][ 6 ] = { { " ", " " }, { "#b(#0", "#b)#0" }, { "#d(#0", "#d)#0" }, { "#f(#0", "#f)#0" } };
 	const char strEWall[ 3 ][ 7 ] = { "#1X#0", " ", "#1|#0" };
@@ -11319,7 +11315,7 @@ void do_map( CHAR_DATA * ch, char *argument, int cmd ) {
 	x = MAP_MAX_RADIUS;
 	y = MAP_MAX_RADIUS;
 
-	fill_map( ch->room, x, y, map );
+	fill_map( ch->room, x, y, map, 0 );
 
 	strcpy( buf, "#0\n" );
 	for ( j = 0; j < MAP_GRID_WIDTH; j++ ) {
