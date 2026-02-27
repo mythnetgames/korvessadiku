@@ -1,0 +1,22 @@
+#!/bin/bash
+# Reboot only the playerport (4500), keeping buildport (4501) running
+
+cd ~/RPI
+
+echo "Killing playerport (4500)..."
+pkill -f "bin/server 4500"
+sleep 2
+
+echo "Removing lockfiles..."
+rm -f lib/booting lib/last_crash
+
+echo "Starting playerport (4500)..."
+./start-server pp > /tmp/pp.log 2>&1 &
+
+sleep 4
+
+echo "Verifying playerport is up..."
+ss -tlnp | grep ':4500'
+ps aux | grep 'bin/server 4500' | grep -v grep
+
+echo "Done. Playerport restarted. Buildport (4501) remains running."
