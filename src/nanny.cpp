@@ -2939,7 +2939,11 @@ nanny_choose_pc (DESCRIPTOR_DATA * d, char *argument)
                 if (loaded_list)
                 {
                     if (!str_cmp (loaded_list->tname, row[0]))
+                    {
+                        ch = loaded_list;
                         loaded_list = loaded_list->next;
+                        unload_pc (ch);
+                    }
                     else
                     {
                         for (ch = loaded_list; ch->next; ch = ch->next)
@@ -2948,7 +2952,9 @@ nanny_choose_pc (DESCRIPTOR_DATA * d, char *argument)
                                 break;
                             if (!str_cmp (GET_NAME (ch->next), row[0]))
                             {
+                                CHAR_DATA *victim = ch->next;
                                 ch->next = ch->next->next;
+                                unload_pc (victim);
                                 break;
                             }
                         }
