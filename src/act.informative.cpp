@@ -5644,6 +5644,13 @@ render_minimap(CHAR_DATA *ch)
 	}
 }
 
+void do_minimap(CHAR_DATA *ch, char *argument, int cmd)
+{
+	if (IS_NPC(ch))
+		return;
+	render_minimap(ch);
+}
+
 void do_look(CHAR_DATA * ch, char *argument, int cmd) {
 	int temp = 0;
 	int dir = 0;

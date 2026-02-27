@@ -469,7 +469,7 @@ const struct command_data commands[] =
 	{"gstat", do_gstat, DEAD, C_LV1},
 	{"invis", do_invis, DEAD, C_LV1},
 	{"immcommands", do_immcommands, DEAD, C_LV1},
-	{"map", do_map, DEAD, C_LV1}, /* staff.c */
+	{"map", do_minimap, DEAD, 0}, /* act.informative.cpp */
 	{"monitor", do_monitor, DEAD, C_LV1}, /* Monitor command - Shade */
 	{"object", do_object, DEAD, C_LV1},
 	{"oinit", do_oinit, DEAD, C_LV1},

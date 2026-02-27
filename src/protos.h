@@ -492,6 +492,7 @@ void do_east (CHAR_DATA * ch, char *argument, int cmd);
 void do_echo (CHAR_DATA * ch, char *argument, int cmd);
 void do_debugecho (char *argument);
 void do_map (CHAR_DATA * ch, char *argument, int cmd);
+void do_minimap (CHAR_DATA * ch, char *argument, int cmd);
 void do_edit (CHAR_DATA * ch, char *argument, int cmd);
 void do_email (CHAR_DATA * ch, char *argument, int cmd);
 void do_emote (CHAR_DATA * ch, char *argument, int cmd);
